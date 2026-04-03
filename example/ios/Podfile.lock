@@ -1,0 +1,42 @@
+PODS:
+  - Flutter (1.0.0)
+  - flutter_angle (0.3.9):
+    - Flutter
+    - FlutterAngle (~> 0.0.8)
+    - FlutterMacOS
+  - FlutterAngle (0.0.8)
+  - integration_test (0.0.1):
+    - Flutter
+  - rapier_physics (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - flutter_angle (from `.symlinks/plugins/flutter_angle/darwin`)
+  - integration_test (from `.symlinks/plugins/integration_test/ios`)
+  - rapier_physics (from `.symlinks/plugins/rapier_physics/ios`)
+
+SPEC REPOS:
+  trunk:
+    - FlutterAngle
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  flutter_angle:
+    :path: ".symlinks/plugins/flutter_angle/darwin"
+  integration_test:
+    :path: ".symlinks/plugins/integration_test/ios"
+  rapier_physics:
+    :path: ".symlinks/plugins/rapier_physics/ios"
+
+SPEC CHECKSUMS:
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  flutter_angle: 290cf0e9610f10ee5e5a77e0a1e43885aa02ae3b
+  FlutterAngle: c810891af800750361b1d0e7cc944f2338d5ae18
+  integration_test: 4a889634ef21a45d28d50d622cf412dc6d9f586e
+  rapier_physics: bb462fb4a35b02ce328177bfe45200f5bc347dd6
+
+PODFILE CHECKSUM: 3c63482e143d1b91d2d2560aee9fb04ecc74ac7e
+
+COCOAPODS: 1.16.2

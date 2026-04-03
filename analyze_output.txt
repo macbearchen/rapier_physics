@@ -1,0 +1,50 @@
+Analyzing rapier_physics...                                     
+
+   info • Don't invoke 'print' in production code • example/lib/main.dart:11:3 • avoid_print
+   info • Don't invoke 'print' in production code • example/lib/main.dart:31:3 • avoid_print
+   info • Don't invoke 'print' in production code • example/lib/main.dart:32:3 • avoid_print
+   info • Don't invoke 'print' in production code • example/lib/main.dart:33:3 • avoid_print
+   info • Don't invoke 'print' in production code • example/lib/main.dart:34:3 • avoid_print
+   info • Don't invoke 'print' in production code • example/lib/main.dart:40:7 • avoid_print
+   info • Don't invoke 'print' in production code • example/lib/main.dart:46:3 • avoid_print
+   info • Don't invoke 'print' in production code • example/lib/main.dart:47:3 • avoid_print
+   info • Don't invoke 'print' in production code • example/lib/main.dart:48:3 • avoid_print
+   info • Don't invoke 'print' in production code • example/lib/main.dart:49:3 • avoid_print
+   info • The variable name 'rapier_init' isn't a lowerCamelCase identifier • lib/src/web/rapier_web_interop.dart:4:20 • non_constant_identifier_names
+   info • The variable name 'rapier_version' isn't a lowerCamelCase identifier • lib/src/web/rapier_web_interop.dart:7:19 • non_constant_identifier_names
+   info • The variable name 'rapier_world_create' isn't a lowerCamelCase identifier • lib/src/web/rapier_web_interop.dart:10:19 • non_constant_identifier_names
+   info • The variable name 'rapier_world_step' isn't a lowerCamelCase identifier • lib/src/web/rapier_web_interop.dart:13:15 • non_constant_identifier_names
+   info • The variable name 'rapier_create_rigid_body' isn't a lowerCamelCase identifier • lib/src/web/rapier_web_interop.dart:16:19 • non_constant_identifier_names
+   info • The variable name 'rapier_create_box_collider' isn't a lowerCamelCase identifier • lib/src/web/rapier_web_interop.dart:25:15 • non_constant_identifier_names
+   info • The variable name 'rapier_create_sphere_collider' isn't a lowerCamelCase identifier • lib/src/web/rapier_web_interop.dart:34:15 • non_constant_identifier_names
+   info • The variable name 'rapier_create_cylinder_collider' isn't a lowerCamelCase identifier • lib/src/web/rapier_web_interop.dart:41:15 • non_constant_identifier_names
+   info • The variable name 'rapier_create_capsule_collider' isn't a lowerCamelCase identifier • lib/src/web/rapier_web_interop.dart:49:15 • non_constant_identifier_names
+   info • The variable name 'rapier_get_body_position_x' isn't a lowerCamelCase identifier • lib/src/web/rapier_web_interop.dart:58:19 • non_constant_identifier_names
+   info • The variable name 'rapier_get_body_position_y' isn't a lowerCamelCase identifier • lib/src/web/rapier_web_interop.dart:60:19 • non_constant_identifier_names
+   info • The variable name 'rapier_get_body_position_z' isn't a lowerCamelCase identifier • lib/src/web/rapier_web_interop.dart:62:19 • non_constant_identifier_names
+   info • The variable name 'rapier_get_body_rotation_x' isn't a lowerCamelCase identifier • lib/src/web/rapier_web_interop.dart:65:19 • non_constant_identifier_names
+   info • The variable name 'rapier_get_body_rotation_y' isn't a lowerCamelCase identifier • lib/src/web/rapier_web_interop.dart:67:19 • non_constant_identifier_names
+   info • The variable name 'rapier_get_body_rotation_z' isn't a lowerCamelCase identifier • lib/src/web/rapier_web_interop.dart:69:19 • non_constant_identifier_names
+   info • The variable name 'rapier_get_body_rotation_w' isn't a lowerCamelCase identifier • lib/src/web/rapier_web_interop.dart:71:19 • non_constant_identifier_names
+   info • The variable name 'rapier_set_body_position' isn't a lowerCamelCase identifier • lib/src/web/rapier_web_interop.dart:74:15 • non_constant_identifier_names
+   info • The variable name 'rapier_set_body_rotation' isn't a lowerCamelCase identifier • lib/src/web/rapier_web_interop.dart:83:15 • non_constant_identifier_names
+   info • The variable name 'rapier_init' isn't a lowerCamelCase identifier • lib/src/web/rapier_web_interop_stub.dart:3:9 • non_constant_identifier_names
+   info • The variable name 'rapier_version' isn't a lowerCamelCase identifier • lib/src/web/rapier_web_interop_stub.dart:4:9 • non_constant_identifier_names
+   info • The variable name 'rapier_world_create' isn't a lowerCamelCase identifier • lib/src/web/rapier_web_interop_stub.dart:5:9 • non_constant_identifier_names
+   info • The variable name 'rapier_world_step' isn't a lowerCamelCase identifier • lib/src/web/rapier_web_interop_stub.dart:6:6 • non_constant_identifier_names
+   info • The variable name 'rapier_create_rigid_body' isn't a lowerCamelCase identifier • lib/src/web/rapier_web_interop_stub.dart:7:9 • non_constant_identifier_names
+   info • The variable name 'rapier_create_box_collider' isn't a lowerCamelCase identifier • lib/src/web/rapier_web_interop_stub.dart:15:6 • non_constant_identifier_names
+   info • The variable name 'rapier_create_sphere_collider' isn't a lowerCamelCase identifier • lib/src/web/rapier_web_interop_stub.dart:23:6 • non_constant_identifier_names
+   info • The variable name 'rapier_create_cylinder_collider' isn't a lowerCamelCase identifier • lib/src/web/rapier_web_interop_stub.dart:29:6 • non_constant_identifier_names
+   info • The variable name 'rapier_create_capsule_collider' isn't a lowerCamelCase identifier • lib/src/web/rapier_web_interop_stub.dart:36:6 • non_constant_identifier_names
+   info • The variable name 'rapier_get_body_position_x' isn't a lowerCamelCase identifier • lib/src/web/rapier_web_interop_stub.dart:44:9 • non_constant_identifier_names
+   info • The variable name 'rapier_get_body_position_y' isn't a lowerCamelCase identifier • lib/src/web/rapier_web_interop_stub.dart:45:9 • non_constant_identifier_names
+   info • The variable name 'rapier_get_body_position_z' isn't a lowerCamelCase identifier • lib/src/web/rapier_web_interop_stub.dart:46:9 • non_constant_identifier_names
+   info • The variable name 'rapier_get_body_rotation_x' isn't a lowerCamelCase identifier • lib/src/web/rapier_web_interop_stub.dart:48:9 • non_constant_identifier_names
+   info • The variable name 'rapier_get_body_rotation_y' isn't a lowerCamelCase identifier • lib/src/web/rapier_web_interop_stub.dart:49:9 • non_constant_identifier_names
+   info • The variable name 'rapier_get_body_rotation_z' isn't a lowerCamelCase identifier • lib/src/web/rapier_web_interop_stub.dart:50:9 • non_constant_identifier_names
+   info • The variable name 'rapier_get_body_rotation_w' isn't a lowerCamelCase identifier • lib/src/web/rapier_web_interop_stub.dart:51:9 • non_constant_identifier_names
+   info • The variable name 'rapier_set_body_position' isn't a lowerCamelCase identifier • lib/src/web/rapier_web_interop_stub.dart:53:6 • non_constant_identifier_names
+   info • The variable name 'rapier_set_body_rotation' isn't a lowerCamelCase identifier • lib/src/web/rapier_web_interop_stub.dart:61:6 • non_constant_identifier_names
+
+46 issues found. (ran in 1.4s)

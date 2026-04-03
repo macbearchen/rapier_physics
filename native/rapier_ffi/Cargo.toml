@@ -1,0 +1,12 @@
+[package]
+name = "rapier_ffi"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "rapier_ffi"
+crate-type = ["staticlib", "cdylib"]   # staticlib for iOS, cdylib for macOS/Linux
+
+[dependencies]
+rapier3d = "0.18"
+nalgebra = "0.32"
