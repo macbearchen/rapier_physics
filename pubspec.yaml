@@ -1,8 +1,14 @@
 name: rapier_physics
 description: A high-performance 3D physics engine for Flutter, powered by Rapier (Rust/WASM).
 version: 0.1.0
-homepage: https://github.com/your_username/rapier_physics # 修改為您的專案首頁
-repository: https://github.com/your_username/rapier_physics # 修改為您的 Git 倉庫
+homepage: https://github.com/macbearchen/rapier_physics # 修改為您的專案首頁
+repository: https://github.com/macbearchen/rapier_physics # 修改為您的 Git 倉庫
+topics:
+  - rapier
+  - physics
+  - rust
+  - wasm
+  - macbear
 
 environment:
   sdk: ^3.11.0

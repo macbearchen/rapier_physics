@@ -12,15 +12,27 @@ A high-performance physics engine for Flutter, powered by [Rapier](https://rapie
 
 ## Getting Started
 
-### 1. Build Native Libraries
-To use the plugin on native platforms or the web, you must first compile the Rust FFI layer.
+### Setup
 
-```bash
-cd native/rapier_ffi
-./build.sh
-```
+Choose one of the following methods to set up the native libraries:
+
+#### 1. Use Prebuilt Library
+If you prefer not to build from source, you can use the prebuilt binaries provided in the repository.
+
+#### 2. Build by Yourself
+To build the library from source, follow these steps:
+
+**Install Cargo**
+2-1. `curl https://sh.rustup.rs -sSf | sh`
+2-2. `source $HOME/.cargo/env`
+2-3. `cargo --version`
+
+**Build Library**
+2-4. `cd native/rapier_ffi`
+2-5. `/build.sh`
 
 This script will:
+
 - Compile `.so` files for Android and place them in `android/src/main/jniLibs`.
 - Compile `.a` files for iOS/macOS and create a `.xcframework`.
 - Compile `.wasm` for the Web and place it in the example project.
