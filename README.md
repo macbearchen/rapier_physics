@@ -1,5 +1,7 @@
 # Rapier Physics for Flutter
 
+[繁體中文](./README_zh.md)
+
 A high-performance physics engine for Flutter, powered by [Rapier](https://rapier.rs/). This plugin provides cross-platform support for 3D physics simulation using Rust and WebAssembly.
 
 ## Features
@@ -7,7 +9,12 @@ A high-performance physics engine for Flutter, powered by [Rapier](https://rapie
 - **Cross-Platform**: Support for Android, iOS, macOS, and Web.
 - **High Performance**: Core physics simulation written in Rust.
 - **Flexible Physics**: Support for various rigid body types (Dynamic, Fixed, Kinematic).
-- **Colliders**: Box, Sphere, Cylinder, and Capsule colliders.
+- **Force & Impulse**: Full support for `addForce`, `applyImpulse`, and their `AtPoint` variants.
+- **Velocity Control**: Set linear and angular velocities directly for precise state control.
+- **Colliders**: Box, Sphere, Cylinder, Capsule, Cone, and **Heightfield** colliders.
+- **Joints Support**: Fixed, Spherical, Revolute, Prismatic, and Rope joints with motor support.
+- **Lifecycle Management**: Robust API for adding and **removing** rigid bodies, colliders, and joints with automatic relationship cleanup.
+- **CCD**: Continuous Collision Detection for high-speed simulation.
 - **Modern Web Support**: Efficient WASM implementation using `dart:js_interop`.
 
 ## Getting Started
@@ -23,13 +30,13 @@ If you prefer not to build from source, you can use the prebuilt binaries provid
 To build the library from source, follow these steps:
 
 **Install Cargo**
-2-1. `curl https://sh.rustup.rs -sSf | sh`
-2-2. `source $HOME/.cargo/env`
-2-3. `cargo --version`
+- 2-1. `curl https://sh.rustup.rs -sSf | sh`
+- 2-2. `source $HOME/.cargo/env`
+- 2-3. `cargo --version`
 
 **Build Library**
-2-4. `cd native/rapier_ffi`
-2-5. `/build.sh`
+- 2-4. `cd native/rapier_ffi`
+- 2-5. `./build.sh`
 
 This script will:
 

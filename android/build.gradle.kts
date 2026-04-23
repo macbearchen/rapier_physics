@@ -1,5 +1,5 @@
 group = "com.example.rapier_physics"
-version = "1.0-SNAPSHOT"
+version = "0.2.0"
 
 buildscript {
     val kotlinVersion = "2.2.20"

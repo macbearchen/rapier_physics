@@ -5,13 +5,20 @@ PODS:
     - FlutterMacOS
   - FlutterAngle (0.0.8)
   - FlutterMacOS (1.0.0)
+  - macbear_3d (0.8.0):
+    - FlutterMacOS
   - rapier_physics (0.0.1):
+    - FlutterMacOS
+  - video_player_avfoundation (0.0.1):
+    - Flutter
     - FlutterMacOS
 
 DEPENDENCIES:
   - flutter_angle (from `Flutter/ephemeral/.symlinks/plugins/flutter_angle/darwin`)
   - FlutterMacOS (from `Flutter/ephemeral`)
+  - macbear_3d (from `Flutter/ephemeral/.symlinks/plugins/macbear_3d/macos`)
   - rapier_physics (from `Flutter/ephemeral/.symlinks/plugins/rapier_physics/macos`)
+  - video_player_avfoundation (from `Flutter/ephemeral/.symlinks/plugins/video_player_avfoundation/darwin`)
 
 SPEC REPOS:
   trunk:
@@ -22,14 +29,20 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/flutter_angle/darwin
   FlutterMacOS:
     :path: Flutter/ephemeral
+  macbear_3d:
+    :path: Flutter/ephemeral/.symlinks/plugins/macbear_3d/macos
   rapier_physics:
     :path: Flutter/ephemeral/.symlinks/plugins/rapier_physics/macos
+  video_player_avfoundation:
+    :path: Flutter/ephemeral/.symlinks/plugins/video_player_avfoundation/darwin
 
 SPEC CHECKSUMS:
   flutter_angle: fd425c2f11c130891a5e87a0dad8de8815413b43
   FlutterAngle: c810891af800750361b1d0e7cc944f2338d5ae18
   FlutterMacOS: d0db08ddef1a9af05a5ec4b724367152bb0500b1
-  rapier_physics: d6fce44f10ef29e18c1c1d45aa6c4f6c5238cb38
+  macbear_3d: 701dbe77f689d224428f84b0a8f48d5f13d4f3d3
+  rapier_physics: 4a370222d1e1d654f6895ecf2aa450f5b0958761
+  video_player_avfoundation: 7993f492ae0bd77edaea24d9dc051d8bb2cd7c86
 
 PODFILE CHECKSUM: 54d867c82ac51cbd61b565781b9fada492027009
 

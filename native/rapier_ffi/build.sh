@@ -9,7 +9,7 @@ DIST_android=../../android/src/main/jniLibs
 mkdir -p $DIST
 
 # ===== Android NDK =====
-export ANDROID_NDK_HOME=${ANDROID_NDK_HOME:-"$HOME/Library/Android/sdk/ndk/29.0.13846066"}
+export ANDROID_NDK_HOME=${ANDROID_NDK_HOME:-"$HOME/Library/Android/sdk/ndk/29.0.14206865"}
 export ANDROID_API_LEVEL=28
 
 # ===== Clean =====

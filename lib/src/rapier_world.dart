@@ -1,25 +1,43 @@
+import 'dart:typed_data';
 import 'bindings/rapier_bindings.dart';
 import 'bindings/rapier_bindings_stub.dart'
     if (dart.library.ffi) 'bindings/rapier_bindings_ffi.dart'
-    if (dart.library.js_interop) 'bindings/rapier_bindings_web.dart' as bindings;
+    if (dart.library.js_interop) 'bindings/rapier_bindings_web.dart'
+    as rapier_bindings;
 
-import 'package:vector_math/vector_math.dart';
+import 'package:vector_math/vector_math.dart' show Vector3, Quaternion;
 export 'package:vector_math/vector_math.dart' show Vector3, Quaternion;
-import 'rigid_body.dart';
+
 import 'collider.dart';
+import 'joint.dart';
+import 'joint_axis.dart';
+import 'rigid_body.dart';
 import 'rigid_body_type.dart';
 
 class RapierWorld {
   late RapierBindings _bindings;
   int _worldHandle = 0;
+  int _groundBodyHandle = 0;
+
+  int get worldHandle => _worldHandle;
+  RapierBindings get bindings => _bindings;
+
+  RigidBody get groundBody => RigidBody(_groundBodyHandle, this);
+
+  final Map<RigidBody, List<Collider>> _bodyColliders = {};
+  final Map<RigidBody, List<Joint>> _bodyJoints = {};
+  final List<RigidBody> _bodies = [];
+  final List<Collider> _colliders = [];
+  final List<Joint> _joints = [];
 
   RapierWorld() {
-    _bindings = bindings.RapierBindingsImpl();
+    _bindings = rapier_bindings.RapierBindingsImpl();
   }
 
   Future<void> init({Vector3? gravity}) async {
     await _bindings.init();
     _worldHandle = _bindings.createWorld();
+    _groundBodyHandle = _bindings.createRigidBody(_worldHandle, 0, 0, 0, RigidBodyType.fixed);
     if (gravity != null) {
       setGravity(gravity.x, gravity.y, gravity.z);
     }
@@ -31,6 +49,14 @@ class RapierWorld {
     }
   }
 
+  void destroy() {
+    if (_worldHandle != 0) {
+      _bindings.destroyWorld(_worldHandle);
+      _worldHandle = 0;
+      _groundBodyHandle = 0;
+    }
+  }
+
   String get version => _bindings.getVersion();
 
   void step() {
@@ -39,30 +65,16 @@ class RapierWorld {
     }
   }
 
-  Vector3 getBodyPosition(int bodyHandle) {
-    return _bindings.getBodyPosition(_worldHandle, bodyHandle);
-  }
-
-  Quaternion getBodyRotation(int bodyHandle) {
-    return _bindings.getBodyRotation(_worldHandle, bodyHandle);
-  }
-
-  void setBodyPosition(int bodyHandle, double x, double y, double z) {
-    _bindings.setBodyPosition(_worldHandle, bodyHandle, x, y, z);
-  }
-
-  void setBodyRotation(int bodyHandle, double x, double y, double z, double w) {
-    _bindings.setBodyRotation(_worldHandle, bodyHandle, x, y, z, w);
-  }
-
   RigidBody createRigidBody(double x, double y, double z, {RigidBodyType type = RigidBodyType.dynamic}) {
-    final handle = createRigidBodyHandle(x, y, z, type: type);
-    return RigidBody(handle, this);
+    final handle = _bindings.createRigidBody(_worldHandle, x, y, z, type);
+    final body = RigidBody(handle, this);
+    _bodies.add(body);
+    return body;
   }
 
-  int createRigidBodyHandle(double x, double y, double z, {RigidBodyType type = RigidBodyType.dynamic}) {
-    return _bindings.createRigidBody(_worldHandle, x, y, z, type);
-  }
+  //--------------------------
+  // add rigid body with collider related
+  //--------------------------
 
   RigidBody addBox({
     required double x,
@@ -103,6 +115,19 @@ class RapierWorld {
     return body;
   }
 
+  RigidBody addCone({
+    required double x,
+    required double y,
+    required double z,
+    required double halfHeight,
+    required double radius,
+    RigidBodyType type = RigidBodyType.dynamic,
+  }) {
+    final body = createRigidBody(x, y, z, type: type);
+    createConeCollider(body, halfHeight, radius);
+    return body;
+  }
+
   RigidBody addCapsule({
     required double x,
     required double y,
@@ -116,23 +141,423 @@ class RapierWorld {
     return body;
   }
 
+  RigidBody addHeightfield({
+    required double x,
+    required double y,
+    required double z,
+    required Float32List heights,
+    required int nrows,
+    required int ncols,
+    required Vector3 scale,
+    RigidBodyType type = RigidBodyType.fixed,
+  }) {
+    final body = createRigidBody(x, y, z, type: type);
+    createHeightfieldCollider(body, heights, nrows, ncols, scale);
+    return body;
+  }
+
+  //--------------------------
+  // create collider by shape type
+  //--------------------------
+
   Collider createBoxCollider(RigidBody body, double hx, double hy, double hz) {
-    _bindings.createBoxCollider(_worldHandle, body.handle, hx, hy, hz);
-    return Collider(body);
+    final handle = _bindings.createBoxCollider(_worldHandle, body.handle, hx, hy, hz);
+    final collider = BoxCollider(handle, body, hx, hy, hz);
+    _registerCollider(collider);
+    return collider;
   }
 
   Collider createSphereCollider(RigidBody body, double radius) {
-    _bindings.createSphereCollider(_worldHandle, body.handle, radius);
-    return Collider(body);
+    final handle = _bindings.createSphereCollider(_worldHandle, body.handle, radius);
+    final collider = SphereCollider(handle, body, radius);
+    _registerCollider(collider);
+    return collider;
   }
 
   Collider createCylinderCollider(RigidBody body, double halfHeight, double radius) {
-    _bindings.createCylinderCollider(_worldHandle, body.handle, halfHeight, radius);
-    return Collider(body);
+    final handle = _bindings.createCylinderCollider(_worldHandle, body.handle, halfHeight, radius);
+    final collider = CylinderCollider(handle, body, halfHeight, radius);
+    _registerCollider(collider);
+    return collider;
+  }
+
+  Collider createConeCollider(RigidBody body, double halfHeight, double radius) {
+    final handle = _bindings.createConeCollider(_worldHandle, body.handle, halfHeight, radius);
+    final collider = ConeCollider(handle, body, halfHeight, radius);
+    _registerCollider(collider);
+    return collider;
   }
 
   Collider createCapsuleCollider(RigidBody body, double halfHeight, double radius) {
-    _bindings.createCapsuleCollider(_worldHandle, body.handle, halfHeight, radius);
-    return Collider(body);
+    final handle = _bindings.createCapsuleCollider(_worldHandle, body.handle, halfHeight, radius);
+    final collider = CapsuleCollider(handle, body, halfHeight, radius);
+    _registerCollider(collider);
+    return collider;
+  }
+
+  Collider createHeightfieldCollider(RigidBody body, Float32List heights, int nrows, int ncols, Vector3 scale) {
+    final handle = _bindings.createHeightfieldCollider(
+      _worldHandle,
+      body.handle,
+      heights,
+      nrows,
+      ncols,
+      scale.x,
+      scale.y,
+      scale.z,
+    );
+    final collider = HeightfieldCollider(handle, body);
+    _registerCollider(collider);
+    return collider;
+  }
+
+  //--------------------------
+  // register collider, joint mapping related
+  //--------------------------
+
+  void _registerCollider(Collider collider) {
+    _colliders.add(collider);
+    _bodyColliders.putIfAbsent(collider.body, () => []).add(collider);
+  }
+
+  /// Returns all colliders attached to a given rigid body.
+  List<Collider> getBodyColliders(RigidBody body) => _bodyColliders[body] ?? [];
+
+  void _registerJoint(Joint joint) {
+    _joints.add(joint);
+    _bodyJoints.putIfAbsent(joint.body1, () => []).add(joint);
+    _bodyJoints.putIfAbsent(joint.body2, () => []).add(joint);
+  }
+
+  /// Returns all joints attached to a given rigid body.
+  List<Joint> getBodyJoints(RigidBody body) => _bodyJoints[body] ?? [];
+
+  //--------------------------
+  // add joint related
+  //--------------------------
+
+  /// Fixed joint — locks two bodies with no relative movement.
+  FixedJoint addFixedJoint(
+    RigidBody body1,
+    RigidBody body2,
+    Vector3 anchor1,
+    Quaternion rot1,
+    Vector3 anchor2,
+    Quaternion rot2,
+  ) {
+    final handle = _bindings.createFixedJoint(
+      _worldHandle,
+      body1.handle,
+      body2.handle,
+      anchor1.x,
+      anchor1.y,
+      anchor1.z,
+      rot1.x,
+      rot1.y,
+      rot1.z,
+      rot1.w,
+      anchor2.x,
+      anchor2.y,
+      anchor2.z,
+      rot2.x,
+      rot2.y,
+      rot2.z,
+      rot2.w,
+    );
+    final joint = FixedJoint(handle, body1, body2);
+    _registerJoint(joint);
+    return joint;
+  }
+
+  /// Spherical joint — allows free rotation in all directions (ball-and-socket).
+  SphericalJoint addSphericalJoint(RigidBody body1, RigidBody body2, Vector3 anchor1, Vector3 anchor2) {
+    final handle = _bindings.createSphericalJoint(
+      _worldHandle,
+      body1.handle,
+      body2.handle,
+      anchor1.x,
+      anchor1.y,
+      anchor1.z,
+      anchor2.x,
+      anchor2.y,
+      anchor2.z,
+    );
+    final joint = SphericalJoint(handle, body1, body2);
+    _registerJoint(joint);
+    return joint;
+  }
+
+  /// Revolute joint — allows rotation around a single axis (hinge).
+  RevoluteJoint addRevoluteJoint(RigidBody body1, RigidBody body2, Vector3 axis, Vector3 anchor1, Vector3 anchor2) {
+    final handle = _bindings.createRevoluteJoint(
+      _worldHandle,
+      body1.handle,
+      body2.handle,
+      axis.x,
+      axis.y,
+      axis.z,
+      anchor1.x,
+      anchor1.y,
+      anchor1.z,
+      anchor2.x,
+      anchor2.y,
+      anchor2.z,
+    );
+    final joint = RevoluteJoint(handle, body1, body2, axis);
+    _registerJoint(joint);
+    return joint;
+  }
+
+  /// Prismatic joint — allows translation along a single axis (slider).
+  PrismaticJoint addPrismaticJoint(RigidBody body1, RigidBody body2, Vector3 axis, Vector3 anchor1, Vector3 anchor2) {
+    final handle = _bindings.createPrismaticJoint(
+      _worldHandle,
+      body1.handle,
+      body2.handle,
+      axis.x,
+      axis.y,
+      axis.z,
+      anchor1.x,
+      anchor1.y,
+      anchor1.z,
+      anchor2.x,
+      anchor2.y,
+      anchor2.z,
+    );
+    final joint = PrismaticJoint(handle, body1, body2, axis);
+    _registerJoint(joint);
+    return joint;
+  }
+
+  /// Generic joint — all axes configurable via [lockJointAxis] and [setJointLimits].
+  GenericJoint addGenericJoint(RigidBody body1, RigidBody body2, Vector3 anchor1, Vector3 anchor2) {
+    final handle = _bindings.createGenericJoint(
+      _worldHandle,
+      body1.handle,
+      body2.handle,
+      anchor1.x,
+      anchor1.y,
+      anchor1.z,
+      anchor2.x,
+      anchor2.y,
+      anchor2.z,
+    );
+    final joint = GenericJoint(handle, body1, body2);
+    _registerJoint(joint);
+    return joint;
+  }
+
+  /// Rope joint — constrains two bodies within a maximum distance.
+  RopeJoint addRopeJoint(RigidBody body1, RigidBody body2, Vector3 anchor1, Vector3 anchor2, double maxDistance) {
+    final handle = _bindings.createRopeJoint(
+      _worldHandle,
+      body1.handle,
+      body2.handle,
+      anchor1.x,
+      anchor1.y,
+      anchor1.z,
+      anchor2.x,
+      anchor2.y,
+      anchor2.z,
+      maxDistance,
+    );
+    final joint = RopeJoint(handle, body1, body2, maxDistance);
+    _registerJoint(joint);
+    return joint;
+  }
+
+  //--------------------------
+  // add joint to world related
+  //--------------------------
+
+  /// Pins [body] to a fixed frame using a [FixedJoint] anchored to the world ground.
+  FixedJoint addFixedJointToWorld(
+    RigidBody body,
+    Vector3 localAnchor,
+    Quaternion localRot,
+    Vector3 worldAnchor,
+    Quaternion worldRot,
+  ) {
+    final ground = groundBody;
+    final handle = _bindings.createFixedJoint(
+      _worldHandle,
+      body.handle,
+      ground.handle,
+      localAnchor.x,
+      localAnchor.y,
+      localAnchor.z,
+      localRot.x,
+      localRot.y,
+      localRot.z,
+      localRot.w,
+      worldAnchor.x,
+      worldAnchor.y,
+      worldAnchor.z,
+      worldRot.x,
+      worldRot.y,
+      worldRot.z,
+      worldRot.w,
+    );
+    final joint = FixedJoint(handle, body, ground);
+    _registerJoint(joint);
+    return joint;
+  }
+
+  /// Pins [body] to a fixed point in world space using a [SphericalJoint].
+  SphericalJoint addSphericalJointToWorld(RigidBody body, Vector3 localAnchor, Vector3 worldAnchor) {
+    final ground = groundBody;
+    final handle = _bindings.createSphericalJoint(
+      _worldHandle,
+      body.handle,
+      ground.handle,
+      localAnchor.x,
+      localAnchor.y,
+      localAnchor.z,
+      worldAnchor.x,
+      worldAnchor.y,
+      worldAnchor.z,
+    );
+    final joint = SphericalJoint(handle, body, ground);
+    _registerJoint(joint);
+    return joint;
+  }
+
+  /// Anchors [body] to the world with a [RevoluteJoint] spinning around [worldAxis].
+  RevoluteJoint addRevoluteJointToWorld(RigidBody body, Vector3 worldAxis, Vector3 localAnchor, Vector3 worldAnchor) {
+    final ground = groundBody;
+    final handle = _bindings.createRevoluteJoint(
+      _worldHandle,
+      body.handle,
+      ground.handle,
+      worldAxis.x,
+      worldAxis.y,
+      worldAxis.z,
+      localAnchor.x,
+      localAnchor.y,
+      localAnchor.z,
+      worldAnchor.x,
+      worldAnchor.y,
+      worldAnchor.z,
+    );
+    final joint = RevoluteJoint(handle, body, ground, worldAxis);
+    _registerJoint(joint);
+    return joint;
+  }
+
+  /// Anchors [body] to the world with a [PrismaticJoint] sliding along [worldAxis].
+  PrismaticJoint addPrismaticJointToWorld(RigidBody body, Vector3 worldAxis, Vector3 localAnchor, Vector3 worldAnchor) {
+    final ground = groundBody;
+    final handle = _bindings.createPrismaticJoint(
+      _worldHandle,
+      body.handle,
+      ground.handle,
+      worldAxis.x,
+      worldAxis.y,
+      worldAxis.z,
+      localAnchor.x,
+      localAnchor.y,
+      localAnchor.z,
+      worldAnchor.x,
+      worldAnchor.y,
+      worldAnchor.z,
+    );
+    final joint = PrismaticJoint(handle, body, ground, worldAxis);
+    _registerJoint(joint);
+    return joint;
+  }
+
+  //--------------------------
+  // joint limits related
+  //--------------------------
+
+  void lockJointAxis(Joint joint, JointAxis axis, bool locked) {
+    _bindings.lockJointAxis(_worldHandle, joint.handle, axis.index, locked);
+  }
+
+  void setJointLimits(Joint joint, JointAxis axis, double min, double max) {
+    _bindings.setJointLimits(_worldHandle, joint.handle, axis.index, min, max);
+  }
+
+  //--------------------------
+  // configure motor related
+  //--------------------------
+
+  void configureRevoluteMotor(
+    RevoluteJoint joint, {
+    double targetPos = 0,
+    double targetVel = 0,
+    double stiffness = 0,
+    double damping = 0,
+  }) {
+    _bindings.configureRevoluteJointMotor(_worldHandle, joint.handle, targetPos, targetVel, stiffness, damping);
+  }
+
+  void configurePrismaticMotor(
+    PrismaticJoint joint, {
+    double targetPos = 0,
+    double targetVel = 0,
+    double stiffness = 0,
+    double damping = 0,
+  }) {
+    _bindings.configurePrismaticJointMotor(_worldHandle, joint.handle, targetPos, targetVel, stiffness, damping);
+  }
+
+  void configureJointMotor(
+    Joint joint,
+    JointAxis axis, {
+    double targetPos = 0,
+    double targetVel = 0,
+    double stiffness = 0,
+    double damping = 0,
+  }) {
+    _bindings.configureJointMotor(_worldHandle, joint.handle, axis.index, targetPos, targetVel, stiffness, damping);
+  }
+
+  //--------------------------
+  // remove rigid body, collider, joint related
+  //--------------------------
+
+  void removeRigidBody(RigidBody rb) {
+    if (_worldHandle != 0) {
+      // 1. Remove attached colliders from our tracking
+      final attachedColliders = getBodyColliders(rb);
+      for (final c in attachedColliders) {
+        _colliders.remove(c);
+      }
+      _bodyColliders.remove(rb);
+
+      // 2. Remove attached joints from our tracking
+      final attachedJoints = getBodyJoints(rb);
+      for (final j in attachedJoints) {
+        _joints.remove(j);
+        // Also remove from the OTHER body's joint list
+        final other = (j.body1 == rb) ? j.body2 : j.body1;
+        _bodyJoints[other]?.remove(j);
+      }
+      _bodyJoints.remove(rb);
+
+      // 3. Remove from native world
+      _bindings.removeRigidBody(_worldHandle, rb.handle);
+
+      // 4. Remove from our list
+      _bodies.remove(rb);
+    }
+  }
+
+  void removeCollider(Collider c) {
+    if (_worldHandle != 0) {
+      _bindings.removeCollider(_worldHandle, c.handle);
+      _colliders.remove(c);
+      _bodyColliders[c.body]?.remove(c);
+    }
+  }
+
+  void removeJoint(Joint j) {
+    if (_worldHandle != 0) {
+      _bindings.removeJoint(_worldHandle, j.handle);
+      _joints.remove(j);
+      _bodyJoints[j.body1]?.remove(j);
+      _bodyJoints[j.body2]?.remove(j);
+    }
   }
 }

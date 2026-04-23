@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'rapier_physics'
-  s.version          = '0.0.1'
+  s.version          = '0.2.0'
   s.summary          = 'A new Flutter plugin project.'
   s.description      = <<-DESC
 A new Flutter plugin project.
@@ -32,6 +32,10 @@ A new Flutter plugin project.
 
   s.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',
+    'OTHER_LDFLAGS' => '-all_load'
+  }
+
+  s.user_target_xcconfig = {
     'OTHER_LDFLAGS' => '-all_load'
   }
 end
