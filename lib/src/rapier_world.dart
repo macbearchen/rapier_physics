@@ -1,4 +1,6 @@
 import 'dart:typed_data';
+import 'package:rapier_physics/src/collider_desc.dart';
+
 import 'bindings/rapier_bindings.dart';
 import 'bindings/rapier_bindings_stub.dart'
     if (dart.library.ffi) 'bindings/rapier_bindings_ffi.dart'
@@ -12,15 +14,14 @@ import 'collider.dart';
 import 'joint.dart';
 import 'joint_axis.dart';
 import 'rigid_body.dart';
-import 'rigid_body_type.dart';
+import 'rigid_body_desc.dart';
 
 class RapierWorld {
-  late RapierBindings _bindings;
+  static final RapierBindings bindings = rapier_bindings.RapierBindingsImpl();
   int _worldHandle = 0;
   int _groundBodyHandle = 0;
 
   int get worldHandle => _worldHandle;
-  RapierBindings get bindings => _bindings;
 
   RigidBody get groundBody => RigidBody(_groundBodyHandle, this);
 
@@ -30,14 +31,12 @@ class RapierWorld {
   final List<Collider> _colliders = [];
   final List<Joint> _joints = [];
 
-  RapierWorld() {
-    _bindings = rapier_bindings.RapierBindingsImpl();
-  }
+  RapierWorld();
 
   Future<void> init({Vector3? gravity}) async {
-    await _bindings.init();
-    _worldHandle = _bindings.createWorld();
-    _groundBodyHandle = _bindings.createRigidBody(_worldHandle, 0, 0, 0, RigidBodyType.fixed);
+    await RapierWorld.bindings.init();
+    _worldHandle = RapierWorld.bindings.createWorld();
+    _groundBodyHandle = RapierWorld.bindings.createRigidBody(_worldHandle, RigidBodyDesc.fixed());
     if (gravity != null) {
       setGravity(gravity.x, gravity.y, gravity.z);
     }
@@ -45,28 +44,28 @@ class RapierWorld {
 
   void setGravity(double x, double y, double z) {
     if (_worldHandle != 0) {
-      _bindings.setGravity(_worldHandle, x, y, z);
+      bindings.setGravity(_worldHandle, x, y, z);
     }
   }
 
   void destroy() {
     if (_worldHandle != 0) {
-      _bindings.destroyWorld(_worldHandle);
+      bindings.destroyWorld(_worldHandle);
       _worldHandle = 0;
       _groundBodyHandle = 0;
     }
   }
 
-  String get version => _bindings.getVersion();
+  String get version => bindings.getVersion();
 
   void step() {
     if (_worldHandle != 0) {
-      _bindings.stepWorld(_worldHandle);
+      bindings.stepWorld(_worldHandle);
     }
   }
 
-  RigidBody createRigidBody(double x, double y, double z, {RigidBodyType type = RigidBodyType.dynamic}) {
-    final handle = _bindings.createRigidBody(_worldHandle, x, y, z, type);
+  RigidBody createRigidBody(RigidBodyDesc desc) {
+    final handle = bindings.createRigidBody(_worldHandle, desc);
     final body = RigidBody(handle, this);
     _bodies.add(body);
     return body;
@@ -77,81 +76,63 @@ class RapierWorld {
   //--------------------------
 
   RigidBody addBox({
-    required double x,
-    required double y,
-    required double z,
     required double hx,
     required double hy,
     required double hz,
-    RigidBodyType type = RigidBodyType.dynamic,
+    RigidBodyDesc? desc,
   }) {
-    final body = createRigidBody(x, y, z, type: type);
-    createBoxCollider(body, hx, hy, hz);
+    final body = createRigidBody(desc ?? RigidBodyDesc.dynamic());
+    createCollider(body, ColliderDesc.cuboid(hx, hy, hz));
     return body;
   }
 
   RigidBody addSphere({
-    required double x,
-    required double y,
-    required double z,
     required double radius,
-    RigidBodyType type = RigidBodyType.dynamic,
+    RigidBodyDesc? desc,
   }) {
-    final body = createRigidBody(x, y, z, type: type);
-    createSphereCollider(body, radius);
+    final body = createRigidBody(desc ?? RigidBodyDesc.dynamic());
+    createCollider(body, ColliderDesc.ball(radius));
     return body;
   }
 
   RigidBody addCylinder({
-    required double x,
-    required double y,
-    required double z,
     required double halfHeight,
     required double radius,
-    RigidBodyType type = RigidBodyType.dynamic,
+    RigidBodyDesc? desc,
   }) {
-    final body = createRigidBody(x, y, z, type: type);
-    createCylinderCollider(body, halfHeight, radius);
+    final body = createRigidBody(desc ?? RigidBodyDesc.dynamic());
+    createCollider(body, ColliderDesc.cylinder(halfHeight, radius));
     return body;
   }
 
   RigidBody addCone({
-    required double x,
-    required double y,
-    required double z,
     required double halfHeight,
     required double radius,
-    RigidBodyType type = RigidBodyType.dynamic,
+    RigidBodyDesc? desc,
   }) {
-    final body = createRigidBody(x, y, z, type: type);
-    createConeCollider(body, halfHeight, radius);
+    final body = createRigidBody(desc ?? RigidBodyDesc.dynamic());
+    createCollider(body, ColliderDesc.cone(halfHeight, radius));
     return body;
   }
 
   RigidBody addCapsule({
-    required double x,
-    required double y,
-    required double z,
     required double halfHeight,
     required double radius,
-    RigidBodyType type = RigidBodyType.dynamic,
+    RigidBodyDesc? desc,
   }) {
-    final body = createRigidBody(x, y, z, type: type);
-    createCapsuleCollider(body, halfHeight, radius);
+    final body = createRigidBody(desc ?? RigidBodyDesc.dynamic());
+    createCollider(body, ColliderDesc.capsule(halfHeight, radius));
     return body;
   }
 
   RigidBody addHeightfield({
-    required double x,
-    required double y,
-    required double z,
     required Float32List heights,
     required int nrows,
     required int ncols,
     required Vector3 scale,
-    RigidBodyType type = RigidBodyType.fixed,
+    RigidBodyDesc? desc,
   }) {
-    final body = createRigidBody(x, y, z, type: type);
+    final body = createRigidBody(desc ?? RigidBodyDesc.fixed());
     createHeightfieldCollider(body, heights, nrows, ncols, scale);
     return body;
   }
@@ -160,43 +141,15 @@ class RapierWorld {
   // create collider by shape type
   //--------------------------
 
-  Collider createBoxCollider(RigidBody body, double hx, double hy, double hz) {
-    final handle = _bindings.createBoxCollider(_worldHandle, body.handle, hx, hy, hz);
-    final collider = BoxCollider(handle, body, hx, hy, hz);
-    _registerCollider(collider);
-    return collider;
-  }
-
-  Collider createSphereCollider(RigidBody body, double radius) {
-    final handle = _bindings.createSphereCollider(_worldHandle, body.handle, radius);
-    final collider = SphereCollider(handle, body, radius);
-    _registerCollider(collider);
-    return collider;
-  }
-
-  Collider createCylinderCollider(RigidBody body, double halfHeight, double radius) {
-    final handle = _bindings.createCylinderCollider(_worldHandle, body.handle, halfHeight, radius);
-    final collider = CylinderCollider(handle, body, halfHeight, radius);
-    _registerCollider(collider);
-    return collider;
-  }
-
-  Collider createConeCollider(RigidBody body, double halfHeight, double radius) {
-    final handle = _bindings.createConeCollider(_worldHandle, body.handle, halfHeight, radius);
-    final collider = ConeCollider(handle, body, halfHeight, radius);
-    _registerCollider(collider);
-    return collider;
-  }
-
-  Collider createCapsuleCollider(RigidBody body, double halfHeight, double radius) {
-    final handle = _bindings.createCapsuleCollider(_worldHandle, body.handle, halfHeight, radius);
-    final collider = CapsuleCollider(handle, body, halfHeight, radius);
+  Collider createCollider(RigidBody body, ColliderDesc desc) {
+    final handle = bindings.createCollider(_worldHandle, body.handle, desc);
+    final collider = Collider(handle, body);
     _registerCollider(collider);
     return collider;
   }
 
   Collider createHeightfieldCollider(RigidBody body, Float32List heights, int nrows, int ncols, Vector3 scale) {
-    final handle = _bindings.createHeightfieldCollider(
+    final handle = bindings.createHeightfieldCollider(
       _worldHandle,
       body.handle,
       heights,
@@ -245,7 +198,7 @@ class RapierWorld {
     Vector3 anchor2,
     Quaternion rot2,
   ) {
-    final handle = _bindings.createFixedJoint(
+    final handle = bindings.createFixedJoint(
       _worldHandle,
       body1.handle,
       body2.handle,
@@ -271,7 +224,7 @@ class RapierWorld {
 
   /// Spherical joint — allows free rotation in all directions (ball-and-socket).
   SphericalJoint addSphericalJoint(RigidBody body1, RigidBody body2, Vector3 anchor1, Vector3 anchor2) {
-    final handle = _bindings.createSphericalJoint(
+    final handle = bindings.createSphericalJoint(
       _worldHandle,
       body1.handle,
       body2.handle,
@@ -289,7 +242,7 @@ class RapierWorld {
 
   /// Revolute joint — allows rotation around a single axis (hinge).
   RevoluteJoint addRevoluteJoint(RigidBody body1, RigidBody body2, Vector3 axis, Vector3 anchor1, Vector3 anchor2) {
-    final handle = _bindings.createRevoluteJoint(
+    final handle = bindings.createRevoluteJoint(
       _worldHandle,
       body1.handle,
       body2.handle,
@@ -310,7 +263,7 @@ class RapierWorld {
 
   /// Prismatic joint — allows translation along a single axis (slider).
   PrismaticJoint addPrismaticJoint(RigidBody body1, RigidBody body2, Vector3 axis, Vector3 anchor1, Vector3 anchor2) {
-    final handle = _bindings.createPrismaticJoint(
+    final handle = bindings.createPrismaticJoint(
       _worldHandle,
       body1.handle,
       body2.handle,
@@ -331,7 +284,7 @@ class RapierWorld {
 
   /// Generic joint — all axes configurable via [lockJointAxis] and [setJointLimits].
   GenericJoint addGenericJoint(RigidBody body1, RigidBody body2, Vector3 anchor1, Vector3 anchor2) {
-    final handle = _bindings.createGenericJoint(
+    final handle = bindings.createGenericJoint(
       _worldHandle,
       body1.handle,
       body2.handle,
@@ -349,7 +302,7 @@ class RapierWorld {
 
   /// Rope joint — constrains two bodies within a maximum distance.
   RopeJoint addRopeJoint(RigidBody body1, RigidBody body2, Vector3 anchor1, Vector3 anchor2, double maxDistance) {
-    final handle = _bindings.createRopeJoint(
+    final handle = bindings.createRopeJoint(
       _worldHandle,
       body1.handle,
       body2.handle,
@@ -379,7 +332,7 @@ class RapierWorld {
     Quaternion worldRot,
   ) {
     final ground = groundBody;
-    final handle = _bindings.createFixedJoint(
+    final handle = bindings.createFixedJoint(
       _worldHandle,
       body.handle,
       ground.handle,
@@ -406,7 +359,7 @@ class RapierWorld {
   /// Pins [body] to a fixed point in world space using a [SphericalJoint].
   SphericalJoint addSphericalJointToWorld(RigidBody body, Vector3 localAnchor, Vector3 worldAnchor) {
     final ground = groundBody;
-    final handle = _bindings.createSphericalJoint(
+    final handle = bindings.createSphericalJoint(
       _worldHandle,
       body.handle,
       ground.handle,
@@ -425,7 +378,7 @@ class RapierWorld {
   /// Anchors [body] to the world with a [RevoluteJoint] spinning around [worldAxis].
   RevoluteJoint addRevoluteJointToWorld(RigidBody body, Vector3 worldAxis, Vector3 localAnchor, Vector3 worldAnchor) {
     final ground = groundBody;
-    final handle = _bindings.createRevoluteJoint(
+    final handle = bindings.createRevoluteJoint(
       _worldHandle,
       body.handle,
       ground.handle,
@@ -447,7 +400,7 @@ class RapierWorld {
   /// Anchors [body] to the world with a [PrismaticJoint] sliding along [worldAxis].
   PrismaticJoint addPrismaticJointToWorld(RigidBody body, Vector3 worldAxis, Vector3 localAnchor, Vector3 worldAnchor) {
     final ground = groundBody;
-    final handle = _bindings.createPrismaticJoint(
+    final handle = bindings.createPrismaticJoint(
       _worldHandle,
       body.handle,
       ground.handle,
@@ -471,11 +424,11 @@ class RapierWorld {
   //--------------------------
 
   void lockJointAxis(Joint joint, JointAxis axis, bool locked) {
-    _bindings.lockJointAxis(_worldHandle, joint.handle, axis.index, locked);
+    bindings.lockJointAxis(_worldHandle, joint.handle, axis.index, locked);
   }
 
   void setJointLimits(Joint joint, JointAxis axis, double min, double max) {
-    _bindings.setJointLimits(_worldHandle, joint.handle, axis.index, min, max);
+    bindings.setJointLimits(_worldHandle, joint.handle, axis.index, min, max);
   }
 
   //--------------------------
@@ -489,7 +442,7 @@ class RapierWorld {
     double stiffness = 0,
     double damping = 0,
   }) {
-    _bindings.configureRevoluteJointMotor(_worldHandle, joint.handle, targetPos, targetVel, stiffness, damping);
+    bindings.configureRevoluteJointMotor(_worldHandle, joint.handle, targetPos, targetVel, stiffness, damping);
   }
 
   void configurePrismaticMotor(
@@ -499,7 +452,7 @@ class RapierWorld {
     double stiffness = 0,
     double damping = 0,
   }) {
-    _bindings.configurePrismaticJointMotor(_worldHandle, joint.handle, targetPos, targetVel, stiffness, damping);
+    bindings.configurePrismaticJointMotor(_worldHandle, joint.handle, targetPos, targetVel, stiffness, damping);
   }
 
   void configureJointMotor(
@@ -510,7 +463,7 @@ class RapierWorld {
     double stiffness = 0,
     double damping = 0,
   }) {
-    _bindings.configureJointMotor(_worldHandle, joint.handle, axis.index, targetPos, targetVel, stiffness, damping);
+    bindings.configureJointMotor(_worldHandle, joint.handle, axis.index, targetPos, targetVel, stiffness, damping);
   }
 
   //--------------------------
@@ -537,7 +490,7 @@ class RapierWorld {
       _bodyJoints.remove(rb);
 
       // 3. Remove from native world
-      _bindings.removeRigidBody(_worldHandle, rb.handle);
+      bindings.removeRigidBody(_worldHandle, rb.handle);
 
       // 4. Remove from our list
       _bodies.remove(rb);
@@ -546,7 +499,7 @@ class RapierWorld {
 
   void removeCollider(Collider c) {
     if (_worldHandle != 0) {
-      _bindings.removeCollider(_worldHandle, c.handle);
+      bindings.removeCollider(_worldHandle, c.handle);
       _colliders.remove(c);
       _bodyColliders[c.body]?.remove(c);
     }
@@ -554,7 +507,7 @@ class RapierWorld {
 
   void removeJoint(Joint j) {
     if (_worldHandle != 0) {
-      _bindings.removeJoint(_worldHandle, j.handle);
+      bindings.removeJoint(_worldHandle, j.handle);
       _joints.remove(j);
       _bodyJoints[j.body1]?.remove(j);
       _bodyJoints[j.body2]?.remove(j);

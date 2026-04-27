@@ -14,10 +14,7 @@ import 'physics_scene.dart';
 ///   • Balls hang below the pivot rail along -Z.
 ///   • Swinging happens in the XZ plane.
 ///   • Hinge axis = Y  →  rotation around Y allows XZ-plane swing.
-class NewtonCradleScene extends SimpleScene {
-  final List<RigidBody> _rbBalls = [];
-  final List<M3Entity> _balls = [];
-
+class NewtonCradleScene extends BaseScene {
   @override
   Future<void> load() async {
     if (isLoaded) return;
@@ -86,22 +83,24 @@ class NewtonCradleScene extends SimpleScene {
     //                                      in the ball's own local frame
     //   worldAnchor = (x, 0, cradleZ)  → the fixed pivot position in world space
 
-    final ballMesh = M3Mesh(M3Resources.unitSphere);
+    final ballMesh = createPendulum(0.5, length);
     final restZ = cradleZ - length; // ball centre height when hanging at rest
+
+    RigidBody? rb0;
 
     for (int i = 0; i < count; i++) {
       final x = (i - (count - 1) / 2.0) * spacing;
       final pos = Vector3(x, 0.0, restZ);
 
       final entity = addMesh(ballMesh, pos)..color = Colors.skyBlue;
-      _balls.add(entity);
+      final rb = world.addSphere(radius: 0.5, desc: RigidBodyDesc.dynamic()..position = pos);
+      mapEntityBody[rb] = entity;
 
-      final rb = world.addSphere(x: pos.x, y: pos.y, z: pos.z, radius: 0.5);
       for (final c in rb.colliders) {
         c.restitution = 1.0;
         c.friction = 0.0;
       }
-      _rbBalls.add(rb);
+
       rb.setCCD(true);
       rb.wakeUp();
 
@@ -112,28 +111,16 @@ class NewtonCradleScene extends SimpleScene {
         Vector3(0, 0, length), // local anchor: pivot is `length` above ball centre
         Vector3(x, 0, cradleZ), // world anchor: pivot position on the rail
       );
+
+      if (i == 0) {
+        rb0 = rb;
+      }
     }
 
     // Pull the leftmost ball back 60° to kick off the cradle motion.
     // Arc formula: newPos = pivot + length * (−sin θ along X,  −cos θ along Z)
     final pivotX = -(count - 1) / 2.0 * spacing;
     const pullAngle = pi / 3; // 60°
-    _rbBalls[0].setPosition(
-      pivotX - length * sin(pullAngle), // pulled back along −X
-      0,
-      cradleZ - length * cos(pullAngle), // raised along +Z
-    );
-  }
-
-  // ── Update ──────────────────────────────────────────────────────────────────
-  @override
-  void update(double delta) {
-    world.step();
-
-    for (int i = 0; i < _balls.length; i++) {
-      _balls[i].position = _rbBalls[i].position;
-      _balls[i].rotation = _rbBalls[i].rotation;
-    }
-    super.update(delta);
+    rb0!.setPosition(Vector3(pivotX - length * sin(pullAngle), 0, cradleZ - length * cos(pullAngle)));
   }
 }

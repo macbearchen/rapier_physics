@@ -11,7 +11,7 @@ A high-performance physics engine for Flutter, powered by [Rapier](https://rapie
 - **Flexible Physics**: Support for various rigid body types (Dynamic, Fixed, Kinematic).
 - **Force & Impulse**: Full support for `addForce`, `applyImpulse`, and their `AtPoint` variants.
 - **Velocity Control**: Set linear and angular velocities directly for precise state control.
-- **Colliders**: Box, Sphere, Cylinder, Capsule, Cone, and **Heightfield** colliders.
+- **Colliders**: Box, Sphere, Cylinder, Capsule, Cone, and **Heightfield** colliders with **native local transform support** (`localPosition`, `localRotation`).
 - **Joints Support**: Fixed, Spherical, Revolute, Prismatic, and Rope joints with motor support.
 - **Lifecycle Management**: Robust API for adding and **removing** rigid bodies, colliders, and joints with automatic relationship cleanup.
 - **CCD**: Continuous Collision Detection for high-speed simulation.
@@ -58,15 +58,14 @@ void main() async {
 
   // 2. Add a static floor
   world.addBox(
-    x: 0, y: 0, z: 0, 
     hx: 10.0, hy: 0.1, hz: 10.0, 
-    type: RigidBodyType.fixed
+    desc: RigidBodyDesc.fixed()..position = Vector3(0, 0, 0)
   );
 
   // 3. Add a dynamic falling box
   final box = world.addBox(
-    x: 0, y: 10, z: 0, 
-    hx: 0.5, hy: 0.5, hz: 0.5
+    hx: 0.5, hy: 0.5, hz: 0.5,
+    desc: RigidBodyDesc.dynamic()..position = Vector3(0, 10, 0)
   );
 
   // 4. Step the simulation in your game loop

@@ -22,19 +22,26 @@ external void rapier_world_step(JSNumber world);
 external JSNumber rapier_create_rigid_body(JSNumber world, JSNumber x, JSNumber y, JSNumber z, JSNumber type);
 
 @JS()
-external JSNumber rapier_create_box_collider(JSNumber world, JSNumber body, JSNumber hx, JSNumber hy, JSNumber hz);
-
-@JS()
-external JSNumber rapier_create_sphere_collider(JSNumber world, JSNumber body, JSNumber radius);
-
-@JS()
-external JSNumber rapier_create_cylinder_collider(JSNumber world, JSNumber body, JSNumber halfHeight, JSNumber radius);
-
-@JS()
-external JSNumber rapier_create_cone_collider(JSNumber world, JSNumber body, JSNumber halfHeight, JSNumber radius);
-
-@JS()
-external JSNumber rapier_create_capsule_collider(JSNumber world, JSNumber body, JSNumber halfHeight, JSNumber radius);
+external JSNumber rapier_create_collider(
+  JSNumber world,
+  JSNumber body,
+  JSNumber shapeType,
+  JSNumber hx,
+  JSNumber hy,
+  JSNumber hz,
+  JSNumber radius,
+  JSNumber halfHeight,
+  JSNumber friction,
+  JSNumber restitution,
+  JSNumber density,
+  JSNumber localPositionX,
+  JSNumber localPositionY,
+  JSNumber localPositionZ,
+  JSNumber localRotationX,
+  JSNumber localRotationY,
+  JSNumber localRotationZ,
+  JSNumber localRotationW,
+);
 
 @JS()
 external JSNumber rapier_create_heightfield_collider(
@@ -202,6 +209,29 @@ external JSNumber rapier_get_body_rotation_z(JSNumber world, JSNumber body);
 external JSNumber rapier_get_body_rotation_w(JSNumber world, JSNumber body);
 
 @JS()
+external JSNumber rapier_get_collider_position_x(JSNumber world, JSNumber handle);
+@JS()
+external JSNumber rapier_get_collider_position_y(JSNumber world, JSNumber handle);
+@JS()
+external JSNumber rapier_get_collider_position_z(JSNumber world, JSNumber handle);
+
+@JS()
+external JSNumber rapier_get_collider_rotation_x(JSNumber world, JSNumber handle);
+@JS()
+external JSNumber rapier_get_collider_rotation_y(JSNumber world, JSNumber handle);
+@JS()
+external JSNumber rapier_get_collider_rotation_z(JSNumber world, JSNumber handle);
+@JS()
+external JSNumber rapier_get_collider_rotation_w(JSNumber world, JSNumber handle);
+
+@JS()
+external JSNumber rapier_get_collider_friction(JSNumber world, JSNumber handle);
+@JS()
+external JSNumber rapier_get_collider_restitution(JSNumber world, JSNumber handle);
+@JS()
+external JSNumber rapier_get_collider_density(JSNumber world, JSNumber handle);
+
+@JS()
 external void rapier_set_body_position(JSNumber world, JSNumber body, JSNumber x, JSNumber y, JSNumber z);
 
 @JS()
@@ -223,6 +253,19 @@ external void rapier_set_collider_restitution(JSNumber world, JSNumber handle, J
 external void rapier_set_collider_density(JSNumber world, JSNumber handle, JSNumber density);
 
 @JS()
+external void rapier_set_collider_position(JSNumber world, JSNumber handle, JSNumber x, JSNumber y, JSNumber z);
+
+@JS()
+external void rapier_set_collider_rotation(
+  JSNumber world,
+  JSNumber handle,
+  JSNumber x,
+  JSNumber y,
+  JSNumber z,
+  JSNumber w,
+);
+
+@JS()
 external void rapier_set_body_linear_damping(JSNumber world, JSNumber handle, JSNumber damping);
 
 @JS()
@@ -242,11 +285,27 @@ external void rapier_body_apply_torque_impulse(JSNumber world, JSNumber handle, 
 
 @JS()
 external void rapier_body_add_force_at_point(
-    JSNumber world, JSNumber handle, JSNumber fx, JSNumber fy, JSNumber fz, JSNumber px, JSNumber py, JSNumber pz);
+  JSNumber world,
+  JSNumber handle,
+  JSNumber fx,
+  JSNumber fy,
+  JSNumber fz,
+  JSNumber px,
+  JSNumber py,
+  JSNumber pz,
+);
 
 @JS()
 external void rapier_body_apply_impulse_at_point(
-    JSNumber world, JSNumber handle, JSNumber ix, JSNumber iy, JSNumber iz, JSNumber px, JSNumber py, JSNumber pz);
+  JSNumber world,
+  JSNumber handle,
+  JSNumber ix,
+  JSNumber iy,
+  JSNumber iz,
+  JSNumber px,
+  JSNumber py,
+  JSNumber pz,
+);
 
 @JS()
 external void rapier_body_set_linear_velocity(JSNumber world, JSNumber handle, JSNumber x, JSNumber y, JSNumber z);

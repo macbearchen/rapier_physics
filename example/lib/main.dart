@@ -11,22 +11,22 @@ void main() async {
   print('Rapier World Version: ${world.version}');
 
   // Create a static floor at y = 0
-  world.addBox(x: 0, y: 0, z: 0, hx: 10.0, hy: 0.1, hz: 10.0, type: RigidBodyType.fixed);
+  world.addBox(hx: 10.0, hy: 0.1, hz: 10.0, desc: RigidBodyDesc.fixed()..position = Vector3(0, 0, 0));
 
   // Create a dynamic box at y = 10.0
-  final box = world.addBox(x: 0, y: 10, z: 0, hx: 0.5, hy: 0.5, hz: 0.5);
+  final box = world.addBox(hx: 0.5, hy: 0.5, hz: 0.5, desc: RigidBodyDesc.dynamic()..position = Vector3(0, 10, 0));
 
   // Create a dynamic sphere at y = 15.0
-  final sphere = world.addSphere(x: 0, y: 15, z: 0, radius: 0.5);
+  final sphere = world.addSphere(radius: 0.5, desc: RigidBodyDesc.dynamic()..position = Vector3(0, 15, 0));
 
   // Test setting position: Move the sphere even higher
-  sphere.setPosition(0, 30, 0);
+  sphere.setPosition(Vector3(0, 30, 0));
 
   // Create a dynamic cylinder at y = 20.0
-  final cylinder = world.addCylinder(x: 0, y: 20, z: 0, halfHeight: 1.0, radius: 0.5);
+  final cylinder = world.addCylinder(halfHeight: 1.0, radius: 0.5, desc: RigidBodyDesc.dynamic()..position = Vector3(0, 20, 0));
 
   // Create a dynamic capsule at y = 25.0
-  final capsule = world.addCapsule(x: 0, y: 25, z: 0, halfHeight: 1.0, radius: 0.5);
+  final capsule = world.addCapsule(halfHeight: 1.0, radius: 0.5, desc: RigidBodyDesc.dynamic()..position = Vector3(0, 25, 0));
 
   print('Initial box Y: ${box.position.y}');
   print('Initial sphere Y: ${sphere.position.y}');

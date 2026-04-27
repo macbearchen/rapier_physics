@@ -1,21 +1,45 @@
 import 'dart:typed_data';
 import 'package:vector_math/vector_math.dart';
-import '../rigid_body_type.dart';
+import '../rigid_body_desc.dart';
+import '../collider_desc.dart';
 
 abstract class RapierBindings {
+  Future<void> init();
   String getVersion();
+
+  // --- World ---
   int createWorld();
   void setGravity(int world, double x, double y, double z);
   void destroyWorld(int world);
   void stepWorld(int world);
 
-  int createRigidBody(int world, double x, double y, double z, RigidBodyType type);
+  // --- RigidBody ---
+  int createRigidBody(int world, RigidBodyDesc desc);
+  void removeRigidBody(int world, int handle);
 
-  int createBoxCollider(int world, int body, double hx, double hy, double hz);
-  int createSphereCollider(int world, int body, double radius);
-  int createCylinderCollider(int world, int body, double halfHeight, double radius);
-  int createConeCollider(int world, int body, double halfHeight, double radius);
-  int createCapsuleCollider(int world, int body, double halfHeight, double radius);
+  Vector3 getBodyPosition(int world, int body);
+  Quaternion getBodyRotation(int world, int body);
+
+  void setBodyPosition(int world, int body, double x, double y, double z);
+  void setBodyRotation(int world, int body, double x, double y, double z, double w);
+  void setBodyLinearDamping(int world, int handle, double damping);
+  void setBodyAngularDamping(int world, int handle, double damping);
+  void setBodyCCD(int world, int body, bool enabled);
+  void wakeBody(int world, int body);
+
+  void addForce(int world, int handle, double x, double y, double z);
+  void addTorque(int world, int handle, double x, double y, double z);
+  void applyImpulse(int world, int handle, double x, double y, double z);
+  void applyTorqueImpulse(int world, int handle, double x, double y, double z);
+  void addForceAtPoint(int world, int handle, double fx, double fy, double fz, double px, double py, double pz);
+  void applyImpulseAtPoint(int world, int handle, double ix, double iy, double iz, double px, double py, double pz);
+
+  void setBodyLinearVelocity(int world, int handle, double x, double y, double z);
+  void setBodyAngularVelocity(int world, int handle, double x, double y, double z);
+
+  // --- Collider ---
+  int createCollider(int world, int body, ColliderDesc desc);
+
   int createHeightfieldCollider(
     int world,
     int body,
@@ -26,7 +50,21 @@ abstract class RapierBindings {
     double sy,
     double sz,
   );
+  void removeCollider(int world, int handle);
 
+  Vector3 getColliderPosition(int world, int handle);
+  Quaternion getColliderRotation(int world, int handle);
+  double getColliderFriction(int world, int handle);
+  double getColliderRestitution(int world, int handle);
+  double getColliderDensity(int world, int handle);
+
+  void setColliderFriction(int world, int handle, double friction);
+  void setColliderRestitution(int world, int handle, double restitution);
+  void setColliderDensity(int world, int handle, double density);
+  void setColliderPosition(int world, int handle, double x, double y, double z);
+  void setColliderRotation(int world, int handle, double x, double y, double z, double w);
+
+  // --- Joint ---
   int createFixedJoint(
     int world,
     int body1,
@@ -108,6 +146,7 @@ abstract class RapierBindings {
     double a2z,
     double maxDist,
   );
+  void removeJoint(int world, int handle);
 
   void lockJointAxis(int world, int joint, int axis, bool locked);
   void setJointLimits(int world, int joint, int axis, double min, double max);
@@ -137,35 +176,4 @@ abstract class RapierBindings {
     double stiffness,
     double damping,
   );
-
-  Vector3 getBodyPosition(int world, int body);
-  Quaternion getBodyRotation(int world, int body);
-
-  void setBodyPosition(int world, int body, double x, double y, double z);
-  void setBodyRotation(int world, int body, double x, double y, double z, double w);
-
-  void setBodyCCD(int world, int body, bool enabled);
-  void wakeBody(int world, int body);
-
-  void setColliderFriction(int world, int handle, double friction);
-  void setColliderRestitution(int world, int handle, double restitution);
-  void setColliderDensity(int world, int handle, double density);
-  void setBodyLinearDamping(int world, int handle, double damping);
-  void setBodyAngularDamping(int world, int handle, double damping);
-
-  void addForce(int world, int handle, double x, double y, double z);
-  void addTorque(int world, int handle, double x, double y, double z);
-  void applyImpulse(int world, int handle, double x, double y, double z);
-  void applyTorqueImpulse(int world, int handle, double x, double y, double z);
-  void addForceAtPoint(int world, int handle, double fx, double fy, double fz, double px, double py, double pz);
-  void applyImpulseAtPoint(int world, int handle, double ix, double iy, double iz, double px, double py, double pz);
-
-  void setBodyLinearVelocity(int world, int handle, double x, double y, double z);
-  void setBodyAngularVelocity(int world, int handle, double x, double y, double z);
-
-  void removeRigidBody(int world, int handle);
-  void removeCollider(int world, int handle);
-  void removeJoint(int world, int handle);
-
-  Future<void> init();
 }

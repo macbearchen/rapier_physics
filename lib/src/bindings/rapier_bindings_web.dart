@@ -1,7 +1,8 @@
 import 'dart:js_interop';
 import 'dart:typed_data';
 import 'package:vector_math/vector_math.dart';
-import '../rigid_body_type.dart';
+import '../rigid_body_desc.dart';
+import '../collider_desc.dart';
 import '../web/rapier_web_interop.dart' as web_ffi;
 import 'rapier_bindings.dart';
 
@@ -14,6 +15,7 @@ class RapierBindingsImpl extends RapierBindings {
   @override
   String getVersion() => web_ffi.rapier_version().toDart;
 
+  // --- World ---
   @override
   int createWorld() => web_ffi.rapier_world_create().toDartInt;
 
@@ -27,29 +29,160 @@ class RapierBindingsImpl extends RapierBindings {
   @override
   void stepWorld(int world) => web_ffi.rapier_world_step(world.toJS);
 
+  // --- RigidBody ---
   @override
-  int createRigidBody(int world, double x, double y, double z, RigidBodyType type) =>
-      web_ffi.rapier_create_rigid_body(world.toJS, x.toJS, y.toJS, z.toJS, type.index.toJS).toDartInt;
+  int createRigidBody(int world, RigidBodyDesc desc) {
+    final handle = web_ffi
+        .rapier_create_rigid_body(
+          world.toJS,
+          desc.position.x.toJS,
+          desc.position.y.toJS,
+          desc.position.z.toJS,
+          desc.type.index.toJS,
+        )
+        .toDartInt;
+
+    if (desc.rotation != Quaternion.identity()) {
+      setBodyRotation(world, handle, desc.rotation.x, desc.rotation.y, desc.rotation.z, desc.rotation.w);
+    }
+    if (desc.linearVelocity != Vector3.zero()) {
+      setBodyLinearVelocity(world, handle, desc.linearVelocity.x, desc.linearVelocity.y, desc.linearVelocity.z);
+    }
+    if (desc.angularVelocity != Vector3.zero()) {
+      setBodyAngularVelocity(world, handle, desc.angularVelocity.x, desc.angularVelocity.y, desc.angularVelocity.z);
+    }
+    if (desc.linearDamping != 0.0) {
+      setBodyLinearDamping(world, handle, desc.linearDamping);
+    }
+    if (desc.angularDamping != 0.0) {
+      setBodyAngularDamping(world, handle, desc.angularDamping);
+    }
+    if (desc.ccdEnabled) {
+      setBodyCCD(world, handle, true);
+    }
+
+    return handle;
+  }
 
   @override
-  int createBoxCollider(int world, int body, double hx, double hy, double hz) =>
-      web_ffi.rapier_create_box_collider(world.toJS, body.toJS, hx.toJS, hy.toJS, hz.toJS).toDartInt;
+  void removeRigidBody(int world, int handle) => web_ffi.rapier_world_remove_rigid_body(world.toJS, handle.toJS);
 
   @override
-  int createSphereCollider(int world, int body, double radius) =>
-      web_ffi.rapier_create_sphere_collider(world.toJS, body.toJS, radius.toJS).toDartInt;
+  Vector3 getBodyPosition(int world, int body) => Vector3(
+    web_ffi.rapier_get_body_position_x(world.toJS, body.toJS).toDartDouble,
+    web_ffi.rapier_get_body_position_y(world.toJS, body.toJS).toDartDouble,
+    web_ffi.rapier_get_body_position_z(world.toJS, body.toJS).toDartDouble,
+  );
 
   @override
-  int createCylinderCollider(int world, int body, double halfHeight, double radius) =>
-      web_ffi.rapier_create_cylinder_collider(world.toJS, body.toJS, halfHeight.toJS, radius.toJS).toDartInt;
+  Quaternion getBodyRotation(int world, int body) => Quaternion(
+    web_ffi.rapier_get_body_rotation_x(world.toJS, body.toJS).toDartDouble,
+    web_ffi.rapier_get_body_rotation_y(world.toJS, body.toJS).toDartDouble,
+    web_ffi.rapier_get_body_rotation_z(world.toJS, body.toJS).toDartDouble,
+    web_ffi.rapier_get_body_rotation_w(world.toJS, body.toJS).toDartDouble,
+  );
 
   @override
-  int createConeCollider(int world, int body, double halfHeight, double radius) =>
-      web_ffi.rapier_create_cone_collider(world.toJS, body.toJS, halfHeight.toJS, radius.toJS).toDartInt;
+  void setBodyPosition(int world, int body, double x, double y, double z) =>
+      web_ffi.rapier_set_body_position(world.toJS, body.toJS, x.toJS, y.toJS, z.toJS);
 
   @override
-  int createCapsuleCollider(int world, int body, double halfHeight, double radius) =>
-      web_ffi.rapier_create_capsule_collider(world.toJS, body.toJS, halfHeight.toJS, radius.toJS).toDartInt;
+  void setBodyRotation(int world, int body, double x, double y, double z, double w) =>
+      web_ffi.rapier_set_body_rotation(world.toJS, body.toJS, x.toJS, y.toJS, z.toJS, w.toJS);
+
+  @override
+  void setBodyLinearDamping(int world, int handle, double damping) =>
+      web_ffi.rapier_set_body_linear_damping(world.toJS, handle.toJS, damping.toJS);
+
+  @override
+  void setBodyAngularDamping(int world, int handle, double damping) =>
+      web_ffi.rapier_set_body_angular_damping(world.toJS, handle.toJS, damping.toJS);
+
+  @override
+  void setBodyCCD(int world, int body, bool enabled) =>
+      web_ffi.rapier_set_body_ccd(world.toJS, body.toJS, enabled.toJS);
+
+  @override
+  void wakeBody(int world, int body) => web_ffi.rapier_wake_body(world.toJS, body.toJS);
+
+  @override
+  void addForce(int world, int handle, double x, double y, double z) =>
+      web_ffi.rapier_body_add_force(world.toJS, handle.toJS, x.toJS, y.toJS, z.toJS);
+
+  @override
+  void addTorque(int world, int handle, double x, double y, double z) =>
+      web_ffi.rapier_body_add_torque(world.toJS, handle.toJS, x.toJS, y.toJS, z.toJS);
+
+  @override
+  void applyImpulse(int world, int handle, double x, double y, double z) =>
+      web_ffi.rapier_body_apply_impulse(world.toJS, handle.toJS, x.toJS, y.toJS, z.toJS);
+
+  @override
+  void applyTorqueImpulse(int world, int handle, double x, double y, double z) =>
+      web_ffi.rapier_body_apply_torque_impulse(world.toJS, handle.toJS, x.toJS, y.toJS, z.toJS);
+
+  @override
+  void addForceAtPoint(int world, int handle, double fx, double fy, double fz, double px, double py, double pz) =>
+      web_ffi.rapier_body_add_force_at_point(
+        world.toJS,
+        handle.toJS,
+        fx.toJS,
+        fy.toJS,
+        fz.toJS,
+        px.toJS,
+        py.toJS,
+        pz.toJS,
+      );
+
+  @override
+  void applyImpulseAtPoint(int world, int handle, double ix, double iy, double iz, double px, double py, double pz) =>
+      web_ffi.rapier_body_apply_impulse_at_point(
+        world.toJS,
+        handle.toJS,
+        ix.toJS,
+        iy.toJS,
+        iz.toJS,
+        px.toJS,
+        py.toJS,
+        pz.toJS,
+      );
+
+  @override
+  void setBodyLinearVelocity(int world, int handle, double x, double y, double z) =>
+      web_ffi.rapier_body_set_linear_velocity(world.toJS, handle.toJS, x.toJS, y.toJS, z.toJS);
+
+  @override
+  void setBodyAngularVelocity(int world, int handle, double x, double y, double z) =>
+      web_ffi.rapier_body_set_angular_velocity(world.toJS, handle.toJS, x.toJS, y.toJS, z.toJS);
+
+  // --- Collider ---
+  @override
+  int createCollider(int world, int body, ColliderDesc desc) {
+    final handle = web_ffi
+        .rapier_create_collider(
+          world.toJS,
+          body.toJS,
+          desc.shapeType.index.toJS,
+          desc.hx.toJS,
+          desc.hy.toJS,
+          desc.hz.toJS,
+          desc.radius.toJS,
+          desc.halfHeight.toJS,
+          desc.friction.toJS,
+          desc.restitution.toJS,
+          desc.density.toJS,
+          desc.localPosition.x.toJS,
+          desc.localPosition.y.toJS,
+          desc.localPosition.z.toJS,
+          desc.localRotation.x.toJS,
+          desc.localRotation.y.toJS,
+          desc.localRotation.z.toJS,
+          desc.localRotation.w.toJS,
+        )
+        .toDartInt;
+
+    return handle;
+  }
 
   @override
   int createHeightfieldCollider(
@@ -74,6 +207,57 @@ class RapierBindingsImpl extends RapierBindings {
       )
       .toDartInt;
 
+  @override
+  void removeCollider(int world, int handle) => web_ffi.rapier_world_remove_collider(world.toJS, handle.toJS);
+
+  @override
+  Vector3 getColliderPosition(int world, int handle) => Vector3(
+    web_ffi.rapier_get_collider_position_x(world.toJS, handle.toJS).toDartDouble,
+    web_ffi.rapier_get_collider_position_y(world.toJS, handle.toJS).toDartDouble,
+    web_ffi.rapier_get_collider_position_z(world.toJS, handle.toJS).toDartDouble,
+  );
+
+  @override
+  Quaternion getColliderRotation(int world, int handle) => Quaternion(
+    web_ffi.rapier_get_collider_rotation_x(world.toJS, handle.toJS).toDartDouble,
+    web_ffi.rapier_get_collider_rotation_y(world.toJS, handle.toJS).toDartDouble,
+    web_ffi.rapier_get_collider_rotation_z(world.toJS, handle.toJS).toDartDouble,
+    web_ffi.rapier_get_collider_rotation_w(world.toJS, handle.toJS).toDartDouble,
+  );
+
+  @override
+  double getColliderFriction(int world, int handle) =>
+      web_ffi.rapier_get_collider_friction(world.toJS, handle.toJS).toDartDouble;
+
+  @override
+  double getColliderRestitution(int world, int handle) =>
+      web_ffi.rapier_get_collider_restitution(world.toJS, handle.toJS).toDartDouble;
+
+  @override
+  double getColliderDensity(int world, int handle) =>
+      web_ffi.rapier_get_collider_density(world.toJS, handle.toJS).toDartDouble;
+
+  @override
+  void setColliderFriction(int world, int handle, double friction) =>
+      web_ffi.rapier_set_collider_friction(world.toJS, handle.toJS, friction.toJS);
+
+  @override
+  void setColliderRestitution(int world, int handle, double restitution) =>
+      web_ffi.rapier_set_collider_restitution(world.toJS, handle.toJS, restitution.toJS);
+
+  @override
+  void setColliderDensity(int world, int handle, double density) =>
+      web_ffi.rapier_set_collider_density(world.toJS, handle.toJS, density.toJS);
+
+  @override
+  void setColliderPosition(int world, int handle, double x, double y, double z) =>
+      web_ffi.rapier_set_collider_position(world.toJS, handle.toJS, x.toJS, y.toJS, z.toJS);
+
+  @override
+  void setColliderRotation(int world, int handle, double x, double y, double z, double w) =>
+      web_ffi.rapier_set_collider_rotation(world.toJS, handle.toJS, x.toJS, y.toJS, z.toJS, w.toJS);
+
+  // --- Joint ---
   @override
   int createFixedJoint(
     int world,
@@ -255,6 +439,9 @@ class RapierBindingsImpl extends RapierBindings {
       .toDartInt;
 
   @override
+  void removeJoint(int world, int handle) => web_ffi.rapier_world_remove_joint(world.toJS, handle.toJS);
+
+  @override
   void lockJointAxis(int world, int joint, int axis, bool locked) =>
       web_ffi.rapier_joint_lock_axis(world.toJS, joint.toJS, axis.toJS, locked.toJS);
 
@@ -314,97 +501,4 @@ class RapierBindingsImpl extends RapierBindings {
     stiffness.toJS,
     damping.toJS,
   );
-
-  @override
-  Vector3 getBodyPosition(int world, int body) => Vector3(
-    web_ffi.rapier_get_body_position_x(world.toJS, body.toJS).toDartDouble,
-    web_ffi.rapier_get_body_position_y(world.toJS, body.toJS).toDartDouble,
-    web_ffi.rapier_get_body_position_z(world.toJS, body.toJS).toDartDouble,
-  );
-
-  @override
-  Quaternion getBodyRotation(int world, int body) => Quaternion(
-    web_ffi.rapier_get_body_rotation_x(world.toJS, body.toJS).toDartDouble,
-    web_ffi.rapier_get_body_rotation_y(world.toJS, body.toJS).toDartDouble,
-    web_ffi.rapier_get_body_rotation_z(world.toJS, body.toJS).toDartDouble,
-    web_ffi.rapier_get_body_rotation_w(world.toJS, body.toJS).toDartDouble,
-  );
-
-  @override
-  void setBodyPosition(int world, int body, double x, double y, double z) =>
-      web_ffi.rapier_set_body_position(world.toJS, body.toJS, x.toJS, y.toJS, z.toJS);
-
-  @override
-  void setBodyRotation(int world, int body, double x, double y, double z, double w) =>
-      web_ffi.rapier_set_body_rotation(world.toJS, body.toJS, x.toJS, y.toJS, z.toJS, w.toJS);
-
-  @override
-  void setBodyCCD(int world, int body, bool enabled) =>
-      web_ffi.rapier_set_body_ccd(world.toJS, body.toJS, enabled.toJS);
-
-  @override
-  void wakeBody(int world, int body) => web_ffi.rapier_wake_body(world.toJS, body.toJS);
-
-  @override
-  void setColliderFriction(int world, int handle, double friction) =>
-      web_ffi.rapier_set_collider_friction(world.toJS, handle.toJS, friction.toJS);
-
-  @override
-  void setColliderRestitution(int world, int handle, double restitution) =>
-      web_ffi.rapier_set_collider_restitution(world.toJS, handle.toJS, restitution.toJS);
-
-  @override
-  void setColliderDensity(int world, int handle, double density) =>
-      web_ffi.rapier_set_collider_density(world.toJS, handle.toJS, density.toJS);
-
-  @override
-  void setBodyLinearDamping(int world, int handle, double damping) =>
-      web_ffi.rapier_set_body_linear_damping(world.toJS, handle.toJS, damping.toJS);
-
-  @override
-  void setBodyAngularDamping(int world, int handle, double damping) =>
-      web_ffi.rapier_set_body_angular_damping(world.toJS, handle.toJS, damping.toJS);
-
-  @override
-  void addForce(int world, int handle, double x, double y, double z) =>
-      web_ffi.rapier_body_add_force(world.toJS, handle.toJS, x.toJS, y.toJS, z.toJS);
-
-  @override
-  void addTorque(int world, int handle, double x, double y, double z) =>
-      web_ffi.rapier_body_add_torque(world.toJS, handle.toJS, x.toJS, y.toJS, z.toJS);
-
-  @override
-  void applyImpulse(int world, int handle, double x, double y, double z) =>
-      web_ffi.rapier_body_apply_impulse(world.toJS, handle.toJS, x.toJS, y.toJS, z.toJS);
-
-  @override
-  void applyTorqueImpulse(int world, int handle, double x, double y, double z) =>
-      web_ffi.rapier_body_apply_torque_impulse(world.toJS, handle.toJS, x.toJS, y.toJS, z.toJS);
-
-  @override
-  void addForceAtPoint(int world, int handle, double fx, double fy, double fz, double px, double py, double pz) =>
-      web_ffi.rapier_body_add_force_at_point(
-          world.toJS, handle.toJS, fx.toJS, fy.toJS, fz.toJS, px.toJS, py.toJS, pz.toJS);
-
-  @override
-  void applyImpulseAtPoint(int world, int handle, double ix, double iy, double iz, double px, double py, double pz) =>
-      web_ffi.rapier_body_apply_impulse_at_point(
-          world.toJS, handle.toJS, ix.toJS, iy.toJS, iz.toJS, px.toJS, py.toJS, pz.toJS);
-
-  @override
-  void setBodyLinearVelocity(int world, int handle, double x, double y, double z) =>
-      web_ffi.rapier_body_set_linear_velocity(world.toJS, handle.toJS, x.toJS, y.toJS, z.toJS);
-
-  @override
-  void setBodyAngularVelocity(int world, int handle, double x, double y, double z) =>
-      web_ffi.rapier_body_set_angular_velocity(world.toJS, handle.toJS, x.toJS, y.toJS, z.toJS);
-
-  @override
-  void removeRigidBody(int world, int handle) => web_ffi.rapier_world_remove_rigid_body(world.toJS, handle.toJS);
-
-  @override
-  void removeCollider(int world, int handle) => web_ffi.rapier_world_remove_collider(world.toJS, handle.toJS);
-
-  @override
-  void removeJoint(int world, int handle) => web_ffi.rapier_world_remove_joint(world.toJS, handle.toJS);
 }

@@ -1,3 +1,5 @@
+// ignore_for_file: unused_import
+
 import 'dart:math';
 import 'package:flutter/material.dart' hide Colors, Matrix4;
 import 'package:rapier_physics/rapier_physics.dart';
@@ -5,9 +7,13 @@ import 'package:rapier_physics/rapier_physics.dart';
 // Macbear3D engine
 import 'package:macbear_3d/macbear_3d.dart';
 import 'demos/physics_scene.dart';
+import 'demos/compound_scene.dart';
+import 'demos/newton_cradle.dart';
 import 'panel.dart';
 
 final world = RapierWorld();
+int sceneIndex = 0;
+final scenes = [PhysicsScene(), CompoundScene()];
 
 // init rapier physics
 Future<void> initPhysics() async {
@@ -30,6 +36,7 @@ Future<void> onDidInit() async {
   appEngine.renderEngine.createShadowMap(width: 2048, height: 4096);
 
   final testScene = PhysicsScene();
+  // final testScene = BaseScene();
   await appEngine.setScene(testScene);
 }
 
@@ -47,7 +54,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Rapier 3D Example'),
+          title: const Text('Rapier 3D'),
           actions: [
             IconButton(
               icon: const Icon(Icons.info),
@@ -87,7 +94,8 @@ class MyApp extends StatelessWidget {
               onPressed: () async {
                 world.destroy();
                 await initPhysics();
-                await M3AppEngine.instance.setScene(PhysicsScene());
+                sceneIndex = (sceneIndex + 1) % scenes.length;
+                await M3AppEngine.instance.setScene(scenes[sceneIndex]);
               },
             ),
           ],

@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.0
+- **Unified Collider API**: Introduced `ColliderDesc` architecture for more robust and extensible collider creation.
+- **Native Local Transform Support**: 
+    - Added `localPosition` and `localRotation` support directly in the native FFI layer.
+    - Colliders can now be positioned and rotated relative to their parent rigid body at creation time, improving physical stability.
+- **API Cleanup**: 
+    - Removed redundant specialized collider creation methods (`createBoxCollider`, `createSphereCollider`, etc.) in favor of the unified `createCollider` API.
+    - Updated `addBox`, `addSphere`, and other convenience methods to use the unified `RigidBodyDesc` system for better extensibility.
+- **FFI Memory Optimization**: Standardized the `ColliderDesc` memory layout (64 bytes) across Rust, Dart, and Swift for efficient zero-copy cross-boundary communication.
+- **Platform Sync**: Updated iOS/macOS Swift plugins and Web/WASM interop to support the expanded native collider transformation data.
+
 ## 0.2.0
 - **Force & Impulse API**: Added `addForce`, `addTorque`, `applyImpulse`, `applyTorqueImpulse`, and their `AtPoint` variants to `RigidBody`.
 - **Velocity Controls**: Added `setLinearVelocity` and `setAngularVelocity` for fine-grained rigid body motion control.

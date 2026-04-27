@@ -1,3 +1,4 @@
+import 'rapier_world.dart';
 import 'rigid_body.dart';
 
 class Collider {
@@ -6,29 +7,34 @@ class Collider {
 
   Collider(this.handle, this.body);
 
-  double _density = 1.0;
-  double _friction = 0.5;
-  double _restitution = 0.0;
+  /// The local position of the collider relative to its parent rigid-body.
+  Vector3 get position => RapierWorld.bindings.getColliderPosition(body.world.worldHandle, handle);
+  void setPosition(Vector3 value) {
+    RapierWorld.bindings.setColliderPosition(body.world.worldHandle, handle, value.x, value.y, value.z);
+  }
+
+  /// The local rotation of the collider relative to its parent rigid-body.
+  Quaternion get rotation => RapierWorld.bindings.getColliderRotation(body.world.worldHandle, handle);
+  void setRotation(Quaternion value) {
+    RapierWorld.bindings.setColliderRotation(body.world.worldHandle, handle, value.x, value.y, value.z, value.w);
+  }
 
   /// The density of the collider in kg/m³. Affects the body's mass if the body is dynamic.
-  double get density => _density;
+  double get density => RapierWorld.bindings.getColliderDensity(body.world.worldHandle, handle);
   set density(double value) {
-    _density = value;
-    body.world.bindings.setColliderDensity(body.world.worldHandle, handle, value);
+    RapierWorld.bindings.setColliderDensity(body.world.worldHandle, handle, value);
   }
 
   /// The friction coefficient of the collider. 0 = no friction, 1 = high friction.
-  double get friction => _friction;
+  double get friction => RapierWorld.bindings.getColliderFriction(body.world.worldHandle, handle);
   set friction(double value) {
-    _friction = value;
-    body.world.bindings.setColliderFriction(body.world.worldHandle, handle, value);
+    RapierWorld.bindings.setColliderFriction(body.world.worldHandle, handle, value);
   }
 
   /// The restitution (bounciness) of the collider. 0 = no bounce, 1 = perfect bounce.
-  double get restitution => _restitution;
+  double get restitution => RapierWorld.bindings.getColliderRestitution(body.world.worldHandle, handle);
   set restitution(double value) {
-    _restitution = value;
-    body.world.bindings.setColliderRestitution(body.world.worldHandle, handle, value);
+    RapierWorld.bindings.setColliderRestitution(body.world.worldHandle, handle, value);
   }
 }
 

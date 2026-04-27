@@ -9,7 +9,7 @@
 - **靈活的物理**: 支持多種剛體類型（動態 Dynamic、固定 Fixed、運動學 Kinematic）。
 - **力與衝量**: 完整支持 `addForce`、`applyImpulse` 及其 `AtPoint` 變體。
 - **速度控制**: 直接設定線速度與角速度，實現精確的物理狀態控制。
-- **碰撞體 (Colliders)**: 支持方塊 (Box)、球體 (Sphere)、圓柱體 (Cylinder)、膠囊體 (Capsule)、圓錐體 (Cone) 和 **高度場 (Heightfield)**。
+- **碰撞體 (Colliders)**: 支持方塊 (Box)、球體 (Sphere)、圓柱體 (Cylinder)、膠囊體 (Capsule)、圓錐體 (Cone) 和 **高度場 (Heightfield)**，並支持**原生局部變換** (`localPosition`, `localRotation`)。
 - **關節支持 (Joints)**: 支持固定關節 (Fixed)、球形關節 (Spherical)、旋轉關節 (Revolute)、棱柱關節 (Prismatic) 和繩索關節 (Rope)，並支持馬達 (Motor)。
 - **生命週期管理**: 提供完善的剛體、碰撞體與關節的 **新增與移除** API，並自動處理內部關連清理。
 - **CCD**: 提供連續碰撞檢測 (Continuous Collision Detection)，防止高速物體穿透。
@@ -56,15 +56,14 @@ void main() async {
 
   // 2. 添加一個固定的地板
   world.addBox(
-    x: 0, y: 0, z: 0, 
     hx: 10.0, hy: 0.1, hz: 10.0, 
-    type: RigidBodyType.fixed
+    desc: RigidBodyDesc.fixed()..position = Vector3(0, 0, 0)
   );
 
   // 3. 添加一個動態掉落的方塊
   final box = world.addBox(
-    x: 0, y: 10, z: 0, 
-    hx: 0.5, hy: 0.5, hz: 0.5
+    hx: 0.5, hy: 0.5, hz: 0.5,
+    desc: RigidBodyDesc.dynamic()..position = Vector3(0, 10, 0)
   );
 
   // 4. 在遊戲循環中執行模擬步進

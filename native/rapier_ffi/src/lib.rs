@@ -68,19 +68,12 @@ pub extern "C" fn rapier_world_create() -> *mut RapierWorld {
     Box::into_raw(Box::new(world))
 }
 
+// --- World ---
+
 #[no_mangle]
 pub extern "C" fn rapier_world_set_gravity(world: *mut RapierWorld, x: f32, y: f32, z: f32) {
     let world = unsafe { &mut *world };
     world.gravity = Vector::new(x, y, z);
-}
-
-#[no_mangle]
-pub extern "C" fn rapier_world_destroy(world: *mut RapierWorld) {
-    if !world.is_null() {
-        unsafe {
-            drop(Box::from_raw(world));
-        }
-    }
 }
 
 #[no_mangle]
@@ -104,6 +97,17 @@ pub extern "C" fn rapier_world_step(world: *mut RapierWorld) {
 }
 
 #[no_mangle]
+pub extern "C" fn rapier_world_destroy(world: *mut RapierWorld) {
+    if !world.is_null() {
+        unsafe {
+            drop(Box::from_raw(world));
+        }
+    }
+}
+
+// --- RigidBody ---
+
+#[no_mangle]
 pub extern "C" fn rapier_create_rigid_body(world: *mut RapierWorld, x: f32, y: f32, z: f32, body_type: u8) -> u32 {
     let world = unsafe { &mut *world };
 
@@ -123,142 +127,17 @@ pub extern "C" fn rapier_create_rigid_body(world: *mut RapierWorld, x: f32, y: f
 }
 
 #[no_mangle]
-pub extern "C" fn rapier_create_box_collider(
-    world: *mut RapierWorld,
-    body_handle: u32,
-    hx: f32,
-    hy: f32,
-    hz: f32,
-) -> u32 {
+pub extern "C" fn rapier_world_remove_rigid_body(world: *mut RapierWorld, handle: u32) {
     let world = unsafe { &mut *world };
-
-    let body_handle = RigidBodyHandle::from_raw_parts(body_handle, 0);
-
-    let collider = ColliderBuilder::cuboid(hx, hy, hz).build();
-
-    let handle = world
-        .colliders
-        .insert_with_parent(collider, body_handle, &mut world.bodies);
-
-    handle.into_raw_parts().0
-}
-
-#[no_mangle]
-pub extern "C" fn rapier_create_sphere_collider(world: *mut RapierWorld, body_handle: u32, radius: f32) -> u32 {
-    let world = unsafe { &mut *world };
-
-    let body_handle = RigidBodyHandle::from_raw_parts(body_handle, 0);
-
-    let collider = ColliderBuilder::ball(radius).build();
-
-    let handle = world
-        .colliders
-        .insert_with_parent(collider, body_handle, &mut world.bodies);
-
-    handle.into_raw_parts().0
-}
-
-#[no_mangle]
-pub extern "C" fn rapier_create_cylinder_collider(
-    world: *mut RapierWorld,
-    body_handle: u32,
-    half_height: f32,
-    radius: f32,
-) -> u32 {
-    let world = unsafe { &mut *world };
-
-    let body_handle = RigidBodyHandle::from_raw_parts(body_handle, 0);
-
-    let collider = ColliderBuilder::cylinder(half_height, radius).build();
-
-    let handle = world
-        .colliders
-        .insert_with_parent(collider, body_handle, &mut world.bodies);
-
-    handle.into_raw_parts().0
-}
-
-#[no_mangle]
-pub extern "C" fn rapier_create_cone_collider(
-    world: *mut RapierWorld,
-    body_handle: u32,
-    half_height: f32,
-    radius: f32,
-) -> u32 {
-    let world = unsafe { &mut *world };
-
-    let body_handle = RigidBodyHandle::from_raw_parts(body_handle, 0);
-
-    let collider = ColliderBuilder::cone(half_height, radius).build();
-
-    let handle = world
-        .colliders
-        .insert_with_parent(collider, body_handle, &mut world.bodies);
-
-    handle.into_raw_parts().0
-}
-
-#[no_mangle]
-pub extern "C" fn rapier_create_capsule_collider(
-    world: *mut RapierWorld,
-    body_handle: u32,
-    half_height: f32,
-    radius: f32,
-) -> u32 {
-    let world = unsafe { &mut *world };
-
-    let body_handle = RigidBodyHandle::from_raw_parts(body_handle, 0);
-
-    let collider = ColliderBuilder::capsule_y(half_height, radius).build();
-
-    let handle = world
-        .colliders
-        .insert_with_parent(collider, body_handle, &mut world.bodies);
-
-    handle.into_raw_parts().0
-}
-
-#[no_mangle]
-pub extern "C" fn rapier_create_heightfield_collider(
-    world: *mut RapierWorld,
-    body_handle: u32,
-    heights: *const f32,
-    nrows: usize,
-    ncols: usize,
-    sx: f32,
-    sy: f32,
-    sz: f32,
-) -> u32 {
-    let world = unsafe { &mut *world };
-    let body_handle = RigidBodyHandle::from_raw_parts(body_handle, 0);
-
-    let heights_slice = unsafe { std::slice::from_raw_parts(heights, nrows * ncols) };
-    let heights_vec = heights_slice.to_vec();
-
-    // Use the Array2 type re-exported by rapier3d/parry3d to ensure type compatibility
-    let heights_array = rapier3d::parry::utils::Array2::new(nrows, ncols, heights_vec);
-
-    let collider = ColliderBuilder::heightfield(heights_array, Vector::new(sx, sy, sz)).build();
-
-    let handle = world
-        .colliders
-        .insert_with_parent(collider, body_handle, &mut world.bodies);
-
-    handle.into_raw_parts().0
-}
-
-#[no_mangle]
-pub extern "C" fn rapier_malloc(size: usize) -> *mut u8 {
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    unsafe { alloc(layout) }
-}
-
-#[no_mangle]
-pub extern "C" fn rapier_free(ptr: *mut u8, size: usize) {
-    if !ptr.is_null() {
-        let layout = Layout::from_size_align(size, 8).unwrap();
-        unsafe { dealloc(ptr, layout) }
-    }
+    let handle = RigidBodyHandle::from_raw_parts(handle, 0);
+    world.bodies.remove(
+        handle,
+        &mut world.islands,
+        &mut world.colliders,
+        &mut world.impulse_joints,
+        &mut world.multibody_joints,
+        true,
+    );
 }
 
 #[no_mangle]
@@ -394,6 +273,332 @@ pub extern "C" fn rapier_wake_body(world: *mut RapierWorld, body_handle: u32) {
 }
 
 #[no_mangle]
+pub extern "C" fn rapier_set_body_linear_damping(world: *mut RapierWorld, handle: u32, damping: f32) {
+    let world = unsafe { &mut *world };
+    let handle = RigidBodyHandle::from_raw_parts(handle, 0);
+    if let Some(body) = world.bodies.get_mut(handle) {
+        body.set_linear_damping(damping);
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_set_body_angular_damping(world: *mut RapierWorld, handle: u32, damping: f32) {
+    let world = unsafe { &mut *world };
+    let handle = RigidBodyHandle::from_raw_parts(handle, 0);
+    if let Some(body) = world.bodies.get_mut(handle) {
+        body.set_angular_damping(damping);
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_body_add_force(world: *mut RapierWorld, handle: u32, x: f32, y: f32, z: f32) {
+    let world = unsafe { &mut *world };
+    let handle = RigidBodyHandle::from_raw_parts(handle, 0);
+    if let Some(body) = world.bodies.get_mut(handle) {
+        body.add_force(vector![x, y, z].into(), true);
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_body_add_torque(world: *mut RapierWorld, handle: u32, x: f32, y: f32, z: f32) {
+    let world = unsafe { &mut *world };
+    let handle = RigidBodyHandle::from_raw_parts(handle, 0);
+    if let Some(body) = world.bodies.get_mut(handle) {
+        body.add_torque(vector![x, y, z].into(), true);
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_body_apply_impulse(world: *mut RapierWorld, handle: u32, x: f32, y: f32, z: f32) {
+    let world = unsafe { &mut *world };
+    let handle = RigidBodyHandle::from_raw_parts(handle, 0);
+    if let Some(body) = world.bodies.get_mut(handle) {
+        body.apply_impulse(vector![x, y, z].into(), true);
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_body_apply_torque_impulse(world: *mut RapierWorld, handle: u32, x: f32, y: f32, z: f32) {
+    let world = unsafe { &mut *world };
+    let handle = RigidBodyHandle::from_raw_parts(handle, 0);
+    if let Some(body) = world.bodies.get_mut(handle) {
+        body.apply_torque_impulse(vector![x, y, z].into(), true);
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_body_add_force_at_point(
+    world: *mut RapierWorld,
+    handle: u32,
+    fx: f32,
+    fy: f32,
+    fz: f32,
+    px: f32,
+    py: f32,
+    pz: f32,
+) {
+    let world = unsafe { &mut *world };
+    let handle = RigidBodyHandle::from_raw_parts(handle, 0);
+    if let Some(body) = world.bodies.get_mut(handle) {
+        body.add_force_at_point(vector![fx, fy, fz].into(), point![px, py, pz].into(), true);
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_body_apply_impulse_at_point(
+    world: *mut RapierWorld,
+    handle: u32,
+    ix: f32,
+    iy: f32,
+    iz: f32,
+    px: f32,
+    py: f32,
+    pz: f32,
+) {
+    let world = unsafe { &mut *world };
+    let handle = RigidBodyHandle::from_raw_parts(handle, 0);
+    if let Some(body) = world.bodies.get_mut(handle) {
+        body.apply_impulse_at_point(vector![ix, iy, iz].into(), point![px, py, pz].into(), true);
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_body_set_linear_velocity(world: *mut RapierWorld, handle: u32, x: f32, y: f32, z: f32) {
+    let world = unsafe { &mut *world };
+    let handle = RigidBodyHandle::from_raw_parts(handle, 0);
+    if let Some(body) = world.bodies.get_mut(handle) {
+        body.set_linvel(vector![x, y, z].into(), true);
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_body_set_angular_velocity(world: *mut RapierWorld, handle: u32, x: f32, y: f32, z: f32) {
+    let world = unsafe { &mut *world };
+    let handle = RigidBodyHandle::from_raw_parts(handle, 0);
+    if let Some(body) = world.bodies.get_mut(handle) {
+        body.set_angvel(vector![x, y, z].into(), true);
+    }
+}
+
+// --- Collider ---
+#[repr(C)]
+pub struct ColliderDesc {
+    pub shape_type: u32,
+    pub hx: f32,
+    pub hy: f32,
+    pub hz: f32,
+    pub radius: f32,
+    pub half_height: f32,
+    pub friction: f32,
+    pub restitution: f32,
+    pub density: f32,
+    pub local_position_x: f32,
+    pub local_position_y: f32,
+    pub local_position_z: f32,
+    pub local_rotation_x: f32,
+    pub local_rotation_y: f32,
+    pub local_rotation_z: f32,
+    pub local_rotation_w: f32,
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_create_collider(world: *mut RapierWorld, body_handle: u32, desc: *const ColliderDesc) -> u32 {
+    let world = unsafe { &mut *world };
+    let body_handle = RigidBodyHandle::from_raw_parts(body_handle, 0);
+    let desc = unsafe { &*desc };
+
+    let mut builder = match desc.shape_type {
+        0 => ColliderBuilder::cuboid(desc.hx, desc.hy, desc.hz),
+        1 => ColliderBuilder::ball(desc.radius),
+        2 => ColliderBuilder::cylinder(desc.half_height, desc.radius),
+        3 => ColliderBuilder::cone(desc.half_height, desc.radius),
+        4 => ColliderBuilder::capsule_y(desc.half_height, desc.radius),
+        _ => ColliderBuilder::cuboid(desc.hx, desc.hy, desc.hz),
+    };
+
+    builder = builder
+        .friction(desc.friction)
+        .restitution(desc.restitution)
+        .density(desc.density)
+        .position(
+            Isometry::from_parts(
+                Translation::new(desc.local_position_x, desc.local_position_y, desc.local_position_z),
+                rapier3d::prelude::Rotation::from_xyzw(
+                    desc.local_rotation_x,
+                    desc.local_rotation_y,
+                    desc.local_rotation_z,
+                    desc.local_rotation_w,
+                )
+                .into(),
+            )
+            .into(),
+        );
+
+    let collider = builder.build();
+
+    let handle = world
+        .colliders
+        .insert_with_parent(collider, body_handle, &mut world.bodies);
+
+    handle.into_raw_parts().0
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_create_heightfield_collider(
+    world: *mut RapierWorld,
+    body_handle: u32,
+    heights: *const f32,
+    nrows: usize,
+    ncols: usize,
+    sx: f32,
+    sy: f32,
+    sz: f32,
+) -> u32 {
+    let world = unsafe { &mut *world };
+    let body_handle = RigidBodyHandle::from_raw_parts(body_handle, 0);
+
+    let heights_slice = unsafe { std::slice::from_raw_parts(heights, nrows * ncols) };
+    let heights_vec = heights_slice.to_vec();
+
+    // Use the Array2 type re-exported by rapier3d/parry3d to ensure type compatibility
+    let heights_array = rapier3d::parry::utils::Array2::new(nrows, ncols, heights_vec);
+
+    let collider = ColliderBuilder::heightfield(heights_array, Vector::new(sx, sy, sz)).build();
+
+    let handle = world
+        .colliders
+        .insert_with_parent(collider, body_handle, &mut world.bodies);
+
+    handle.into_raw_parts().0
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_world_remove_collider(world: *mut RapierWorld, handle: u32) {
+    let world = unsafe { &mut *world };
+    let handle = ColliderHandle::from_raw_parts(handle, 0);
+    world
+        .colliders
+        .remove(handle, &mut world.islands, &mut world.bodies, true);
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_set_collider_friction(world: *mut RapierWorld, handle: u32, friction: f32) {
+    let world = unsafe { &mut *world };
+    let handle = ColliderHandle::from_raw_parts(handle, 0);
+    if let Some(collider) = world.colliders.get_mut(handle) {
+        collider.set_friction(friction);
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_set_collider_restitution(world: *mut RapierWorld, handle: u32, restitution: f32) {
+    let world = unsafe { &mut *world };
+    let handle = ColliderHandle::from_raw_parts(handle, 0);
+    if let Some(collider) = world.colliders.get_mut(handle) {
+        collider.set_restitution(restitution);
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_set_collider_density(world: *mut RapierWorld, handle: u32, density: f32) {
+    let world = unsafe { &mut *world };
+    let handle = ColliderHandle::from_raw_parts(handle, 0);
+    if let Some(collider) = world.colliders.get_mut(handle) {
+        collider.set_density(density);
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_set_collider_position(world: *mut RapierWorld, handle: u32, x: f32, y: f32, z: f32) {
+    let world = unsafe { &mut *world };
+    let handle = ColliderHandle::from_raw_parts(handle, 0);
+    if let Some(collider) = world.colliders.get_mut(handle) {
+        collider.set_translation(Vector::new(x, y, z));
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_set_collider_rotation(world: *mut RapierWorld, handle: u32, x: f32, y: f32, z: f32, w: f32) {
+    let world = unsafe { &mut *world };
+    let handle = ColliderHandle::from_raw_parts(handle, 0);
+    if let Some(collider) = world.colliders.get_mut(handle) {
+        collider.set_rotation(rapier3d::prelude::Rotation::from_xyzw(x, y, z, w));
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_get_collider_position_x(world: *mut RapierWorld, handle: u32) -> f32 {
+    let world = unsafe { &mut *world };
+    let handle = ColliderHandle::from_raw_parts(handle, 0);
+    world.colliders.get(handle).map(|c| c.translation().x).unwrap_or(0.0)
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_get_collider_position_y(world: *mut RapierWorld, handle: u32) -> f32 {
+    let world = unsafe { &mut *world };
+    let handle = ColliderHandle::from_raw_parts(handle, 0);
+    world.colliders.get(handle).map(|c| c.translation().y).unwrap_or(0.0)
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_get_collider_position_z(world: *mut RapierWorld, handle: u32) -> f32 {
+    let world = unsafe { &mut *world };
+    let handle = ColliderHandle::from_raw_parts(handle, 0);
+    world.colliders.get(handle).map(|c| c.translation().z).unwrap_or(0.0)
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_get_collider_rotation_x(world: *mut RapierWorld, handle: u32) -> f32 {
+    let world = unsafe { &mut *world };
+    let handle = ColliderHandle::from_raw_parts(handle, 0);
+    world.colliders.get(handle).map(|c| c.rotation().x).unwrap_or(0.0)
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_get_collider_rotation_y(world: *mut RapierWorld, handle: u32) -> f32 {
+    let world = unsafe { &mut *world };
+    let handle = ColliderHandle::from_raw_parts(handle, 0);
+    world.colliders.get(handle).map(|c| c.rotation().y).unwrap_or(0.0)
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_get_collider_rotation_z(world: *mut RapierWorld, handle: u32) -> f32 {
+    let world = unsafe { &mut *world };
+    let handle = ColliderHandle::from_raw_parts(handle, 0);
+    world.colliders.get(handle).map(|c| c.rotation().z).unwrap_or(0.0)
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_get_collider_rotation_w(world: *mut RapierWorld, handle: u32) -> f32 {
+    let world = unsafe { &mut *world };
+    let handle = ColliderHandle::from_raw_parts(handle, 0);
+    world.colliders.get(handle).map(|c| c.rotation().w).unwrap_or(1.0)
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_get_collider_friction(world: *mut RapierWorld, handle: u32) -> f32 {
+    let world = unsafe { &mut *world };
+    let handle = ColliderHandle::from_raw_parts(handle, 0);
+    world.colliders.get(handle).map(|c| c.friction()).unwrap_or(0.0)
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_get_collider_restitution(world: *mut RapierWorld, handle: u32) -> f32 {
+    let world = unsafe { &mut *world };
+    let handle = ColliderHandle::from_raw_parts(handle, 0);
+    world.colliders.get(handle).map(|c| c.restitution()).unwrap_or(0.0)
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_get_collider_density(world: *mut RapierWorld, handle: u32) -> f32 {
+    let world = unsafe { &mut *world };
+    let handle = ColliderHandle::from_raw_parts(handle, 0);
+    world.colliders.get(handle).map(|c| c.density()).unwrap_or(0.0)
+}
+
+// --- Joint ---
+
+#[no_mangle]
 pub extern "C" fn rapier_create_fixed_joint(
     world: *mut RapierWorld,
     body1: u32,
@@ -513,6 +718,13 @@ pub extern "C" fn rapier_create_prismatic_joint(
 
     let handle = world.impulse_joints.insert(b1, b2, joint, true);
     handle.into_raw_parts().0
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_world_remove_joint(world: *mut RapierWorld, handle: u32) {
+    let world = unsafe { &mut *world };
+    let handle = ImpulseJointHandle::from_raw_parts(handle, 0);
+    world.impulse_joints.remove(handle, true);
 }
 
 #[no_mangle]
@@ -674,165 +886,18 @@ pub extern "C" fn rapier_joint_configure_motor(
     }
 }
 
+// --- Utility ---
+
 #[no_mangle]
-pub extern "C" fn rapier_set_collider_friction(world: *mut RapierWorld, handle: u32, friction: f32) {
-    let world = unsafe { &mut *world };
-    let handle = ColliderHandle::from_raw_parts(handle, 0);
-    if let Some(collider) = world.colliders.get_mut(handle) {
-        collider.set_friction(friction);
+pub extern "C" fn rapier_malloc(size: usize) -> *mut u8 {
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    unsafe { alloc(layout) }
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_free(ptr: *mut u8, size: usize) {
+    if !ptr.is_null() {
+        let layout = Layout::from_size_align(size, 8).unwrap();
+        unsafe { dealloc(ptr, layout) }
     }
-}
-
-#[no_mangle]
-pub extern "C" fn rapier_set_collider_restitution(world: *mut RapierWorld, handle: u32, restitution: f32) {
-    let world = unsafe { &mut *world };
-    let handle = ColliderHandle::from_raw_parts(handle, 0);
-    if let Some(collider) = world.colliders.get_mut(handle) {
-        collider.set_restitution(restitution);
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn rapier_set_collider_density(world: *mut RapierWorld, handle: u32, density: f32) {
-    let world = unsafe { &mut *world };
-    let handle = ColliderHandle::from_raw_parts(handle, 0);
-    if let Some(collider) = world.colliders.get_mut(handle) {
-        collider.set_density(density);
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn rapier_set_body_linear_damping(world: *mut RapierWorld, handle: u32, damping: f32) {
-    let world = unsafe { &mut *world };
-    let handle = RigidBodyHandle::from_raw_parts(handle, 0);
-    if let Some(body) = world.bodies.get_mut(handle) {
-        body.set_linear_damping(damping);
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn rapier_set_body_angular_damping(world: *mut RapierWorld, handle: u32, damping: f32) {
-    let world = unsafe { &mut *world };
-    let handle = RigidBodyHandle::from_raw_parts(handle, 0);
-    if let Some(body) = world.bodies.get_mut(handle) {
-        body.set_angular_damping(damping);
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn rapier_body_add_force(world: *mut RapierWorld, handle: u32, x: f32, y: f32, z: f32) {
-    let world = unsafe { &mut *world };
-    let handle = RigidBodyHandle::from_raw_parts(handle, 0);
-    if let Some(body) = world.bodies.get_mut(handle) {
-        body.add_force(vector![x, y, z].into(), true);
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn rapier_body_add_torque(world: *mut RapierWorld, handle: u32, x: f32, y: f32, z: f32) {
-    let world = unsafe { &mut *world };
-    let handle = RigidBodyHandle::from_raw_parts(handle, 0);
-    if let Some(body) = world.bodies.get_mut(handle) {
-        body.add_torque(vector![x, y, z].into(), true);
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn rapier_body_apply_impulse(world: *mut RapierWorld, handle: u32, x: f32, y: f32, z: f32) {
-    let world = unsafe { &mut *world };
-    let handle = RigidBodyHandle::from_raw_parts(handle, 0);
-    if let Some(body) = world.bodies.get_mut(handle) {
-        body.apply_impulse(vector![x, y, z].into(), true);
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn rapier_body_apply_torque_impulse(world: *mut RapierWorld, handle: u32, x: f32, y: f32, z: f32) {
-    let world = unsafe { &mut *world };
-    let handle = RigidBodyHandle::from_raw_parts(handle, 0);
-    if let Some(body) = world.bodies.get_mut(handle) {
-        body.apply_torque_impulse(vector![x, y, z].into(), true);
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn rapier_body_add_force_at_point(
-    world: *mut RapierWorld,
-    handle: u32,
-    fx: f32,
-    fy: f32,
-    fz: f32,
-    px: f32,
-    py: f32,
-    pz: f32,
-) {
-    let world = unsafe { &mut *world };
-    let handle = RigidBodyHandle::from_raw_parts(handle, 0);
-    if let Some(body) = world.bodies.get_mut(handle) {
-        body.add_force_at_point(vector![fx, fy, fz].into(), point![px, py, pz].into(), true);
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn rapier_body_apply_impulse_at_point(
-    world: *mut RapierWorld,
-    handle: u32,
-    ix: f32,
-    iy: f32,
-    iz: f32,
-    px: f32,
-    py: f32,
-    pz: f32,
-) {
-    let world = unsafe { &mut *world };
-    let handle = RigidBodyHandle::from_raw_parts(handle, 0);
-    if let Some(body) = world.bodies.get_mut(handle) {
-        body.apply_impulse_at_point(vector![ix, iy, iz].into(), point![px, py, pz].into(), true);
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn rapier_body_set_linear_velocity(world: *mut RapierWorld, handle: u32, x: f32, y: f32, z: f32) {
-    let world = unsafe { &mut *world };
-    let handle = RigidBodyHandle::from_raw_parts(handle, 0);
-    if let Some(body) = world.bodies.get_mut(handle) {
-        body.set_linvel(vector![x, y, z].into(), true);
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn rapier_body_set_angular_velocity(world: *mut RapierWorld, handle: u32, x: f32, y: f32, z: f32) {
-    let world = unsafe { &mut *world };
-    let handle = RigidBodyHandle::from_raw_parts(handle, 0);
-    if let Some(body) = world.bodies.get_mut(handle) {
-        body.set_angvel(vector![x, y, z].into(), true);
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn rapier_world_remove_rigid_body(world: *mut RapierWorld, handle: u32) {
-    let world = unsafe { &mut *world };
-    let handle = RigidBodyHandle::from_raw_parts(handle, 0);
-    world.bodies.remove(
-        handle,
-        &mut world.islands,
-        &mut world.colliders,
-        &mut world.impulse_joints,
-        &mut world.multibody_joints,
-        true,
-    );
-}
-
-#[no_mangle]
-pub extern "C" fn rapier_world_remove_collider(world: *mut RapierWorld, handle: u32) {
-    let world = unsafe { &mut *world };
-    let handle = ColliderHandle::from_raw_parts(handle, 0);
-    world.colliders.remove(handle, &mut world.islands, &mut world.bodies, true);
-}
-
-#[no_mangle]
-pub extern "C" fn rapier_world_remove_joint(world: *mut RapierWorld, handle: u32) {
-    let world = unsafe { &mut *world };
-    let handle = ImpulseJointHandle::from_raw_parts(handle, 0);
-    world.impulse_joints.remove(handle, true);
 }

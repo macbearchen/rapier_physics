@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'rapier_physics'
-  s.version          = '0.2.0'
+  s.version          = '0.3.0'
   s.summary          = 'Rapier Physics plugin project.'
   s.description      = <<-DESC
 A Rapier Physics plugin project.
