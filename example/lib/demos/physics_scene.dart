@@ -1,82 +1,11 @@
 // ignore_for_file: unused_local_variable
 
-import 'dart:math';
 import 'package:flutter/foundation.dart';
-import 'package:vector_math/vector_math.dart';
-
-// Macbear3D engine
-import 'package:macbear_3d/macbear_3d.dart';
-// Rapier physics
-import 'package:rapier_physics/rapier_physics.dart';
 import '../main_3d.dart';
-
-// Define a base scene
-class BaseScene extends M3Scene {
-  final Map<RigidBody, M3Entity> mapEntityBody = {};
-
-  @override
-  Future<void> load() async {
-    if (isLoaded) return;
-    await super.load();
-
-    M3AppEngine.backgroundColor = Vector3(0.04, 0.04, 0.8);
-
-    camera.setEuler(pi / 9, -pi / 5, 0, distance: 20);
-    light.setEuler(pi / 5, -pi / 3, 0, distance: 30);
-
-    addGround();
-    // axis gizmo
-    addMesh(M3Resources.axisGizmoMesh, Vector3(0, 0, 1));
-
-    final mesh = M3Mesh(M3Resources.unitSphere);
-    addMesh(mesh, Vector3(5, 5, 2));
-
-    // sample cubemap
-    skybox = M3Skybox(M3Texture.createSampleCubemap());
-  }
-
-  M3Mesh createPendulum(double radius, double length) {
-    final pendulumMesh = M3Mesh(M3Resources.unitSphere);
-    pendulumMesh.subMeshes[0].localMatrix.scaleByVector3(Vector3.all(radius / 0.5));
-
-    final rodPart = M3SubMesh(M3Resources.unitCube);
-    rodPart.localMatrix = Matrix4.compose(Vector3(0, 0, length / 2), Quaternion.identity(), Vector3(0.1, 0.1, length));
-    pendulumMesh.subMeshes.add(rodPart);
-
-    return pendulumMesh;
-  }
-
-  // ── Ground ──────────────────────────────────────────────────────────────────
-  void addGround() {
-    M3Texture texGrid = M3Texture.createCheckerboard(size: 10);
-    M3Material mtr = M3Material();
-    mtr.texDiffuse = texGrid;
-
-    const hs = 10.0;
-    // Fixed physics floor — top surface sits at z = 0
-    world.addBox(hx: hs, hy: hs, hz: 0.5, desc: RigidBodyDesc.fixed()..position = Vector3(0, 0, -0.5));
-
-    final floor = addMesh(M3Mesh(M3PlaneGeom(hs * 2, hs * 2), material: mtr), Vector3(0, 0, 0));
-    floor.color = Colors.limeGreen;
-  }
-
-  @override
-  void update(double delta) {
-    world.step();
-
-    mapEntityBody.forEach((body, entity) {
-      entity.position = body.position;
-      entity.rotation = body.rotation;
-    });
-
-    super.update(delta);
-  }
-}
+import 'base_scene.dart';
 
 // Define a physics scene for testing
-class PhysicsScene extends M3Scene {
-  final Map<RigidBody, M3Entity> mapEntityBody = {};
-
+class PhysicsScene extends BaseScene {
   final ballMesh = M3Mesh(M3Resources.unitSphere);
   final boxMesh = M3Mesh(M3Resources.unitCube);
   final capsuleMesh = M3Mesh(M3CapsuleGeom(0.5, 1.0, axis: M3Axis.y));
@@ -98,8 +27,16 @@ class PhysicsScene extends M3Scene {
 
     final entityCapsule = addMesh(capsuleMesh, Vector3(0, 0, 1.2))..color = Colors.lime;
     final entityCone = addMesh(coneMesh, Vector3(0, 0, 1.2))..color = Colors.yellow;
-    final rbCapsule = world.addCapsule(halfHeight: 0.5, radius: 0.5, desc: RigidBodyDesc.dynamic()..position = Vector3(2, -4, 3));
-    final rbCone = world.addCone(halfHeight: 1, radius: 0.8, desc: RigidBodyDesc.dynamic()..position = Vector3(4, -4, 3));
+    final rbCapsule = world.addCapsule(
+      halfHeight: 0.5,
+      radius: 0.5,
+      desc: RigidBodyDesc.dynamic()..position = Vector3(2, -4, 3),
+    );
+    final rbCone = world.addCone(
+      halfHeight: 1,
+      radius: 0.8,
+      desc: RigidBodyDesc.dynamic()..position = Vector3(4, -4, 3),
+    );
 
     mapEntityBody[rbCapsule] = entityCapsule;
     mapEntityBody[rbCone] = entityCone;
@@ -136,9 +73,9 @@ class PhysicsScene extends M3Scene {
     addWalls();
     addGridFall();
     // addFalling();
-    addFan(Vector3(0, -10, -2));
-    addLift(Vector3(-2, -10, -4));
-    addRope(12, Vector3(10, 0, 4));
+    addFan(Vector3(0, -12, 2));
+    addLift(Vector3(2, -12, 4));
+    addRope(12, Vector3(12, 0, 8));
 
     addHeightfield();
 
@@ -318,18 +255,10 @@ class PhysicsScene extends M3Scene {
 
   @override
   void update(double delta) {
-    world.step();
-
     // Oscillate along X: targetPos 0 = (-2,-2,6), targetPos 6 = (4,-2,6)
     final t = DateTime.now().millisecondsSinceEpoch / 1200.0;
     final targetX = (sin(t) + 1.0) / 2.0 * 6.0; // smooth 0..6
     world.configurePrismaticMotor(_liftJoint!, targetPos: targetX, stiffness: 100.0, damping: 20.0);
-
-    // Sync all physics bodies to render entities
-    mapEntityBody.forEach((body, entity) {
-      entity.position = body.position;
-      entity.rotation = body.rotation;
-    });
 
     super.update(delta);
   }

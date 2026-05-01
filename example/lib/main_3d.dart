@@ -1,11 +1,8 @@
 // ignore_for_file: unused_import
 
-import 'dart:math';
 import 'package:flutter/material.dart' hide Colors, Matrix4;
-import 'package:rapier_physics/rapier_physics.dart';
 
-// Macbear3D engine
-import 'package:macbear_3d/macbear_3d.dart';
+import 'demos/base_scene.dart';
 import 'demos/physics_scene.dart';
 import 'demos/compound_scene.dart';
 import 'demos/newton_cradle.dart';

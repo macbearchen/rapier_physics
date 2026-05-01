@@ -1,12 +1,5 @@
-import 'dart:math';
-import 'package:vector_math/vector_math.dart';
-
-// Macbear3D engine
-import 'package:macbear_3d/macbear_3d.dart';
-// Rapier physics
-import 'package:rapier_physics/rapier_physics.dart';
 import '../main_3d.dart';
-import 'physics_scene.dart';
+import 'base_scene.dart';
 
 /// Newton's Cradle demo.
 ///
@@ -65,7 +58,7 @@ class NewtonCradleScene extends BaseScene {
 
   // ── Newton's Cradle ─────────────────────────────────────────────────────────
   void _addNewtonCradle({required int count, required double length}) {
-    const spacing = 1.08; // tiny gap between balls
+    const spacing = 1.07; // tiny gap between balls
     final cradleZ = length + 1.0; // Z height of the top pivot rail
     final frameW = (count - 1) * spacing + 2.0; // rail length
     const yOff = 0.9; // front / back rail offset

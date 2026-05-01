@@ -1,9 +1,5 @@
-import 'dart:math';
-import 'package:vector_math/vector_math.dart';
-
-import 'package:rapier_physics/rapier_physics.dart';
 import '../main_3d.dart';
-import 'physics_scene.dart';
+import 'base_scene.dart';
 
 class DoublePendulumScene extends BaseScene {
   @override

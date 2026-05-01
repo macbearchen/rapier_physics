@@ -1,9 +1,5 @@
-import 'dart:math';
-import 'package:vector_math/vector_math.dart';
-import 'package:macbear_3d/macbear_3d.dart';
-import 'package:rapier_physics/rapier_physics.dart';
 import '../main_3d.dart';
-import 'physics_scene.dart';
+import 'base_scene.dart';
 
 class CompoundScene extends BaseScene {
   final _random = Random();
