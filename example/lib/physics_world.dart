@@ -1,4 +1,3 @@
-import 'package:vector_math/vector_math.dart';
 import 'package:rapier_physics/rapier_physics.dart';
 import 'package:flutter/foundation.dart';
 
