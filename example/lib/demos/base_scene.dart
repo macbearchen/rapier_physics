@@ -12,7 +12,7 @@ export 'package:macbear_3d/macbear_3d.dart';
 import 'package:rapier_physics/rapier_physics.dart';
 export 'package:rapier_physics/rapier_physics.dart';
 
-import '../main_3d.dart';
+import '../physics_world.dart';
 
 // Define a base scene
 class BaseScene extends M3Scene {

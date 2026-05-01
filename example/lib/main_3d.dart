@@ -8,15 +8,16 @@ import 'demos/compound_scene.dart';
 import 'demos/newton_cradle.dart';
 import 'panel.dart';
 
-final world = RapierWorld();
-int sceneIndex = 0;
-final scenes = [PhysicsScene(), CompoundScene()];
+import 'physics_world.dart';
+export 'physics_world.dart';
 
-// init rapier physics
-Future<void> initPhysics() async {
-  final gravity = Vector3(0, 0, -9.8);
-  await world.init(gravity: gravity);
-  debugPrint('Rapier World Version: ${world.version}');
+int sceneIndex = 0;
+List<BaseScene> _scenes = [];
+List<BaseScene> get scenes {
+  if (_scenes.isEmpty) {
+    _scenes = [PhysicsScene(), CompoundScene()];
+  }
+  return _scenes;
 }
 
 void main() async {
@@ -32,7 +33,7 @@ Future<void> onDidInit() async {
   final appEngine = M3AppEngine.instance;
   appEngine.renderEngine.createShadowMap(width: 2048, height: 4096);
 
-  final testScene = PhysicsScene();
+  final testScene = scenes[0];
   // final testScene = BaseScene();
   await appEngine.setScene(testScene);
 }

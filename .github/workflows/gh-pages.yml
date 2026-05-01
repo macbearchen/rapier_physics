@@ -1,0 +1,36 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Build Web
+        run: |
+          cd example
+          flutter build web -t lib/main_3d.dart --base-href /rapier_physics/
+          # Ensure gles_bindings.js is in the right place (if not already in web/)
+          cp web/gles_bindings.js build/web/ || true
+
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: example/build/web
+          branch: gh-pages
