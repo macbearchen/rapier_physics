@@ -1,6 +1,8 @@
 # Rapier Physics for Flutter (繁體中文)
 
-這是一個基於 [Rapier](https://rapier.rs/) 的 Flutter 高性能物理引擎。此套件透過 Rust 和 WebAssembly 提供 3D 物理模擬的跨平台支持。
+這是一個基於 [Rapier](https://rapier.rs/) 的 Flutter 高性能 3D 物理引擎。本套件透過 Rust 與 WebAssembly 提供跨平台（Android, iOS, macOS, Web）的物理模擬支援。
+
+[**網頁版線上展示**](https://macbearchen.github.io/rapier_physics/)
 
 ## 特色
 

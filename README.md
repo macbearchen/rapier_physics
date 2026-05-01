@@ -4,6 +4,8 @@
 
 A high-performance physics engine for Flutter, powered by [Rapier](https://rapier.rs/). This plugin provides cross-platform support for 3D physics simulation using Rust and WebAssembly.
 
+[**Live Web Demo**](https://macbearchen.github.io/rapier_physics/)
+
 ## Features
 
 - **Cross-Platform**: Support for Android, iOS, macOS, and Web.
