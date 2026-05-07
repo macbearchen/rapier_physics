@@ -24,10 +24,11 @@ class ColliderDesc {
   double friction = 0.5;
   double restitution = 0.0;
   double density = 1.0;
+  bool isSensor = false;
 
   ColliderDesc.cuboid(this.hx, this.hy, this.hz) : shapeType = ColliderShapeType.cuboid;
   ColliderDesc.ball(this.radius) : shapeType = ColliderShapeType.ball;
-  ColliderDesc.cylinder(this.halfHeight, this.radius) : shapeType = ColliderShapeType.cylinder;
-  ColliderDesc.cone(this.halfHeight, this.radius) : shapeType = ColliderShapeType.cone;
-  ColliderDesc.capsule(this.halfHeight, this.radius) : shapeType = ColliderShapeType.capsule;
+  ColliderDesc.cylinder(this.radius, this.halfHeight) : shapeType = ColliderShapeType.cylinder;
+  ColliderDesc.cone(this.radius, this.halfHeight) : shapeType = ColliderShapeType.cone;
+  ColliderDesc.capsule(this.radius, this.halfHeight) : shapeType = ColliderShapeType.capsule;
 }

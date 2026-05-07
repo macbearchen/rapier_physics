@@ -15,6 +15,7 @@
 - **關節支持 (Joints)**: 支持固定關節 (Fixed)、球形關節 (Spherical)、旋轉關節 (Revolute)、棱柱關節 (Prismatic) 和繩索關節 (Rope)，並支持馬達 (Motor)。
 - **生命週期管理**: 提供完善的剛體、碰撞體與關節的 **新增與移除** API，並自動處理內部關連清理。
 - **CCD**: 提供連續碰撞檢測 (Continuous Collision Detection)，防止高速物體穿透。
+- **步進控制 (Timestep)**: 通過 `RapierWorld.timestep` 獲取與設定物理模擬的集成步進大小 (`dt`)。
 - **現代 Web 支持**: 使用 `dart:js_interop` 實現高效的 WASM 調用。
 
 ## 開始使用

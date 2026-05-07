@@ -24,6 +24,12 @@ class RapierBindingsImpl extends RapierBindings {
   @override
   void stepWorld(int world) => throw UnsupportedError('Stub');
 
+  @override
+  double getTimestep(int world) => throw UnsupportedError('Stub');
+
+  @override
+  void setTimestep(int world, double dt) => throw UnsupportedError('Stub');
+
   // --- RigidBody ---
   @override
   int createRigidBody(int world, RigidBodyDesc desc) => throw UnsupportedError('Stub');

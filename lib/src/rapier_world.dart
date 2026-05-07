@@ -57,6 +57,16 @@ class RapierWorld {
   }
 
   String get version => bindings.getVersion();
+  
+  /// Gets the current simulation timestep (dt).
+  double get timestep => bindings.getTimestep(_worldHandle);
+
+  /// Sets the simulation timestep (dt).
+  set timestep(double value) {
+    if (_worldHandle != 0) {
+      bindings.setTimestep(_worldHandle, value);
+    }
+  }
 
   void step() {
     if (_worldHandle != 0) {
@@ -75,51 +85,31 @@ class RapierWorld {
   // add rigid body with collider related
   //--------------------------
 
-  RigidBody addBox({
-    required double hx,
-    required double hy,
-    required double hz,
-    RigidBodyDesc? desc,
-  }) {
+  RigidBody addBox({required double hx, required double hy, required double hz, RigidBodyDesc? desc}) {
     final body = createRigidBody(desc ?? RigidBodyDesc.dynamic());
     createCollider(body, ColliderDesc.cuboid(hx, hy, hz));
     return body;
   }
 
-  RigidBody addSphere({
-    required double radius,
-    RigidBodyDesc? desc,
-  }) {
+  RigidBody addSphere({required double radius, RigidBodyDesc? desc}) {
     final body = createRigidBody(desc ?? RigidBodyDesc.dynamic());
     createCollider(body, ColliderDesc.ball(radius));
     return body;
   }
 
-  RigidBody addCylinder({
-    required double halfHeight,
-    required double radius,
-    RigidBodyDesc? desc,
-  }) {
+  RigidBody addCylinder({required double halfHeight, required double radius, RigidBodyDesc? desc}) {
     final body = createRigidBody(desc ?? RigidBodyDesc.dynamic());
     createCollider(body, ColliderDesc.cylinder(halfHeight, radius));
     return body;
   }
 
-  RigidBody addCone({
-    required double halfHeight,
-    required double radius,
-    RigidBodyDesc? desc,
-  }) {
+  RigidBody addCone({required double halfHeight, required double radius, RigidBodyDesc? desc}) {
     final body = createRigidBody(desc ?? RigidBodyDesc.dynamic());
     createCollider(body, ColliderDesc.cone(halfHeight, radius));
     return body;
   }
 
-  RigidBody addCapsule({
-    required double halfHeight,
-    required double radius,
-    RigidBodyDesc? desc,
-  }) {
+  RigidBody addCapsule({required double halfHeight, required double radius, RigidBodyDesc? desc}) {
     final body = createRigidBody(desc ?? RigidBodyDesc.dynamic());
     createCollider(body, ColliderDesc.capsule(halfHeight, radius));
     return body;

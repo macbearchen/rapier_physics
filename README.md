@@ -17,6 +17,7 @@ A high-performance physics engine for Flutter, powered by [Rapier](https://rapie
 - **Joints Support**: Fixed, Spherical, Revolute, Prismatic, and Rope joints with motor support.
 - **Lifecycle Management**: Robust API for adding and **removing** rigid bodies, colliders, and joints with automatic relationship cleanup.
 - **CCD**: Continuous Collision Detection for high-speed simulation.
+- **Timestep Control**: Get and set the simulation integration step size (`dt`) via `RapierWorld.timestep`.
 - **Modern Web Support**: Efficient WASM implementation using `dart:js_interop`.
 
 ## Getting Started

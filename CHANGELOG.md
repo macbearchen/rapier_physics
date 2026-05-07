@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.1
+- **Timestep API**: Added `timestep` getter and setter to `RapierWorld`, allowing users to control the simulation's integration step size (`dt`).
+- **FFI Naming Refactor**: Standardized all FFI function names to the `rapier_[component]_[action]` convention (e.g., `rapier_rigid_body_create`, `rapier_collider_get_position_x`) for better consistency across Native and Web platforms.
+- **API Refinement**: Updated `ColliderDesc` constructors for `cylinder`, `cone`, and `capsule` to follow a more intuitive parameter order: `(radius, halfHeight)` instead of `(halfHeight, radius)`.
+- **Platform Sync**: Updated iOS/macOS Swift plugins and Web/WASM bridge to support the new timestep FFI symbols and improve symbol visibility.
+
+
 ## 0.3.0
 - **Unified Collider API**: Introduced `ColliderDesc` architecture for more robust and extensible collider creation.
 - **Native Local Transform Support**: 

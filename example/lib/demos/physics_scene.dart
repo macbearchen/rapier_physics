@@ -73,8 +73,8 @@ class PhysicsScene extends BaseScene {
     addWalls();
     addGridFall();
     // addFalling();
-    addFan(Vector3(0, -12, 2));
-    addLift(Vector3(2, -12, 4));
+    addFan(Vector3(0, -12, 4));
+    addLift(Vector3(5, -12, 8));
     addRope(12, Vector3(12, 0, 8));
 
     addHeightfield();

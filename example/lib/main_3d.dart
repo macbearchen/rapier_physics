@@ -11,15 +11,6 @@ import 'panel.dart';
 import 'physics_world.dart';
 export 'physics_world.dart';
 
-int sceneIndex = 0;
-List<BaseScene> _scenes = [];
-List<BaseScene> get scenes {
-  if (_scenes.isEmpty) {
-    _scenes = [PhysicsScene(), CompoundScene()];
-  }
-  return _scenes;
-}
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   M3AppEngine.instance.onDidInit = onDidInit;
@@ -33,7 +24,7 @@ Future<void> onDidInit() async {
   final appEngine = M3AppEngine.instance;
   appEngine.renderEngine.createShadowMap(width: 2048, height: 4096);
 
-  final testScene = scenes[0];
+  final testScene = PhysicsScene();
   // final testScene = BaseScene();
   await appEngine.setScene(testScene);
 }
@@ -85,15 +76,6 @@ class MyApp extends StatelessWidget {
                   renderOptions.shadows = true;
                   scene.camera.csmCount = 4;
                 }
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.refresh),
-              onPressed: () async {
-                world.destroy();
-                await initPhysics();
-                sceneIndex = (sceneIndex + 1) % scenes.length;
-                await M3AppEngine.instance.setScene(scenes[sceneIndex]);
               },
             ),
           ],

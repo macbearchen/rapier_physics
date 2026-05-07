@@ -1,28 +1,38 @@
 // Stub for web interop to allow compilation on non-web platforms.
 
+// ignore_for_file: non_constant_identifier_names
+
 dynamic rapier_init() => throw UnsupportedError('Web only');
 dynamic rapier_version() => throw UnsupportedError('Web only');
 dynamic rapier_world_create() => throw UnsupportedError('Web only');
 void rapier_world_destroy(dynamic world) => throw UnsupportedError('Web only');
 void rapier_world_set_gravity(dynamic world, dynamic x, dynamic y, dynamic z) => throw UnsupportedError('Web only');
 void rapier_world_step(dynamic world) => throw UnsupportedError('Web only');
-dynamic rapier_create_rigid_body(dynamic world, dynamic x, dynamic y, dynamic z, dynamic type) =>
+dynamic rapier_rigid_body_create(dynamic world, dynamic x, dynamic y, dynamic z, dynamic type) =>
     throw UnsupportedError('Web only');
-void rapier_create_collider(
+void rapier_collider_create(
   dynamic world,
   dynamic body,
   dynamic shapeType,
-  dynamic x,
-  dynamic y,
-  dynamic z,
+  dynamic hx,
+  dynamic hy,
+  dynamic hz,
   dynamic radius,
   dynamic halfHeight,
   dynamic friction,
   dynamic restitution,
   dynamic density,
+  dynamic localPositionX,
+  dynamic localPositionY,
+  dynamic localPositionZ,
+  dynamic localRotationX,
+  dynamic localRotationY,
+  dynamic localRotationZ,
+  dynamic localRotationW,
+  dynamic isSensor,
 ) => throw UnsupportedError('Web only');
 
-void rapier_create_heightfield_collider(
+void rapier_collider_create_heightfield(
   dynamic world,
   dynamic body,
   dynamic heights,
@@ -36,7 +46,7 @@ void rapier_create_heightfield_collider(
 dynamic rapier_malloc(dynamic size) => throw UnsupportedError('Web only');
 void rapier_free(dynamic ptr, dynamic size) => throw UnsupportedError('Web only');
 
-dynamic rapier_create_fixed_joint(
+dynamic rapier_joint_create_fixed(
   dynamic world,
   dynamic body1,
   dynamic body2,
@@ -56,7 +66,7 @@ dynamic rapier_create_fixed_joint(
   dynamic r2w,
 ) => throw UnsupportedError('Web only');
 
-dynamic rapier_create_spherical_joint(
+dynamic rapier_joint_create_spherical(
   dynamic world,
   dynamic body1,
   dynamic body2,
@@ -68,22 +78,7 @@ dynamic rapier_create_spherical_joint(
   dynamic a2z,
 ) => throw UnsupportedError('Web only');
 
-dynamic rapier_create_revolute_joint(
-  dynamic world,
-  dynamic body1,
-  dynamic body2,
-  dynamic vx,
-  dynamic vy,
-  dynamic vz,
-  dynamic a1x,
-  dynamic a1y,
-  dynamic a1z,
-  dynamic a2x,
-  dynamic a2y,
-  dynamic a2z,
-) => throw UnsupportedError('Web only');
-
-dynamic rapier_create_prismatic_joint(
+dynamic rapier_joint_create_revolute(
   dynamic world,
   dynamic body1,
   dynamic body2,
@@ -98,7 +93,22 @@ dynamic rapier_create_prismatic_joint(
   dynamic a2z,
 ) => throw UnsupportedError('Web only');
 
-dynamic rapier_create_generic_joint(
+dynamic rapier_joint_create_prismatic(
+  dynamic world,
+  dynamic body1,
+  dynamic body2,
+  dynamic vx,
+  dynamic vy,
+  dynamic vz,
+  dynamic a1x,
+  dynamic a1y,
+  dynamic a1z,
+  dynamic a2x,
+  dynamic a2y,
+  dynamic a2z,
+) => throw UnsupportedError('Web only');
+
+dynamic rapier_joint_create_generic(
   dynamic world,
   dynamic body1,
   dynamic body2,
@@ -110,7 +120,7 @@ dynamic rapier_create_generic_joint(
   dynamic a2z,
 ) => throw UnsupportedError('Web only');
 
-dynamic rapier_create_rope_joint(
+dynamic rapier_joint_create_rope(
   dynamic world,
   dynamic body1,
   dynamic body2,
@@ -157,59 +167,59 @@ void rapier_joint_configure_prismatic_motor(
   dynamic damping,
 ) => throw UnsupportedError('Web only');
 
-dynamic rapier_get_body_position_x(dynamic world, dynamic body) => throw UnsupportedError('Web only');
-dynamic rapier_get_body_position_y(dynamic world, dynamic body) => throw UnsupportedError('Web only');
-dynamic rapier_get_body_position_z(dynamic world, dynamic body) => throw UnsupportedError('Web only');
+dynamic rapier_rigid_body_get_position_x(dynamic world, dynamic body) => throw UnsupportedError('Web only');
+dynamic rapier_rigid_body_get_position_y(dynamic world, dynamic body) => throw UnsupportedError('Web only');
+dynamic rapier_rigid_body_get_position_z(dynamic world, dynamic body) => throw UnsupportedError('Web only');
 
-dynamic rapier_get_body_rotation_x(dynamic world, dynamic body) => throw UnsupportedError('Web only');
-dynamic rapier_get_body_rotation_y(dynamic world, dynamic body) => throw UnsupportedError('Web only');
-dynamic rapier_get_body_rotation_z(dynamic world, dynamic body) => throw UnsupportedError('Web only');
-dynamic rapier_get_body_rotation_w(dynamic world, dynamic body) => throw UnsupportedError('Web only');
+dynamic rapier_rigid_body_get_rotation_x(dynamic world, dynamic body) => throw UnsupportedError('Web only');
+dynamic rapier_rigid_body_get_rotation_y(dynamic world, dynamic body) => throw UnsupportedError('Web only');
+dynamic rapier_rigid_body_get_rotation_z(dynamic world, dynamic body) => throw UnsupportedError('Web only');
+dynamic rapier_rigid_body_get_rotation_w(dynamic world, dynamic body) => throw UnsupportedError('Web only');
 
-dynamic rapier_get_collider_position_x(dynamic world, dynamic handle) => throw UnsupportedError('Web only');
-dynamic rapier_get_collider_position_y(dynamic world, dynamic handle) => throw UnsupportedError('Web only');
-dynamic rapier_get_collider_position_z(dynamic world, dynamic handle) => throw UnsupportedError('Web only');
+dynamic rapier_collider_get_position_x(dynamic world, dynamic handle) => throw UnsupportedError('Web only');
+dynamic rapier_collider_get_position_y(dynamic world, dynamic handle) => throw UnsupportedError('Web only');
+dynamic rapier_collider_get_position_z(dynamic world, dynamic handle) => throw UnsupportedError('Web only');
 
-dynamic rapier_get_collider_rotation_x(dynamic world, dynamic handle) => throw UnsupportedError('Web only');
-dynamic rapier_get_collider_rotation_y(dynamic world, dynamic handle) => throw UnsupportedError('Web only');
-dynamic rapier_get_collider_rotation_z(dynamic world, dynamic handle) => throw UnsupportedError('Web only');
-dynamic rapier_get_collider_rotation_w(dynamic world, dynamic handle) => throw UnsupportedError('Web only');
+dynamic rapier_collider_get_rotation_x(dynamic world, dynamic handle) => throw UnsupportedError('Web only');
+dynamic rapier_collider_get_rotation_y(dynamic world, dynamic handle) => throw UnsupportedError('Web only');
+dynamic rapier_collider_get_rotation_z(dynamic world, dynamic handle) => throw UnsupportedError('Web only');
+dynamic rapier_collider_get_rotation_w(dynamic world, dynamic handle) => throw UnsupportedError('Web only');
 
-dynamic rapier_get_collider_friction(dynamic world, dynamic handle) => throw UnsupportedError('Web only');
-dynamic rapier_get_collider_restitution(dynamic world, dynamic handle) => throw UnsupportedError('Web only');
-dynamic rapier_get_collider_density(dynamic world, dynamic handle) => throw UnsupportedError('Web only');
+dynamic rapier_collider_get_friction(dynamic world, dynamic handle) => throw UnsupportedError('Web only');
+dynamic rapier_collider_get_restitution(dynamic world, dynamic handle) => throw UnsupportedError('Web only');
+dynamic rapier_collider_get_density(dynamic world, dynamic handle) => throw UnsupportedError('Web only');
 
-void rapier_set_body_position(dynamic world, dynamic body, dynamic x, dynamic y, dynamic z) =>
+void rapier_rigid_body_set_position(dynamic world, dynamic body, dynamic x, dynamic y, dynamic z) =>
     throw UnsupportedError('Web only');
-void rapier_set_body_rotation(dynamic world, dynamic body, dynamic x, dynamic y, dynamic z, dynamic w) =>
-    throw UnsupportedError('Web only');
-
-void rapier_wake_body(dynamic world, dynamic body) => throw UnsupportedError('Web only');
-void rapier_set_body_ccd(dynamic world, dynamic body, dynamic enabled) => throw UnsupportedError('Web only');
-
-void rapier_set_collider_friction(dynamic world, dynamic handle, dynamic friction) =>
-    throw UnsupportedError('Web only');
-void rapier_set_collider_restitution(dynamic world, dynamic handle, dynamic restitution) =>
-    throw UnsupportedError('Web only');
-void rapier_set_collider_density(dynamic world, dynamic handle, dynamic density) => throw UnsupportedError('Web only');
-void rapier_set_collider_position(dynamic world, dynamic handle, dynamic x, dynamic y, dynamic z) =>
-    throw UnsupportedError('Web only');
-void rapier_set_collider_rotation(dynamic world, dynamic handle, dynamic x, dynamic y, dynamic z, dynamic w) =>
-    throw UnsupportedError('Web only');
-void rapier_set_body_linear_damping(dynamic world, dynamic handle, dynamic damping) =>
-    throw UnsupportedError('Web only');
-void rapier_set_body_angular_damping(dynamic world, dynamic handle, dynamic damping) =>
+void rapier_rigid_body_set_rotation(dynamic world, dynamic body, dynamic x, dynamic y, dynamic z, dynamic w) =>
     throw UnsupportedError('Web only');
 
-void rapier_body_add_force(dynamic world, dynamic handle, dynamic x, dynamic y, dynamic z) =>
+void rapier_rigid_body_wake(dynamic world, dynamic body) => throw UnsupportedError('Web only');
+void rapier_rigid_body_set_ccd(dynamic world, dynamic body, dynamic enabled) => throw UnsupportedError('Web only');
+
+void rapier_collider_set_friction(dynamic world, dynamic handle, dynamic friction) =>
     throw UnsupportedError('Web only');
-void rapier_body_add_torque(dynamic world, dynamic handle, dynamic x, dynamic y, dynamic z) =>
+void rapier_collider_set_restitution(dynamic world, dynamic handle, dynamic restitution) =>
     throw UnsupportedError('Web only');
-void rapier_body_apply_impulse(dynamic world, dynamic handle, dynamic x, dynamic y, dynamic z) =>
+void rapier_collider_set_density(dynamic world, dynamic handle, dynamic density) => throw UnsupportedError('Web only');
+void rapier_collider_set_position(dynamic world, dynamic handle, dynamic x, dynamic y, dynamic z) =>
     throw UnsupportedError('Web only');
-void rapier_body_apply_torque_impulse(dynamic world, dynamic handle, dynamic x, dynamic y, dynamic z) =>
+void rapier_collider_set_rotation(dynamic world, dynamic handle, dynamic x, dynamic y, dynamic z, dynamic w) =>
     throw UnsupportedError('Web only');
-void rapier_body_add_force_at_point(
+void rapier_rigid_body_set_linear_damping(dynamic world, dynamic handle, dynamic damping) =>
+    throw UnsupportedError('Web only');
+void rapier_rigid_body_set_angular_damping(dynamic world, dynamic handle, dynamic damping) =>
+    throw UnsupportedError('Web only');
+
+void rapier_rigid_body_add_force(dynamic world, dynamic handle, dynamic x, dynamic y, dynamic z) =>
+    throw UnsupportedError('Web only');
+void rapier_rigid_body_add_torque(dynamic world, dynamic handle, dynamic x, dynamic y, dynamic z) =>
+    throw UnsupportedError('Web only');
+void rapier_rigid_body_apply_impulse(dynamic world, dynamic handle, dynamic x, dynamic y, dynamic z) =>
+    throw UnsupportedError('Web only');
+void rapier_rigid_body_apply_torque_impulse(dynamic world, dynamic handle, dynamic x, dynamic y, dynamic z) =>
+    throw UnsupportedError('Web only');
+void rapier_rigid_body_add_force_at_point(
   dynamic world,
   dynamic handle,
   dynamic fx,
@@ -219,7 +229,7 @@ void rapier_body_add_force_at_point(
   dynamic py,
   dynamic pz,
 ) => throw UnsupportedError('Web only');
-void rapier_body_apply_impulse_at_point(
+void rapier_rigid_body_apply_impulse_at_point(
   dynamic world,
   dynamic handle,
   dynamic ix,
@@ -230,11 +240,11 @@ void rapier_body_apply_impulse_at_point(
   dynamic pz,
 ) => throw UnsupportedError('Web only');
 
-void rapier_body_set_linear_velocity(dynamic world, dynamic handle, dynamic x, dynamic y, dynamic z) =>
+void rapier_rigid_body_set_linear_velocity(dynamic world, dynamic handle, dynamic x, dynamic y, dynamic z) =>
     throw UnsupportedError('Web only');
-void rapier_body_set_angular_velocity(dynamic world, dynamic handle, dynamic x, dynamic y, dynamic z) =>
+void rapier_rigid_body_set_angular_velocity(dynamic world, dynamic handle, dynamic x, dynamic y, dynamic z) =>
     throw UnsupportedError('Web only');
 
-void rapier_world_remove_rigid_body(dynamic world, dynamic handle) => throw UnsupportedError('Web only');
-void rapier_world_remove_collider(dynamic world, dynamic handle) => throw UnsupportedError('Web only');
-void rapier_world_remove_joint(dynamic world, dynamic handle) => throw UnsupportedError('Web only');
+void rapier_rigid_body_remove(dynamic world, dynamic handle) => throw UnsupportedError('Web only');
+void rapier_collider_remove(dynamic world, dynamic handle) => throw UnsupportedError('Web only');
+void rapier_joint_remove(dynamic world, dynamic handle) => throw UnsupportedError('Web only');

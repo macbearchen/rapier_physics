@@ -12,6 +12,8 @@ abstract class RapierBindings {
   void setGravity(int world, double x, double y, double z);
   void destroyWorld(int world);
   void stepWorld(int world);
+  double getTimestep(int world);
+  void setTimestep(int world, double dt);
 
   // --- RigidBody ---
   int createRigidBody(int world, RigidBodyDesc desc);

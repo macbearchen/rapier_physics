@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'dart:js_interop';
 
 @JS()
@@ -19,10 +21,16 @@ external void rapier_world_set_gravity(JSNumber world, JSNumber x, JSNumber y, J
 external void rapier_world_step(JSNumber world);
 
 @JS()
-external JSNumber rapier_create_rigid_body(JSNumber world, JSNumber x, JSNumber y, JSNumber z, JSNumber type);
+external JSNumber rapier_world_get_timestep(JSNumber world);
 
 @JS()
-external JSNumber rapier_create_collider(
+external void rapier_world_set_timestep(JSNumber world, JSNumber dt);
+
+@JS()
+external JSNumber rapier_rigid_body_create(JSNumber world, JSNumber x, JSNumber y, JSNumber z, JSNumber type);
+
+@JS()
+external JSNumber rapier_collider_create(
   JSNumber world,
   JSNumber body,
   JSNumber shapeType,
@@ -41,10 +49,11 @@ external JSNumber rapier_create_collider(
   JSNumber localRotationY,
   JSNumber localRotationZ,
   JSNumber localRotationW,
+  JSBoolean isSensor,
 );
 
 @JS()
-external JSNumber rapier_create_heightfield_collider(
+external JSNumber rapier_collider_create_heightfield(
   JSNumber world,
   JSNumber body,
   JSFloat32Array heights,
@@ -62,7 +71,7 @@ external JSNumber rapier_malloc(JSNumber size);
 external void rapier_free(JSNumber ptr, JSNumber size);
 
 @JS()
-external JSNumber rapier_create_fixed_joint(
+external JSNumber rapier_joint_create_fixed(
   JSNumber world,
   JSNumber body1,
   JSNumber body2,
@@ -83,7 +92,7 @@ external JSNumber rapier_create_fixed_joint(
 );
 
 @JS()
-external JSNumber rapier_create_spherical_joint(
+external JSNumber rapier_joint_create_spherical(
   JSNumber world,
   JSNumber body1,
   JSNumber body2,
@@ -96,23 +105,7 @@ external JSNumber rapier_create_spherical_joint(
 );
 
 @JS()
-external JSNumber rapier_create_revolute_joint(
-  JSNumber world,
-  JSNumber body1,
-  JSNumber body2,
-  JSNumber vx,
-  JSNumber vy,
-  JSNumber vz,
-  JSNumber a1x,
-  JSNumber a1y,
-  JSNumber a1z,
-  JSNumber a2x,
-  JSNumber a2y,
-  JSNumber a2z,
-);
-
-@JS()
-external JSNumber rapier_create_prismatic_joint(
+external JSNumber rapier_joint_create_revolute(
   JSNumber world,
   JSNumber body1,
   JSNumber body2,
@@ -128,7 +121,23 @@ external JSNumber rapier_create_prismatic_joint(
 );
 
 @JS()
-external JSNumber rapier_create_generic_joint(
+external JSNumber rapier_joint_create_prismatic(
+  JSNumber world,
+  JSNumber body1,
+  JSNumber body2,
+  JSNumber vx,
+  JSNumber vy,
+  JSNumber vz,
+  JSNumber a1x,
+  JSNumber a1y,
+  JSNumber a1z,
+  JSNumber a2x,
+  JSNumber a2y,
+  JSNumber a2z,
+);
+
+@JS()
+external JSNumber rapier_joint_create_generic(
   JSNumber world,
   JSNumber body1,
   JSNumber body2,
@@ -141,7 +150,7 @@ external JSNumber rapier_create_generic_joint(
 );
 
 @JS()
-external JSNumber rapier_create_rope_joint(
+external JSNumber rapier_joint_create_rope(
   JSNumber world,
   JSNumber body1,
   JSNumber body2,
@@ -193,70 +202,70 @@ external void rapier_joint_configure_prismatic_motor(
 
 // Getters
 @JS()
-external JSNumber rapier_get_body_position_x(JSNumber world, JSNumber body);
+external JSNumber rapier_rigid_body_get_position_x(JSNumber world, JSNumber body);
 @JS()
-external JSNumber rapier_get_body_position_y(JSNumber world, JSNumber body);
+external JSNumber rapier_rigid_body_get_position_y(JSNumber world, JSNumber body);
 @JS()
-external JSNumber rapier_get_body_position_z(JSNumber world, JSNumber body);
+external JSNumber rapier_rigid_body_get_position_z(JSNumber world, JSNumber body);
 
 @JS()
-external JSNumber rapier_get_body_rotation_x(JSNumber world, JSNumber body);
+external JSNumber rapier_rigid_body_get_rotation_x(JSNumber world, JSNumber body);
 @JS()
-external JSNumber rapier_get_body_rotation_y(JSNumber world, JSNumber body);
+external JSNumber rapier_rigid_body_get_rotation_y(JSNumber world, JSNumber body);
 @JS()
-external JSNumber rapier_get_body_rotation_z(JSNumber world, JSNumber body);
+external JSNumber rapier_rigid_body_get_rotation_z(JSNumber world, JSNumber body);
 @JS()
-external JSNumber rapier_get_body_rotation_w(JSNumber world, JSNumber body);
+external JSNumber rapier_rigid_body_get_rotation_w(JSNumber world, JSNumber body);
 
 @JS()
-external JSNumber rapier_get_collider_position_x(JSNumber world, JSNumber handle);
+external JSNumber rapier_collider_get_position_x(JSNumber world, JSNumber handle);
 @JS()
-external JSNumber rapier_get_collider_position_y(JSNumber world, JSNumber handle);
+external JSNumber rapier_collider_get_position_y(JSNumber world, JSNumber handle);
 @JS()
-external JSNumber rapier_get_collider_position_z(JSNumber world, JSNumber handle);
+external JSNumber rapier_collider_get_position_z(JSNumber world, JSNumber handle);
 
 @JS()
-external JSNumber rapier_get_collider_rotation_x(JSNumber world, JSNumber handle);
+external JSNumber rapier_collider_get_rotation_x(JSNumber world, JSNumber handle);
 @JS()
-external JSNumber rapier_get_collider_rotation_y(JSNumber world, JSNumber handle);
+external JSNumber rapier_collider_get_rotation_y(JSNumber world, JSNumber handle);
 @JS()
-external JSNumber rapier_get_collider_rotation_z(JSNumber world, JSNumber handle);
+external JSNumber rapier_collider_get_rotation_z(JSNumber world, JSNumber handle);
 @JS()
-external JSNumber rapier_get_collider_rotation_w(JSNumber world, JSNumber handle);
+external JSNumber rapier_collider_get_rotation_w(JSNumber world, JSNumber handle);
 
 @JS()
-external JSNumber rapier_get_collider_friction(JSNumber world, JSNumber handle);
+external JSNumber rapier_collider_get_friction(JSNumber world, JSNumber handle);
 @JS()
-external JSNumber rapier_get_collider_restitution(JSNumber world, JSNumber handle);
+external JSNumber rapier_collider_get_restitution(JSNumber world, JSNumber handle);
 @JS()
-external JSNumber rapier_get_collider_density(JSNumber world, JSNumber handle);
+external JSNumber rapier_collider_get_density(JSNumber world, JSNumber handle);
 
 @JS()
-external void rapier_set_body_position(JSNumber world, JSNumber body, JSNumber x, JSNumber y, JSNumber z);
+external void rapier_rigid_body_set_position(JSNumber world, JSNumber body, JSNumber x, JSNumber y, JSNumber z);
 
 @JS()
-external void rapier_set_body_rotation(JSNumber world, JSNumber body, JSNumber x, JSNumber y, JSNumber z, JSNumber w);
+external void rapier_rigid_body_set_rotation(JSNumber world, JSNumber body, JSNumber x, JSNumber y, JSNumber z, JSNumber w);
 
 @JS()
-external void rapier_wake_body(JSNumber world, JSNumber body);
+external void rapier_rigid_body_wake(JSNumber world, JSNumber body);
 
 @JS()
-external void rapier_set_body_ccd(JSNumber world, JSNumber body, JSBoolean enabled);
+external void rapier_rigid_body_set_ccd(JSNumber world, JSNumber body, JSBoolean enabled);
 
 @JS()
-external void rapier_set_collider_friction(JSNumber world, JSNumber handle, JSNumber friction);
+external void rapier_collider_set_friction(JSNumber world, JSNumber handle, JSNumber friction);
 
 @JS()
-external void rapier_set_collider_restitution(JSNumber world, JSNumber handle, JSNumber restitution);
+external void rapier_collider_set_restitution(JSNumber world, JSNumber handle, JSNumber restitution);
 
 @JS()
-external void rapier_set_collider_density(JSNumber world, JSNumber handle, JSNumber density);
+external void rapier_collider_set_density(JSNumber world, JSNumber handle, JSNumber density);
 
 @JS()
-external void rapier_set_collider_position(JSNumber world, JSNumber handle, JSNumber x, JSNumber y, JSNumber z);
+external void rapier_collider_set_position(JSNumber world, JSNumber handle, JSNumber x, JSNumber y, JSNumber z);
 
 @JS()
-external void rapier_set_collider_rotation(
+external void rapier_collider_set_rotation(
   JSNumber world,
   JSNumber handle,
   JSNumber x,
@@ -266,25 +275,25 @@ external void rapier_set_collider_rotation(
 );
 
 @JS()
-external void rapier_set_body_linear_damping(JSNumber world, JSNumber handle, JSNumber damping);
+external void rapier_rigid_body_set_linear_damping(JSNumber world, JSNumber handle, JSNumber damping);
 
 @JS()
-external void rapier_set_body_angular_damping(JSNumber world, JSNumber handle, JSNumber damping);
+external void rapier_rigid_body_set_angular_damping(JSNumber world, JSNumber handle, JSNumber damping);
 
 @JS()
-external void rapier_body_add_force(JSNumber world, JSNumber handle, JSNumber x, JSNumber y, JSNumber z);
+external void rapier_rigid_body_add_force(JSNumber world, JSNumber handle, JSNumber x, JSNumber y, JSNumber z);
 
 @JS()
-external void rapier_body_add_torque(JSNumber world, JSNumber handle, JSNumber x, JSNumber y, JSNumber z);
+external void rapier_rigid_body_add_torque(JSNumber world, JSNumber handle, JSNumber x, JSNumber y, JSNumber z);
 
 @JS()
-external void rapier_body_apply_impulse(JSNumber world, JSNumber handle, JSNumber x, JSNumber y, JSNumber z);
+external void rapier_rigid_body_apply_impulse(JSNumber world, JSNumber handle, JSNumber x, JSNumber y, JSNumber z);
 
 @JS()
-external void rapier_body_apply_torque_impulse(JSNumber world, JSNumber handle, JSNumber x, JSNumber y, JSNumber z);
+external void rapier_rigid_body_apply_torque_impulse(JSNumber world, JSNumber handle, JSNumber x, JSNumber y, JSNumber z);
 
 @JS()
-external void rapier_body_add_force_at_point(
+external void rapier_rigid_body_add_force_at_point(
   JSNumber world,
   JSNumber handle,
   JSNumber fx,
@@ -296,7 +305,7 @@ external void rapier_body_add_force_at_point(
 );
 
 @JS()
-external void rapier_body_apply_impulse_at_point(
+external void rapier_rigid_body_apply_impulse_at_point(
   JSNumber world,
   JSNumber handle,
   JSNumber ix,
@@ -308,16 +317,16 @@ external void rapier_body_apply_impulse_at_point(
 );
 
 @JS()
-external void rapier_body_set_linear_velocity(JSNumber world, JSNumber handle, JSNumber x, JSNumber y, JSNumber z);
+external void rapier_rigid_body_set_linear_velocity(JSNumber world, JSNumber handle, JSNumber x, JSNumber y, JSNumber z);
 
 @JS()
-external void rapier_body_set_angular_velocity(JSNumber world, JSNumber handle, JSNumber x, JSNumber y, JSNumber z);
+external void rapier_rigid_body_set_angular_velocity(JSNumber world, JSNumber handle, JSNumber x, JSNumber y, JSNumber z);
 
 @JS()
-external void rapier_world_remove_rigid_body(JSNumber world, JSNumber handle);
+external void rapier_rigid_body_remove(JSNumber world, JSNumber handle);
 
 @JS()
-external void rapier_world_remove_collider(JSNumber world, JSNumber handle);
+external void rapier_collider_remove(JSNumber world, JSNumber handle);
 
 @JS()
-external void rapier_world_remove_joint(JSNumber world, JSNumber handle);
+external void rapier_joint_remove(JSNumber world, JSNumber handle);

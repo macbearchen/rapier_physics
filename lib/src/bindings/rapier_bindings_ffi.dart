@@ -13,6 +13,8 @@ typedef _CreateWorldC = Pointer<Void> Function();
 typedef _SetGravityC = Void Function(Pointer<Void>, Float, Float, Float);
 typedef _DestroyWorldC = Void Function(Pointer<Void>);
 typedef _StepWorldC = Void Function(Pointer<Void>);
+typedef _GetTimestepC = Float Function(Pointer<Void>);
+typedef _SetTimestepC = Void Function(Pointer<Void>, Float);
 
 // --- RigidBody ---
 typedef _CreateRigidBodyC = Uint32 Function(Pointer<Void>, Float, Float, Float, Uint8);
@@ -58,6 +60,8 @@ final class _ColliderDesc extends Struct {
   external double localRotationZ;
   @Float()
   external double localRotationW;
+  @Bool()
+  external bool isSensor;
 }
 
 typedef _CreateColliderC = Uint32 Function(Pointer<Void>, Uint32, Pointer<_ColliderDesc>);
@@ -114,6 +118,8 @@ typedef _CreateWorldDart = Pointer<Void> Function();
 typedef _SetGravityDart = void Function(Pointer<Void>, double, double, double);
 typedef _DestroyWorldDart = void Function(Pointer<Void>);
 typedef _StepWorldDart = void Function(Pointer<Void>);
+typedef _GetTimestepDart = double Function(Pointer<Void>);
+typedef _SetTimestepDart = void Function(Pointer<Void>, double);
 
 // --- RigidBody ---
 typedef _CreateRigidBodyDart = int Function(Pointer<Void>, double, double, double, int);
@@ -178,6 +184,8 @@ class RapierBindingsImpl extends RapierBindings {
   late _DestroyWorldDart _destroyWorldNative;
   late _SetGravityDart _setGravityNative;
   late _StepWorldDart _stepWorldNative;
+  late _GetTimestepDart _getTimestepNative;
+  late _SetTimestepDart _setTimestepNative;
 
   // --- RigidBody ---
   late _CreateRigidBodyDart _createRigidBodyNative;
@@ -258,92 +266,94 @@ class RapierBindingsImpl extends RapierBindings {
     _destroyWorldNative = _dylib.lookupFunction<_DestroyWorldC, _DestroyWorldDart>('rapier_world_destroy');
     _setGravityNative = _dylib.lookupFunction<_SetGravityC, _SetGravityDart>('rapier_world_set_gravity');
     _stepWorldNative = _dylib.lookupFunction<_StepWorldC, _StepWorldDart>('rapier_world_step');
+    _getTimestepNative = _dylib.lookupFunction<_GetTimestepC, _GetTimestepDart>('rapier_world_get_timestep');
+    _setTimestepNative = _dylib.lookupFunction<_SetTimestepC, _SetTimestepDart>('rapier_world_set_timestep');
 
     // --- RigidBody ---
-    _createRigidBodyNative = _dylib.lookupFunction<_CreateRigidBodyC, _CreateRigidBodyDart>('rapier_create_rigid_body');
-    _removeRigidBodyNative = _dylib.lookupFunction<_WakeBodyC, _WakeBodyDart>('rapier_world_remove_rigid_body');
-    _getPosX = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_get_body_position_x');
-    _getPosY = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_get_body_position_y');
-    _getPosZ = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_get_body_position_z');
-    _getRotX = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_get_body_rotation_x');
-    _getRotY = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_get_body_rotation_y');
-    _getRotZ = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_get_body_rotation_z');
-    _getRotW = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_get_body_rotation_w');
-    _setPositionNative = _dylib.lookupFunction<_SetPositionC, _SetPositionDart>('rapier_set_body_position');
-    _setRotationNative = _dylib.lookupFunction<_SetRotationC, _SetRotationDart>('rapier_set_body_rotation');
-    _wakeBodyNative = _dylib.lookupFunction<_WakeBodyC, _WakeBodyDart>('rapier_wake_body');
-    _setCCDNative = _dylib.lookupFunction<_SetCCDC, _SetCCDDart>('rapier_set_body_ccd');
+    _createRigidBodyNative = _dylib.lookupFunction<_CreateRigidBodyC, _CreateRigidBodyDart>('rapier_rigid_body_create');
+    _removeRigidBodyNative = _dylib.lookupFunction<_WakeBodyC, _WakeBodyDart>('rapier_rigid_body_remove');
+    _getPosX = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_rigid_body_get_position_x');
+    _getPosY = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_rigid_body_get_position_y');
+    _getPosZ = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_rigid_body_get_position_z');
+    _getRotX = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_rigid_body_get_rotation_x');
+    _getRotY = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_rigid_body_get_rotation_y');
+    _getRotZ = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_rigid_body_get_rotation_z');
+    _getRotW = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_rigid_body_get_rotation_w');
+    _setPositionNative = _dylib.lookupFunction<_SetPositionC, _SetPositionDart>('rapier_rigid_body_set_position');
+    _setRotationNative = _dylib.lookupFunction<_SetRotationC, _SetRotationDart>('rapier_rigid_body_set_rotation');
+    _wakeBodyNative = _dylib.lookupFunction<_WakeBodyC, _WakeBodyDart>('rapier_rigid_body_wake');
+    _setCCDNative = _dylib.lookupFunction<_SetCCDC, _SetCCDDart>('rapier_rigid_body_set_ccd');
     _setBodyLinearDampingNative = _dylib.lookupFunction<_SetBodyDampingC, _SetBodyDampingDart>(
-      'rapier_set_body_linear_damping',
+      'rapier_rigid_body_set_linear_damping',
     );
     _setBodyAngularDampingNative = _dylib.lookupFunction<_SetBodyDampingC, _SetBodyDampingDart>(
-      'rapier_set_body_angular_damping',
+      'rapier_rigid_body_set_angular_damping',
     );
-    _addForceNative = _dylib.lookupFunction<_BodyForceC, _BodyForceDart>('rapier_body_add_force');
-    _addTorqueNative = _dylib.lookupFunction<_BodyForceC, _BodyForceDart>('rapier_body_add_torque');
-    _applyImpulseNative = _dylib.lookupFunction<_BodyForceC, _BodyForceDart>('rapier_body_apply_impulse');
-    _applyTorqueImpulseNative = _dylib.lookupFunction<_BodyForceC, _BodyForceDart>('rapier_body_apply_torque_impulse');
+    _addForceNative = _dylib.lookupFunction<_BodyForceC, _BodyForceDart>('rapier_rigid_body_add_force');
+    _addTorqueNative = _dylib.lookupFunction<_BodyForceC, _BodyForceDart>('rapier_rigid_body_add_torque');
+    _applyImpulseNative = _dylib.lookupFunction<_BodyForceC, _BodyForceDart>('rapier_rigid_body_apply_impulse');
+    _applyTorqueImpulseNative = _dylib.lookupFunction<_BodyForceC, _BodyForceDart>('rapier_rigid_body_apply_torque_impulse');
     _addForceAtPointNative = _dylib.lookupFunction<_BodyForceAtPointC, _BodyForceAtPointDart>(
-      'rapier_body_add_force_at_point',
+      'rapier_rigid_body_add_force_at_point',
     );
     _applyImpulseAtPointNative = _dylib.lookupFunction<_BodyForceAtPointC, _BodyForceAtPointDart>(
-      'rapier_body_apply_impulse_at_point',
+      'rapier_rigid_body_apply_impulse_at_point',
     );
-    _setLinearVelocityNative = _dylib.lookupFunction<_BodyForceC, _BodyForceDart>('rapier_body_set_linear_velocity');
-    _setAngularVelocityNative = _dylib.lookupFunction<_BodyForceC, _BodyForceDart>('rapier_body_set_angular_velocity');
+    _setLinearVelocityNative = _dylib.lookupFunction<_BodyForceC, _BodyForceDart>('rapier_rigid_body_set_linear_velocity');
+    _setAngularVelocityNative = _dylib.lookupFunction<_BodyForceC, _BodyForceDart>('rapier_rigid_body_set_angular_velocity');
 
     // --- Collider ---
-    _createColliderNative = _dylib.lookupFunction<_CreateColliderC, _CreateColliderDart>('rapier_create_collider');
+    _createColliderNative = _dylib.lookupFunction<_CreateColliderC, _CreateColliderDart>('rapier_collider_create');
 
     _createHeightfieldColliderNative = _dylib
         .lookupFunction<_CreateHeightfieldColliderC, _CreateHeightfieldColliderDart>(
-          'rapier_create_heightfield_collider',
+          'rapier_collider_create_heightfield',
         );
-    _removeColliderNative = _dylib.lookupFunction<_WakeBodyC, _WakeBodyDart>('rapier_world_remove_collider');
-    _getColPosX = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_get_collider_position_x');
-    _getColPosY = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_get_collider_position_y');
-    _getColPosZ = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_get_collider_position_z');
-    _getColRotX = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_get_collider_rotation_x');
-    _getColRotY = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_get_collider_rotation_y');
-    _getColRotZ = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_get_collider_rotation_z');
-    _getColRotW = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_get_collider_rotation_w');
-    _getColFriction = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_get_collider_friction');
-    _getColRestitution = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_get_collider_restitution');
-    _getColDensity = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_get_collider_density');
+    _removeColliderNative = _dylib.lookupFunction<_WakeBodyC, _WakeBodyDart>('rapier_collider_remove');
+    _getColPosX = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_collider_get_position_x');
+    _getColPosY = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_collider_get_position_y');
+    _getColPosZ = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_collider_get_position_z');
+    _getColRotX = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_collider_get_rotation_x');
+    _getColRotY = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_collider_get_rotation_y');
+    _getColRotZ = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_collider_get_rotation_z');
+    _getColRotW = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_collider_get_rotation_w');
+    _getColFriction = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_collider_get_friction');
+    _getColRestitution = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_collider_get_restitution');
+    _getColDensity = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_collider_get_density');
     _setColliderFrictionNative = _dylib.lookupFunction<_SetColliderFrictionC, _SetColliderFrictionDart>(
-      'rapier_set_collider_friction',
+      'rapier_collider_set_friction',
     );
     _setColliderRestitutionNative = _dylib.lookupFunction<_SetColliderRestitutionC, _SetColliderRestitutionDart>(
-      'rapier_set_collider_restitution',
+      'rapier_collider_set_restitution',
     );
     _setColliderDensityNative = _dylib.lookupFunction<_SetColliderDensityC, _SetColliderDensityDart>(
-      'rapier_set_collider_density',
+      'rapier_collider_set_density',
     );
     _setColliderPositionNative = _dylib.lookupFunction<_SetColliderPositionC, _SetColliderPositionDart>(
-      'rapier_set_collider_position',
+      'rapier_collider_set_position',
     );
     _setColliderRotationNative = _dylib.lookupFunction<_SetColliderRotationC, _SetColliderRotationDart>(
-      'rapier_set_collider_rotation',
+      'rapier_collider_set_rotation',
     );
 
     // --- Joint ---
     _createFixedJointNative = _dylib.lookupFunction<_CreateFixedJointC, _CreateFixedJointDart>(
-      'rapier_create_fixed_joint',
+      'rapier_joint_create_fixed',
     );
     _createSphericalJointNative = _dylib.lookupFunction<_CreateSphericalJointC, _CreateSphericalJointDart>(
-      'rapier_create_spherical_joint',
+      'rapier_joint_create_spherical',
     );
     _createRevoluteJointNative = _dylib.lookupFunction<_CreateRevoluteJointC, _CreateRevoluteJointDart>(
-      'rapier_create_revolute_joint',
+      'rapier_joint_create_revolute',
     );
     _createPrismaticJointNative = _dylib.lookupFunction<_CreatePrismaticJointC, _CreatePrismaticJointDart>(
-      'rapier_create_prismatic_joint',
+      'rapier_joint_create_prismatic',
     );
     _createGenericJointNative = _dylib.lookupFunction<_CreateGenericJointC, _CreateGenericJointDart>(
-      'rapier_create_generic_joint',
+      'rapier_joint_create_generic',
     );
-    _createRopeJointNative = _dylib.lookupFunction<_CreateRopeJointC, _CreateRopeJointDart>('rapier_create_rope_joint');
-    _removeJointNative = _dylib.lookupFunction<_WakeBodyC, _WakeBodyDart>('rapier_world_remove_joint');
+    _createRopeJointNative = _dylib.lookupFunction<_CreateRopeJointC, _CreateRopeJointDart>('rapier_joint_create_rope');
+    _removeJointNative = _dylib.lookupFunction<_WakeBodyC, _WakeBodyDart>('rapier_joint_remove');
     _lockAxisNative = _dylib.lookupFunction<_LockAxisC, _LockAxisDart>('rapier_joint_lock_axis');
     _setLimitsNative = _dylib.lookupFunction<_SetLimitsC, _SetLimitsDart>('rapier_joint_set_limits');
     _configureJointMotorNative = _dylib.lookupFunction<_ConfigureJointMotorC, _ConfigureJointMotorDart>(
@@ -373,6 +383,12 @@ class RapierBindingsImpl extends RapierBindings {
 
   @override
   void stepWorld(int world) => _stepWorldNative(Pointer<Void>.fromAddress(world));
+
+  @override
+  double getTimestep(int world) => _getTimestepNative(Pointer<Void>.fromAddress(world));
+
+  @override
+  void setTimestep(int world, double dt) => _setTimestepNative(Pointer<Void>.fromAddress(world), dt);
 
   // --- RigidBody ---
   @override
@@ -496,6 +512,7 @@ class RapierBindingsImpl extends RapierBindings {
     nativeDesc.ref.localRotationY = desc.localRotation.y;
     nativeDesc.ref.localRotationZ = desc.localRotation.z;
     nativeDesc.ref.localRotationW = desc.localRotation.w;
+    nativeDesc.ref.isSensor = desc.isSensor;
 
     final handle = _createColliderNative(Pointer<Void>.fromAddress(world), body, nativeDesc);
 
