@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - develop
   workflow_dispatch:
 
 permissions:
@@ -27,8 +28,10 @@ jobs:
         run: |
           cd example
           flutter build web -t lib/main_3d.dart --base-href /rapier_physics/
-          # Ensure gles_bindings.js is in the right place (if not already in web/)
+          # Ensure essential files are in the build directory
           cp web/gles_bindings.js build/web/ || true
+          cp web/rapier.js build/web/ || true
+          cp web/rapier_ffi.wasm build/web/ || true
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
