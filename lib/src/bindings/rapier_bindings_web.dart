@@ -7,6 +7,10 @@ import '../web/rapier_web_interop.dart' as web_ffi;
 import 'rapier_bindings.dart';
 
 class RapierBindingsImpl extends RapierBindings {
+  // ==========================================
+  // Initialization & Version
+  // ==========================================
+
   @override
   Future<void> init() async {
     await web_ffi.rapier_init().toDart;
@@ -15,7 +19,10 @@ class RapierBindingsImpl extends RapierBindings {
   @override
   String getVersion() => web_ffi.rapier_version().toDart;
 
-  // --- World ---
+  // ==========================================
+  // World
+  // ==========================================
+
   @override
   int createWorld() => web_ffi.rapier_world_create().toDartInt;
 
@@ -35,7 +42,10 @@ class RapierBindingsImpl extends RapierBindings {
   @override
   void setTimestep(int world, double dt) => web_ffi.rapier_world_set_timestep(world.toJS, dt.toJS);
 
-  // --- RigidBody ---
+  // ==========================================
+  // Rigid Body
+  // ==========================================
+
   @override
   int createRigidBody(int world, RigidBodyDesc desc) {
     final handle = web_ffi
@@ -161,7 +171,10 @@ class RapierBindingsImpl extends RapierBindings {
   void setBodyAngularVelocity(int world, int handle, double x, double y, double z) =>
       web_ffi.rapier_rigid_body_set_angular_velocity(world.toJS, handle.toJS, x.toJS, y.toJS, z.toJS);
 
-  // --- Collider ---
+  // ==========================================
+  // Collider
+  // ==========================================
+
   @override
   int createCollider(int world, int body, ColliderDesc desc) {
     final handle = web_ffi
@@ -264,7 +277,10 @@ class RapierBindingsImpl extends RapierBindings {
   void setColliderRotation(int world, int handle, double x, double y, double z, double w) =>
       web_ffi.rapier_collider_set_rotation(world.toJS, handle.toJS, x.toJS, y.toJS, z.toJS, w.toJS);
 
-  // --- Joint ---
+  // ==========================================
+  // Joint
+  // ==========================================
+
   @override
   int createFixedJoint(
     int world,

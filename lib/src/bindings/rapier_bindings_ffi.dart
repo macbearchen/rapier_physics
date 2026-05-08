@@ -7,16 +7,22 @@ import '../rigid_body_desc.dart';
 import '../collider_desc.dart';
 import 'rapier_bindings.dart';
 
-// Native (C) signatures
+// ==========================================
+// Native (C) Signatures
+// ==========================================
+
+// Initialization & Version
 typedef _VersionC = Pointer<Utf8> Function();
+
+// World
 typedef _CreateWorldC = Pointer<Void> Function();
-typedef _SetGravityC = Void Function(Pointer<Void>, Float, Float, Float);
 typedef _DestroyWorldC = Void Function(Pointer<Void>);
+typedef _SetGravityC = Void Function(Pointer<Void>, Float, Float, Float);
 typedef _StepWorldC = Void Function(Pointer<Void>);
 typedef _GetTimestepC = Float Function(Pointer<Void>);
 typedef _SetTimestepC = Void Function(Pointer<Void>, Float);
 
-// --- RigidBody ---
+// RigidBody
 typedef _CreateRigidBodyC = Uint32 Function(Pointer<Void>, Float, Float, Float, Uint8);
 typedef _WakeBodyC = Void Function(Pointer<Void>, Uint32);
 typedef _SetPositionC = Void Function(Pointer<Void>, Uint32, Float, Float, Float);
@@ -26,7 +32,7 @@ typedef _SetBodyDampingC = Void Function(Pointer<Void>, Uint32, Float);
 typedef _BodyForceC = Void Function(Pointer<Void>, Uint32, Float, Float, Float);
 typedef _BodyForceAtPointC = Void Function(Pointer<Void>, Uint32, Float, Float, Float, Float, Float, Float);
 
-// --- Collider ---
+// Collider
 final class _ColliderDesc extends Struct {
   @Uint32()
   external int shapeType;
@@ -65,8 +71,6 @@ final class _ColliderDesc extends Struct {
 }
 
 typedef _CreateColliderC = Uint32 Function(Pointer<Void>, Uint32, Pointer<_ColliderDesc>);
-typedef _CreateColliderDart = int Function(Pointer<Void>, int, Pointer<_ColliderDesc>);
-
 typedef _CreateHeightfieldColliderC =
     Uint32 Function(Pointer<Void>, Uint32, Pointer<Float>, Size, Size, Float, Float, Float);
 typedef _SetColliderFrictionC = Void Function(Pointer<Void>, Uint32, Float);
@@ -75,7 +79,7 @@ typedef _SetColliderDensityC = Void Function(Pointer<Void>, Uint32, Float);
 typedef _SetColliderPositionC = Void Function(Pointer<Void>, Uint32, Float, Float, Float);
 typedef _SetColliderRotationC = Void Function(Pointer<Void>, Uint32, Float, Float, Float, Float);
 
-// --- Joint ---
+// Joint
 typedef _CreateFixedJointC =
     Uint32 Function(
       Pointer<Void>,
@@ -110,18 +114,25 @@ typedef _SetLimitsC = Void Function(Pointer<Void>, Uint32, Uint8, Float, Float);
 typedef _ConfigureMotorC = Void Function(Pointer<Void>, Uint32, Float, Float, Float, Float);
 typedef _ConfigureJointMotorC = Void Function(Pointer<Void>, Uint32, Uint8, Float, Float, Float, Float);
 
+// Helpers
 typedef _GetFloatC = Float Function(Pointer<Void>, Uint32);
 
-// Dart-side equivalents
+// ==========================================
+// Dart Signatures
+// ==========================================
+
+// Initialization & Version
 typedef _VersionDart = Pointer<Utf8> Function();
+
+// World
 typedef _CreateWorldDart = Pointer<Void> Function();
-typedef _SetGravityDart = void Function(Pointer<Void>, double, double, double);
 typedef _DestroyWorldDart = void Function(Pointer<Void>);
+typedef _SetGravityDart = void Function(Pointer<Void>, double, double, double);
 typedef _StepWorldDart = void Function(Pointer<Void>);
 typedef _GetTimestepDart = double Function(Pointer<Void>);
 typedef _SetTimestepDart = void Function(Pointer<Void>, double);
 
-// --- RigidBody ---
+// RigidBody
 typedef _CreateRigidBodyDart = int Function(Pointer<Void>, double, double, double, int);
 typedef _WakeBodyDart = void Function(Pointer<Void>, int);
 typedef _SetPositionDart = void Function(Pointer<Void>, int, double, double, double);
@@ -131,6 +142,8 @@ typedef _SetBodyDampingDart = void Function(Pointer<Void>, int, double);
 typedef _BodyForceDart = void Function(Pointer<Void>, int, double, double, double);
 typedef _BodyForceAtPointDart = void Function(Pointer<Void>, int, double, double, double, double, double, double);
 
+// Collider
+typedef _CreateColliderDart = int Function(Pointer<Void>, int, Pointer<_ColliderDesc>);
 typedef _CreateHeightfieldColliderDart =
     int Function(Pointer<Void>, int, Pointer<Float>, int, int, double, double, double);
 typedef _SetColliderFrictionDart = void Function(Pointer<Void>, int, double);
@@ -139,7 +152,7 @@ typedef _SetColliderDensityDart = void Function(Pointer<Void>, int, double);
 typedef _SetColliderPositionDart = void Function(Pointer<Void>, int, double, double, double);
 typedef _SetColliderRotationDart = void Function(Pointer<Void>, int, double, double, double, double);
 
-// --- Joint ---
+// Joint
 typedef _CreateFixedJointDart =
     int Function(
       Pointer<Void>,
@@ -174,12 +187,20 @@ typedef _SetLimitsDart = void Function(Pointer<Void>, int, int, double, double);
 typedef _ConfigureMotorDart = void Function(Pointer<Void>, int, double, double, double, double);
 typedef _ConfigureJointMotorDart = void Function(Pointer<Void>, int, int, double, double, double, double);
 
+// Helpers
 typedef _GetFloatDart = double Function(Pointer<Void>, int);
+
+// ==========================================
+// Implementation
+// ==========================================
 
 class RapierBindingsImpl extends RapierBindings {
   late DynamicLibrary _dylib;
 
+  // Initialization & Version
   late _VersionDart _versionNative;
+
+  // World
   late _CreateWorldDart _createWorldNative;
   late _DestroyWorldDart _destroyWorldNative;
   late _SetGravityDart _setGravityNative;
@@ -187,7 +208,7 @@ class RapierBindingsImpl extends RapierBindings {
   late _GetTimestepDart _getTimestepNative;
   late _SetTimestepDart _setTimestepNative;
 
-  // --- RigidBody ---
+  // RigidBody
   late _CreateRigidBodyDart _createRigidBodyNative;
   late _WakeBodyDart _removeRigidBodyNative;
   late _GetFloatDart _getPosX;
@@ -212,9 +233,8 @@ class RapierBindingsImpl extends RapierBindings {
   late _BodyForceDart _setLinearVelocityNative;
   late _BodyForceDart _setAngularVelocityNative;
 
-  // --- Collider ---
+  // Collider
   late _CreateColliderDart _createColliderNative;
-
   late _CreateHeightfieldColliderDart _createHeightfieldColliderNative;
   late _WakeBodyDart _removeColliderNative;
   late _GetFloatDart _getColPosX;
@@ -233,7 +253,7 @@ class RapierBindingsImpl extends RapierBindings {
   late _SetColliderPositionDart _setColliderPositionNative;
   late _SetColliderRotationDart _setColliderRotationNative;
 
-  // --- Joint ---
+  // Joint
   late _CreateFixedJointDart _createFixedJointNative;
   late _CreateSphericalJointDart _createSphericalJointNative;
   late _CreateRevoluteJointDart _createRevoluteJointNative;
@@ -261,7 +281,10 @@ class RapierBindingsImpl extends RapierBindings {
       throw UnsupportedError('Platform not supported');
     }
 
+    // Initialization & Version
     _versionNative = _dylib.lookupFunction<_VersionC, _VersionDart>('rapier_version');
+
+    // World
     _createWorldNative = _dylib.lookupFunction<_CreateWorldC, _CreateWorldDart>('rapier_world_create');
     _destroyWorldNative = _dylib.lookupFunction<_DestroyWorldC, _DestroyWorldDart>('rapier_world_destroy');
     _setGravityNative = _dylib.lookupFunction<_SetGravityC, _SetGravityDart>('rapier_world_set_gravity');
@@ -269,7 +292,7 @@ class RapierBindingsImpl extends RapierBindings {
     _getTimestepNative = _dylib.lookupFunction<_GetTimestepC, _GetTimestepDart>('rapier_world_get_timestep');
     _setTimestepNative = _dylib.lookupFunction<_SetTimestepC, _SetTimestepDart>('rapier_world_set_timestep');
 
-    // --- RigidBody ---
+    // RigidBody
     _createRigidBodyNative = _dylib.lookupFunction<_CreateRigidBodyC, _CreateRigidBodyDart>('rapier_rigid_body_create');
     _removeRigidBodyNative = _dylib.lookupFunction<_WakeBodyC, _WakeBodyDart>('rapier_rigid_body_remove');
     _getPosX = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_rigid_body_get_position_x');
@@ -302,9 +325,8 @@ class RapierBindingsImpl extends RapierBindings {
     _setLinearVelocityNative = _dylib.lookupFunction<_BodyForceC, _BodyForceDart>('rapier_rigid_body_set_linear_velocity');
     _setAngularVelocityNative = _dylib.lookupFunction<_BodyForceC, _BodyForceDart>('rapier_rigid_body_set_angular_velocity');
 
-    // --- Collider ---
+    // Collider
     _createColliderNative = _dylib.lookupFunction<_CreateColliderC, _CreateColliderDart>('rapier_collider_create');
-
     _createHeightfieldColliderNative = _dylib
         .lookupFunction<_CreateHeightfieldColliderC, _CreateHeightfieldColliderDart>(
           'rapier_collider_create_heightfield',
@@ -336,7 +358,7 @@ class RapierBindingsImpl extends RapierBindings {
       'rapier_collider_set_rotation',
     );
 
-    // --- Joint ---
+    // Joint
     _createFixedJointNative = _dylib.lookupFunction<_CreateFixedJointC, _CreateFixedJointDart>(
       'rapier_joint_create_fixed',
     );
@@ -367,10 +389,17 @@ class RapierBindingsImpl extends RapierBindings {
     );
   }
 
+  // ==========================================
+  // Version
+  // ==========================================
+
   @override
   String getVersion() => _versionNative().toDartString();
 
-  // --- World ---
+  // ==========================================
+  // World
+  // ==========================================
+
   @override
   int createWorld() => _createWorldNative().address;
 
@@ -390,7 +419,10 @@ class RapierBindingsImpl extends RapierBindings {
   @override
   void setTimestep(int world, double dt) => _setTimestepNative(Pointer<Void>.fromAddress(world), dt);
 
-  // --- RigidBody ---
+  // ==========================================
+  // Rigid Body
+  // ==========================================
+
   @override
   int createRigidBody(int world, RigidBodyDesc desc) {
     final handle = _createRigidBodyNative(
@@ -492,7 +524,10 @@ class RapierBindingsImpl extends RapierBindings {
   void setBodyAngularVelocity(int world, int handle, double x, double y, double z) =>
       _setAngularVelocityNative(Pointer<Void>.fromAddress(world), handle, x, y, z);
 
-  // --- Collider ---
+  // ==========================================
+  // Collider
+  // ==========================================
+
   @override
   int createCollider(int world, int body, ColliderDesc desc) {
     final nativeDesc = calloc<_ColliderDesc>();
@@ -596,7 +631,10 @@ class RapierBindingsImpl extends RapierBindings {
   void setColliderRotation(int world, int handle, double x, double y, double z, double w) =>
       _setColliderRotationNative(Pointer<Void>.fromAddress(world), handle, x, y, z, w);
 
-  // --- Joint ---
+  // ==========================================
+  // Joint
+  // ==========================================
+
   @override
   int createFixedJoint(
     int world,

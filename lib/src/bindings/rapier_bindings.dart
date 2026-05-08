@@ -4,10 +4,17 @@ import '../rigid_body_desc.dart';
 import '../collider_desc.dart';
 
 abstract class RapierBindings {
+  // ==========================================
+  // Initialization & Version
+  // ==========================================
+
   Future<void> init();
   String getVersion();
 
-  // --- World ---
+  // ==========================================
+  // World
+  // ==========================================
+
   int createWorld();
   void setGravity(int world, double x, double y, double z);
   void destroyWorld(int world);
@@ -15,7 +22,10 @@ abstract class RapierBindings {
   double getTimestep(int world);
   void setTimestep(int world, double dt);
 
-  // --- RigidBody ---
+  // ==========================================
+  // Rigid Body
+  // ==========================================
+
   int createRigidBody(int world, RigidBodyDesc desc);
   void removeRigidBody(int world, int handle);
 
@@ -39,7 +49,10 @@ abstract class RapierBindings {
   void setBodyLinearVelocity(int world, int handle, double x, double y, double z);
   void setBodyAngularVelocity(int world, int handle, double x, double y, double z);
 
-  // --- Collider ---
+  // ==========================================
+  // Collider
+  // ==========================================
+
   int createCollider(int world, int body, ColliderDesc desc);
 
   int createHeightfieldCollider(
@@ -66,7 +79,10 @@ abstract class RapierBindings {
   void setColliderPosition(int world, int handle, double x, double y, double z);
   void setColliderRotation(int world, int handle, double x, double y, double z, double w);
 
-  // --- Joint ---
+  // ==========================================
+  // Joint
+  // ==========================================
+
   int createFixedJoint(
     int world,
     int body1,

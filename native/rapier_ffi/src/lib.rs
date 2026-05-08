@@ -3,14 +3,9 @@ pub use rapier3d::prelude::*;
 use std::alloc::{alloc, dealloc, Layout};
 use std::os::raw::c_char;
 
-#[no_mangle]
-pub extern "C" fn rapier_version() -> *const c_char {
-    use std::sync::OnceLock;
-    static VERSION_CSTR: OnceLock<std::ffi::CString> = OnceLock::new();
-    VERSION_CSTR
-        .get_or_init(|| std::ffi::CString::new(rapier3d::VERSION).unwrap())
-        .as_ptr()
-}
+// ==========================================
+// Types
+// ==========================================
 
 #[repr(C)]
 pub struct Vec3 {
@@ -45,6 +40,40 @@ pub struct RapierWorld {
     ccd_solver: CCDSolver,
 }
 
+#[repr(C)]
+pub struct ColliderDesc {
+    pub shape_type: u32,
+    pub hx: f32,
+    pub hy: f32,
+    pub hz: f32,
+    pub radius: f32,
+    pub half_height: f32,
+    pub friction: f32,
+    pub restitution: f32,
+    pub density: f32,
+    pub local_position_x: f32,
+    pub local_position_y: f32,
+    pub local_position_z: f32,
+    pub local_rotation_x: f32,
+    pub local_rotation_y: f32,
+    pub local_rotation_z: f32,
+    pub local_rotation_w: f32,
+    pub is_sensor: bool,
+}
+
+// ==========================================
+// Initialization & Version
+// ==========================================
+
+#[no_mangle]
+pub extern "C" fn rapier_version() -> *const c_char {
+    use std::sync::OnceLock;
+    static VERSION_CSTR: OnceLock<std::ffi::CString> = OnceLock::new();
+    VERSION_CSTR
+        .get_or_init(|| std::ffi::CString::new(rapier3d::VERSION).unwrap())
+        .as_ptr()
+}
+
 #[no_mangle]
 pub extern "C" fn rapier_world_create() -> *mut RapierWorld {
     let world = RapierWorld {
@@ -68,7 +97,18 @@ pub extern "C" fn rapier_world_create() -> *mut RapierWorld {
     Box::into_raw(Box::new(world))
 }
 
-// --- World ---
+// ==========================================
+// World
+// ==========================================
+
+#[no_mangle]
+pub extern "C" fn rapier_world_destroy(world: *mut RapierWorld) {
+    if !world.is_null() {
+        unsafe {
+            drop(Box::from_raw(world));
+        }
+    }
+}
 
 #[no_mangle]
 pub extern "C" fn rapier_world_set_gravity(world: *mut RapierWorld, x: f32, y: f32, z: f32) {
@@ -97,15 +137,6 @@ pub extern "C" fn rapier_world_step(world: *mut RapierWorld) {
 }
 
 #[no_mangle]
-pub extern "C" fn rapier_world_destroy(world: *mut RapierWorld) {
-    if !world.is_null() {
-        unsafe {
-            drop(Box::from_raw(world));
-        }
-    }
-}
-
-#[no_mangle]
 pub extern "C" fn rapier_world_get_timestep(world: *mut RapierWorld) -> f32 {
     let world = unsafe { &mut *world };
     world.integration_parameters.dt
@@ -117,7 +148,9 @@ pub extern "C" fn rapier_world_set_timestep(world: *mut RapierWorld, dt: f32) {
     world.integration_parameters.dt = dt;
 }
 
-// --- RigidBody ---
+// ==========================================
+// Rigid Body
+// ==========================================
 
 #[no_mangle]
 pub extern "C" fn rapier_rigid_body_create(world: *mut RapierWorld, x: f32, y: f32, z: f32, body_type: u8) -> u32 {
@@ -155,12 +188,10 @@ pub extern "C" fn rapier_rigid_body_remove(world: *mut RapierWorld, handle: u32)
 #[no_mangle]
 pub extern "C" fn rapier_rigid_body_get_position(world: *mut RapierWorld, body_handle: u32) -> Vec3 {
     let world = unsafe { &mut *world };
-
     let body_handle = RigidBodyHandle::from_raw_parts(body_handle, 0);
 
     if let Some(body) = world.bodies.get(body_handle) {
         let pos = body.translation();
-
         Vec3 {
             x: pos.x,
             y: pos.y,
@@ -174,12 +205,10 @@ pub extern "C" fn rapier_rigid_body_get_position(world: *mut RapierWorld, body_h
 #[no_mangle]
 pub extern "C" fn rapier_rigid_body_get_rotation(world: *mut RapierWorld, body_handle: u32) -> Quat {
     let world = unsafe { &mut *world };
-
     let body_handle = RigidBodyHandle::from_raw_parts(body_handle, 0);
 
     if let Some(body) = world.bodies.get(body_handle) {
         let rot = body.rotation();
-
         Quat {
             x: rot.x,
             y: rot.y,
@@ -196,27 +225,6 @@ pub extern "C" fn rapier_rigid_body_get_rotation(world: *mut RapierWorld, body_h
     }
 }
 
-#[no_mangle]
-pub extern "C" fn rapier_rigid_body_set_position(world: *mut RapierWorld, body_handle: u32, x: f32, y: f32, z: f32) {
-    let world = unsafe { &mut *world };
-    let handle = RigidBodyHandle::from_raw_parts(body_handle, 0);
-
-    if let Some(body) = world.bodies.get_mut(handle) {
-        body.set_translation(Vector::new(x, y, z), true);
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn rapier_rigid_body_set_rotation(world: *mut RapierWorld, body_handle: u32, x: f32, y: f32, z: f32, w: f32) {
-    let world = unsafe { &mut *world };
-    let handle = RigidBodyHandle::from_raw_parts(body_handle, 0);
-
-    if let Some(body) = world.bodies.get_mut(handle) {
-        body.set_rotation(rapier3d::prelude::Rotation::from_xyzw(x, y, z, w), true);
-    }
-}
-
-// WASM-friendly getters (returning f32 instead of structs)
 #[no_mangle]
 pub extern "C" fn rapier_rigid_body_get_position_x(world: *mut RapierWorld, body_handle: u32) -> f32 {
     let world = unsafe { &mut *world };
@@ -264,6 +272,26 @@ pub extern "C" fn rapier_rigid_body_get_rotation_w(world: *mut RapierWorld, body
     let world = unsafe { &mut *world };
     let handle = RigidBodyHandle::from_raw_parts(body_handle, 0);
     world.bodies.get(handle).map(|b| b.rotation().w).unwrap_or(1.0)
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_rigid_body_set_position(world: *mut RapierWorld, body_handle: u32, x: f32, y: f32, z: f32) {
+    let world = unsafe { &mut *world };
+    let handle = RigidBodyHandle::from_raw_parts(body_handle, 0);
+
+    if let Some(body) = world.bodies.get_mut(handle) {
+        body.set_translation(Vector::new(x, y, z), true);
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_rigid_body_set_rotation(world: *mut RapierWorld, body_handle: u32, x: f32, y: f32, z: f32, w: f32) {
+    let world = unsafe { &mut *world };
+    let handle = RigidBodyHandle::from_raw_parts(body_handle, 0);
+
+    if let Some(body) = world.bodies.get_mut(handle) {
+        body.set_rotation(rapier3d::prelude::Rotation::from_xyzw(x, y, z, w), true);
+    }
 }
 
 #[no_mangle]
@@ -392,27 +420,9 @@ pub extern "C" fn rapier_rigid_body_set_angular_velocity(world: *mut RapierWorld
     }
 }
 
-// --- Collider ---
-#[repr(C)]
-pub struct ColliderDesc {
-    pub shape_type: u32,
-    pub hx: f32,
-    pub hy: f32,
-    pub hz: f32,
-    pub radius: f32,
-    pub half_height: f32,
-    pub friction: f32,
-    pub restitution: f32,
-    pub density: f32,
-    pub local_position_x: f32,
-    pub local_position_y: f32,
-    pub local_position_z: f32,
-    pub local_rotation_x: f32,
-    pub local_rotation_y: f32,
-    pub local_rotation_z: f32,
-    pub local_rotation_w: f32,
-    pub is_sensor: bool,
-}
+// ==========================================
+// Collider
+// ==========================================
 
 #[no_mangle]
 pub extern "C" fn rapier_collider_create(world: *mut RapierWorld, body_handle: u32, desc: *const ColliderDesc) -> u32 {
@@ -610,7 +620,9 @@ pub extern "C" fn rapier_collider_get_density(world: *mut RapierWorld, handle: u
     world.colliders.get(handle).map(|c| c.density()).unwrap_or(0.0)
 }
 
-// --- Joint ---
+// ==========================================
+// Joint
+// ==========================================
 
 #[no_mangle]
 pub extern "C" fn rapier_joint_create_fixed(
@@ -735,64 +747,6 @@ pub extern "C" fn rapier_joint_create_prismatic(
 }
 
 #[no_mangle]
-pub extern "C" fn rapier_joint_remove(world: *mut RapierWorld, handle: u32) {
-    let world = unsafe { &mut *world };
-    let handle = ImpulseJointHandle::from_raw_parts(handle, 0);
-    world.impulse_joints.remove(handle, true);
-}
-
-#[no_mangle]
-pub extern "C" fn rapier_joint_configure_revolute_motor(
-    world: *mut RapierWorld,
-    joint_handle: u32,
-    target_pos: f32,
-    target_vel: f32,
-    stiffness: f32,
-    damping: f32,
-) {
-    let world = unsafe { &mut *world };
-    let handle = ImpulseJointHandle::from_raw_parts(joint_handle, 0);
-    if let Some(joint) = world.impulse_joints.get_mut(handle, true) {
-        // Rapier internally aligns the revolute joint's free axis to AngX in the joint frame.
-        // Using AngZ was incorrect and caused the motor to have no effect.
-        let axis = JointAxis::AngX;
-        if stiffness > 0.0 {
-            // Position mode: drive to a target angle.
-            joint.data.set_motor_position(axis, target_pos, stiffness, damping);
-        } else {
-            // Velocity mode: drive at a constant angular velocity.
-            // Calling both set_motor_position + set_motor_velocity conflicts (they override
-            // each other's MotorModel), so we call only the one that matches intent.
-            joint.data.set_motor_velocity(axis, target_vel, damping);
-        }
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn rapier_joint_configure_prismatic_motor(
-    world: *mut RapierWorld,
-    joint_handle: u32,
-    target_pos: f32,
-    target_vel: f32,
-    stiffness: f32,
-    damping: f32,
-) {
-    let world = unsafe { &mut *world };
-    let handle = ImpulseJointHandle::from_raw_parts(joint_handle, 0);
-    if let Some(joint) = world.impulse_joints.get_mut(handle, true) {
-        // Prismatic joint's free axis is LinX in Rapier's joint frame.
-        let axis = JointAxis::LinX;
-        if stiffness > 0.0 {
-            // Position mode: drive to a target linear position.
-            joint.data.set_motor_position(axis, target_pos, stiffness, damping);
-        } else {
-            // Velocity mode: drive at a constant linear velocity.
-            joint.data.set_motor_velocity(axis, target_vel, damping);
-        }
-    }
-}
-
-#[no_mangle]
 pub extern "C" fn rapier_joint_create_generic(
     world: *mut RapierWorld,
     body1: u32,
@@ -842,16 +796,11 @@ pub extern "C" fn rapier_joint_create_rope(
     handle.into_raw_parts().0
 }
 
-fn u8_to_joint_axis(axis: u8) -> Option<JointAxis> {
-    match axis {
-        0 => Some(JointAxis::LinX),
-        1 => Some(JointAxis::LinY),
-        2 => Some(JointAxis::LinZ),
-        3 => Some(JointAxis::AngX),
-        4 => Some(JointAxis::AngY),
-        5 => Some(JointAxis::AngZ),
-        _ => None,
-    }
+#[no_mangle]
+pub extern "C" fn rapier_joint_remove(world: *mut RapierWorld, handle: u32) {
+    let world = unsafe { &mut *world };
+    let handle = ImpulseJointHandle::from_raw_parts(handle, 0);
+    world.impulse_joints.remove(handle, true);
 }
 
 #[no_mangle]
@@ -900,7 +849,51 @@ pub extern "C" fn rapier_joint_configure_motor(
     }
 }
 
-// --- Utility ---
+#[no_mangle]
+pub extern "C" fn rapier_joint_configure_revolute_motor(
+    world: *mut RapierWorld,
+    joint_handle: u32,
+    target_pos: f32,
+    target_vel: f32,
+    stiffness: f32,
+    damping: f32,
+) {
+    let world = unsafe { &mut *world };
+    let handle = ImpulseJointHandle::from_raw_parts(joint_handle, 0);
+    if let Some(joint) = world.impulse_joints.get_mut(handle, true) {
+        let axis = JointAxis::AngX;
+        if stiffness > 0.0 {
+            joint.data.set_motor_position(axis, target_pos, stiffness, damping);
+        } else {
+            joint.data.set_motor_velocity(axis, target_vel, damping);
+        }
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_joint_configure_prismatic_motor(
+    world: *mut RapierWorld,
+    joint_handle: u32,
+    target_pos: f32,
+    target_vel: f32,
+    stiffness: f32,
+    damping: f32,
+) {
+    let world = unsafe { &mut *world };
+    let handle = ImpulseJointHandle::from_raw_parts(joint_handle, 0);
+    if let Some(joint) = world.impulse_joints.get_mut(handle, true) {
+        let axis = JointAxis::LinX;
+        if stiffness > 0.0 {
+            joint.data.set_motor_position(axis, target_pos, stiffness, damping);
+        } else {
+            joint.data.set_motor_velocity(axis, target_vel, damping);
+        }
+    }
+}
+
+// ==========================================
+// Memory Management
+// ==========================================
 
 #[no_mangle]
 pub extern "C" fn rapier_malloc(size: usize) -> *mut u8 {
@@ -913,5 +906,21 @@ pub extern "C" fn rapier_free(ptr: *mut u8, size: usize) {
     if !ptr.is_null() {
         let layout = Layout::from_size_align(size, 8).unwrap();
         unsafe { dealloc(ptr, layout) }
+    }
+}
+
+// ==========================================
+// Internal Helpers
+// ==========================================
+
+fn u8_to_joint_axis(axis: u8) -> Option<JointAxis> {
+    match axis {
+        0 => Some(JointAxis::LinX),
+        1 => Some(JointAxis::LinY),
+        2 => Some(JointAxis::LinZ),
+        3 => Some(JointAxis::AngX),
+        4 => Some(JointAxis::AngY),
+        5 => Some(JointAxis::AngZ),
+        _ => None,
     }
 }

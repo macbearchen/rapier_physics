@@ -5,13 +5,20 @@ import '../collider_desc.dart';
 import 'rapier_bindings.dart';
 
 class RapierBindingsImpl extends RapierBindings {
-  @override
-  String getVersion() => throw UnsupportedError('Stub');
+  // ==========================================
+  // Initialization & Version
+  // ==========================================
 
   @override
   Future<void> init() async {}
 
-  // --- World ---
+  @override
+  String getVersion() => throw UnsupportedError('Stub');
+
+  // ==========================================
+  // World
+  // ==========================================
+
   @override
   int createWorld() => throw UnsupportedError('Stub');
 
@@ -30,7 +37,10 @@ class RapierBindingsImpl extends RapierBindings {
   @override
   void setTimestep(int world, double dt) => throw UnsupportedError('Stub');
 
-  // --- RigidBody ---
+  // ==========================================
+  // Rigid Body
+  // ==========================================
+
   @override
   int createRigidBody(int world, RigidBodyDesc desc) => throw UnsupportedError('Stub');
 
@@ -87,7 +97,10 @@ class RapierBindingsImpl extends RapierBindings {
   @override
   void setBodyAngularVelocity(int world, int handle, double x, double y, double z) => throw UnsupportedError('Stub');
 
-  // --- Collider ---
+  // ==========================================
+  // Collider
+  // ==========================================
+
   @override
   int createCollider(int world, int body, ColliderDesc desc) => throw UnsupportedError('Stub');
 
@@ -137,7 +150,10 @@ class RapierBindingsImpl extends RapierBindings {
   void setColliderRotation(int world, int handle, double x, double y, double z, double w) =>
       throw UnsupportedError('Stub');
 
-  // --- Joint ---
+  // ==========================================
+  // Joint
+  // ==========================================
+
   @override
   int createFixedJoint(
     int world,
