@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Rapier 3D'),
+          title: Text(RapierPhysics.version),
           actions: [
             IconButton(
               icon: const Icon(Icons.info),

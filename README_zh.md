@@ -5,6 +5,8 @@
 
 這是一個基於 [Rapier](https://rapier.rs/) 的 Flutter 高性能物理引擎。此套件透過 Rust 和 WebAssembly 提供 3D 物理模擬的跨平台支持。
 
+[**網頁版線上展示**](https://macbearchen.github.io/rapier_physics/)
+
 ## 特色
 
 - **跨平台**: 支持 Android、iOS、macOS、Windows 和 Web。

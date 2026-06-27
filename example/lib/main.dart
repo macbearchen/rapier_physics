@@ -68,6 +68,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
+  String _rapierVersion = 'Unknown';
   final _rapierPhysicsPlugin = RapierPhysics();
 
   @override
@@ -94,15 +95,20 @@ class _MyAppState extends State<MyApp> {
 
     setState(() {
       _platformVersion = platformVersion;
+      _rapierVersion = RapierPhysics.version;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    String output =
+        '''
+Running on: $_platformVersion
+Rapier Physics: $_rapierVersion''';
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(title: const Text('Rapier Physics plugin app')),
-        body: Center(child: Text('Running on: $_platformVersion\n')),
+        body: Center(child: Text(output)),
       ),
     );
   }
