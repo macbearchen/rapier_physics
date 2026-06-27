@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'rapier_physics'
-  s.version          = '0.3.1'
+  s.version          = '0.4.0'
   s.summary          = 'Rapier Physics plugin project.'
   s.description      = <<-DESC
 A Rapier Physics plugin project.
@@ -13,12 +13,12 @@ A Rapier Physics plugin project.
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Your Company' => 'email@example.com' }
   s.source           = { :path => '.' }
-  s.source_files = 'Classes/**/*'
+  s.source_files = 'rapier_physics/Sources/rapier_physics/**/*'
   s.dependency 'Flutter'
   s.platform = :ios, '13.0'
   s.swift_version = '5.0'
 
-  s.vendored_frameworks = 'rapier_ffi.xcframework'
+  s.vendored_frameworks = 'rapier_physics/rapier_ffi.xcframework'
   s.static_framework = true
 
   # Flutter.framework does not contain a i386 slice.

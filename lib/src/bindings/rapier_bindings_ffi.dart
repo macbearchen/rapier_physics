@@ -272,7 +272,11 @@ class RapierBindingsImpl extends RapierBindings {
     if (Platform.isMacOS || Platform.isIOS) {
       _dylib = DynamicLibrary.process();
     } else if (Platform.isWindows) {
-      _dylib = DynamicLibrary.open('prebuilt/rapier_ffi.dll');
+      try {
+        _dylib = DynamicLibrary.open('rapier_ffi.dll');
+      } catch (_) {
+        _dylib = DynamicLibrary.open('prebuilt/rapier_ffi.dll');
+      }
     } else if (Platform.isLinux) {
       _dylib = DynamicLibrary.open('prebuilt/librapier_ffi.so');
     } else if (Platform.isAndroid) {

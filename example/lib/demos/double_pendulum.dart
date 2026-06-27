@@ -1,7 +1,9 @@
-import '../main_3d.dart';
 import 'base_scene.dart';
 
 class DoublePendulumScene extends BaseScene {
+  // constrtuctor
+  DoublePendulumScene({required super.physics});
+
   @override
   Future<void> load() async {
     if (isLoaded) return;
@@ -23,35 +25,36 @@ class DoublePendulumScene extends BaseScene {
     // --- Sphere 1 ---
     final posSphere1 = position + Vector3(0, 0, -length);
     final entityS1 = addMesh(pendulumMesh, posSphere1)..color = Colors.red;
-    final rbS1 = world.addSphere(radius: radius, desc: RigidBodyDesc.dynamic()..position = posSphere1);
-    mapEntityBody[rbS1] = entityS1;
-
-    rbS1.colliders.first.density = sphereDensity;
-
-    // Joint 1: Pin Sphere 1 to World at 'position'
-    world.addRevoluteJointToWorld(
-      rbS1,
-      Vector3(0, 1, 0), // Axis Y
-      Vector3(0, 0, length), // Local anchor relative to S1 center
-      position, // World anchor
-    );
+    final rbS1 = physicsSystem.addSphere(radius, M3RigidBodyDesc.dynamic()..position = posSphere1);
+    physicsSystem.attachEntity(entityS1, rbS1);
 
     // --- Sphere 2 ---
     final posSphere2 = posSphere1 + Vector3(0, 0, -length);
     final entityS2 = addMesh(pendulumMesh, posSphere2)..color = Colors.yellow;
-    final rbS2 = world.addSphere(radius: radius, desc: RigidBodyDesc.dynamic()..position = posSphere2);
-    mapEntityBody[rbS2] = entityS2;
-    rbS2.colliders.first.density = sphereDensity;
+    final rbS2 = physicsSystem.addSphere(radius, M3RigidBodyDesc.dynamic()..position = posSphere2);
+    physicsSystem.attachEntity(entityS2, rbS2);
 
-    // Joint 2: Connect Sphere 2 to Sphere 1
-    world.addRevoluteJoint(
-      rbS1,
-      rbS2,
-      Vector3(0, 1, 0), // Axis Y
-      Vector3(0, 0, 0), // Local anchor 1: Center of S1
-      Vector3(0, 0, length), // Local anchor 2: Up from S2 center
-    );
+    if (rbS1 is M3RapierRigidBody && rbS2 is M3RapierRigidBody) {
+      rbS1.colliders.first.density = sphereDensity;
 
+      // Joint 1: Pin Sphere 1 to World at 'position'
+      world.addRevoluteJointToWorld(
+        rbS1,
+        Vector3(0, 1, 0), // Axis Y
+        Vector3(0, 0, length), // Local anchor relative to S1 center
+        position, // World anchor
+      );
+
+      rbS2.colliders.first.density = sphereDensity;
+      // Joint 2: Connect Sphere 2 to Sphere 1
+      world.addRevoluteJoint(
+        rbS1,
+        rbS2,
+        Vector3(0, 1, 0), // Axis Y
+        Vector3(0, 0, 0), // Local anchor 1: Center of S1
+        Vector3(0, 0, length), // Local anchor 2: Up from S2 center
+      );
+    }
     // Initial state: Tilt by 60 degrees
 
     final q = Quaternion.euler(-angle1, 0, 0);

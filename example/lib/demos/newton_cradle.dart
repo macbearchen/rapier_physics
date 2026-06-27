@@ -1,4 +1,3 @@
-import '../main_3d.dart';
 import 'base_scene.dart';
 
 /// Newton's Cradle demo.
@@ -8,6 +7,9 @@ import 'base_scene.dart';
 ///   • Swinging happens in the XZ plane.
 ///   • Hinge axis = Y  →  rotation around Y allows XZ-plane swing.
 class NewtonCradleScene extends BaseScene {
+  // constructor
+  NewtonCradleScene({required super.physics});
+
   @override
   Future<void> load() async {
     if (isLoaded) return;
@@ -86,27 +88,29 @@ class NewtonCradleScene extends BaseScene {
       final pos = Vector3(x, 0.0, restZ);
 
       final entity = addMesh(ballMesh, pos)..color = Colors.skyBlue;
-      final rb = world.addSphere(radius: 0.5, desc: RigidBodyDesc.dynamic()..position = pos);
-      mapEntityBody[rb] = entity;
+      final rb = physicsSystem.addSphere(0.5, M3RigidBodyDesc.dynamic()..position = pos);
+      physicsSystem.attachEntity(entity, rb);
 
-      for (final c in rb.colliders) {
-        c.restitution = 1.0;
-        c.friction = 0.0;
-      }
+      if (rb is M3RapierRigidBody) {
+        for (final c in rb.colliders) {
+          c.restitution = 1.0;
+          c.friction = 0.0;
+        }
 
-      rb.setCCD(true);
-      rb.wakeUp();
+        rb.setCCD(true);
+        rb.wakeUp();
 
-      // Every ball (including ball 0) must have a joint
-      world.addRevoluteJointToWorld(
-        rb,
-        Vector3(0, 1, 0), // hinge axis = Y
-        Vector3(0, 0, length), // local anchor: pivot is `length` above ball centre
-        Vector3(x, 0, cradleZ), // world anchor: pivot position on the rail
-      );
+        // Every ball (including ball 0) must have a joint
+        world.addRevoluteJointToWorld(
+          rb,
+          Vector3(0, 1, 0), // hinge axis = Y
+          Vector3(0, 0, length), // local anchor: pivot is `length` above ball centre
+          Vector3(x, 0, cradleZ), // world anchor: pivot position on the rail
+        );
 
-      if (i == 0) {
-        rb0 = rb;
+        if (i == 0) {
+          rb0 = rb;
+        }
       }
     }
 

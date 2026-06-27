@@ -12,11 +12,28 @@ export 'package:macbear_3d/macbear_3d.dart';
 import 'package:rapier_physics/rapier_physics.dart';
 export 'package:rapier_physics/rapier_physics.dart';
 
-import '../physics_world.dart';
+import 'rapier_physics_engine.dart';
+export 'rapier_physics_engine.dart';
 
 // Define a base scene
 class BaseScene extends M3Scene {
-  final Map<RigidBody, M3Entity> mapEntityBody = {};
+  late final RapierWorld world;
+
+  // 通用的靜態工廠方法
+  static T createPhysicsScene<T extends BaseScene>(T Function(M3PhysicsSystem) sceneFactory) {
+    final rapierEngine = M3RapierPhysicsEngine();
+    final physicsSystem = M3PhysicsSystem(rapierEngine);
+
+    // 使用傳入的工廠函數建立具體子類別
+    final ret = sceneFactory(physicsSystem);
+
+    // 設定共用的 rapierWorld
+    ret.world = rapierEngine.world;
+    return ret;
+  }
+
+  // constrtuctor
+  BaseScene({required super.physics});
 
   @override
   Future<void> load() async {
@@ -47,27 +64,24 @@ class BaseScene extends M3Scene {
 
   // ── Ground ──────────────────────────────────────────────────────────────────
   void addGround() {
-    M3Texture texGrid = M3Texture.createCheckerboard(size: 10);
+    M3Texture texGrid = M3Texture.createCheckerboard(size: 6);
     M3Material mtr = M3Material();
-    mtr.texDiffuse = texGrid;
+    mtr.diffuseTexture = texGrid;
 
-    const hs = 10.0;
+    const hs = 9.0;
     // Fixed physics floor — top surface sits at z = 0
-    world.addBox(hx: hs, hy: hs, hz: 0.5, desc: RigidBodyDesc.fixed()..position = Vector3(0, 0, -0.5));
-
+    final rb = physicsSystem.addBox(hs, hs, 0.5, M3RigidBodyDesc.fixed()..position = Vector3(0, 0, -0.5));
     final floor = addMesh(M3Mesh(M3PlaneGeom(hs * 2, hs * 2), material: mtr), Vector3(0, 0, 0));
+    floor.mesh.subMeshes[0].localMatrix.setTranslation(Vector3(0, 0, 0.5));
     floor.color = Colors.limeGreen;
+    physicsSystem.attachEntity(floor, rb);
   }
 
   @override
   void update(double delta) {
-    world.step();
-
-    mapEntityBody.forEach((body, entity) {
-      entity.position = body.position;
-      entity.rotation = body.rotation;
-    });
-
     super.update(delta);
+
+    double sec = totalTime;
+    light.setEuler(sec * pi / 18, -pi / 3, 0, distance: light.distanceToTarget); // rotate light
   }
 }

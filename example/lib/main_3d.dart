@@ -1,20 +1,16 @@
 // ignore_for_file: unused_import
 
-import 'package:flutter/material.dart' hide Colors, Matrix4;
+import 'package:flutter/material.dart';
 
-import 'demos/base_scene.dart';
+import 'demos/base_scene.dart' hide Colors;
 import 'demos/physics_scene.dart';
 import 'demos/compound_scene.dart';
+import 'demos/double_pendulum.dart';
 import 'demos/newton_cradle.dart';
-import 'panel.dart';
-
-import 'physics_world.dart';
-export 'physics_world.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   M3AppEngine.instance.onDidInit = onDidInit;
-  await initPhysics();
 
   runApp(MyApp());
 }
@@ -24,7 +20,7 @@ Future<void> onDidInit() async {
   final appEngine = M3AppEngine.instance;
   appEngine.renderEngine.createShadowMap(width: 2048, height: 4096);
 
-  final testScene = PhysicsScene();
+  final testScene = BaseScene.createPhysicsScene((physicsSystem) => PhysicsScene(physics: physicsSystem));
   // final testScene = BaseScene();
   await appEngine.setScene(testScene);
 }
@@ -83,6 +79,74 @@ class MyApp extends StatelessWidget {
         body: const M3View(),
         floatingActionButton: const PanelWidget(),
       ),
+    );
+  }
+}
+
+/// panel for select physics scene
+class PanelWidget extends StatefulWidget {
+  const PanelWidget({super.key});
+
+  @override
+  _PanelWidgetState createState() => _PanelWidgetState();
+}
+
+class _PanelWidgetState extends State<PanelWidget> {
+  int _selectedIndex = 0;
+
+  Future<void> _loadScene(int index) async {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    M3Scene scene;
+    if (index == 0) {
+      scene = BaseScene.createPhysicsScene((physicsSystem) => PhysicsScene(physics: physicsSystem));
+    } else if (index == 1) {
+      scene = BaseScene.createPhysicsScene((physicsSystem) => NewtonCradleScene(physics: physicsSystem));
+    } else if (index == 2) {
+      scene = BaseScene.createPhysicsScene((physicsSystem) => DoublePendulumScene(physics: physicsSystem));
+    } else {
+      scene = BaseScene.createPhysicsScene((physicsSystem) => CompoundScene(physics: physicsSystem));
+    }
+
+    await M3AppEngine.instance.setScene(scene);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        FloatingActionButton(
+          heroTag: 'scene_01',
+          backgroundColor: _selectedIndex == 0 ? Colors.lightGreen : Colors.grey,
+          onPressed: () => _loadScene(0),
+          child: const Icon(Icons.filter_1),
+        ),
+        const SizedBox(width: 10),
+        FloatingActionButton(
+          heroTag: 'scene_02',
+          backgroundColor: _selectedIndex == 1 ? Colors.lightGreen : Colors.grey,
+          onPressed: () => _loadScene(1),
+          child: const Icon(Icons.filter_2),
+        ),
+        const SizedBox(width: 10),
+        FloatingActionButton(
+          heroTag: 'scene_03',
+          backgroundColor: _selectedIndex == 2 ? Colors.lightGreen : Colors.grey,
+          onPressed: () => _loadScene(2),
+          child: const Icon(Icons.filter_3),
+        ),
+        const SizedBox(width: 10),
+        FloatingActionButton(
+          heroTag: 'scene_04',
+          backgroundColor: _selectedIndex == 3 ? Colors.lightGreen : Colors.grey,
+          onPressed: () => _loadScene(3),
+          child: const Icon(Icons.filter_4),
+        ),
+      ],
     );
   }
 }

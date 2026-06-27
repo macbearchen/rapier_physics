@@ -8,7 +8,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final world = RapierWorld();
   await world.init(gravity: Vector3(0, 0, -9.8));
-  debugPrint('Rapier World Version: ${world.version}');
+  debugPrint('=== ${RapierPhysics.version} (core ${world.version}) ===');
 
   // Create a static floor at y = 0
   world.addBox(hx: 10.0, hy: 0.1, hz: 10.0, desc: RigidBodyDesc.fixed()..position = Vector3(0, 0, 0));

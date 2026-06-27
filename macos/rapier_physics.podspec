@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'rapier_physics'
-  s.version          = '0.3.1'
+  s.version          = '0.4.0'
   s.summary          = 'A new Flutter plugin project.'
   s.description      = <<-DESC
 A new Flutter plugin project.
@@ -14,7 +14,7 @@ A new Flutter plugin project.
   s.author           = { 'Your Company' => 'email@example.com' }
 
   s.source           = { :path => '.' }
-  s.source_files = 'Classes/**/*'
+  s.source_files = 'rapier_physics/Sources/rapier_physics/**/*'
 
   # If your plugin requires a privacy manifest, for example if it collects user
   # data, update the PrivacyInfo.xcprivacy file to describe your plugin's
@@ -27,7 +27,7 @@ A new Flutter plugin project.
   s.platform = :osx, '10.11'
   s.swift_version = '5.0'
 
-  s.vendored_frameworks = 'rapier_ffi.xcframework'
+  s.vendored_frameworks = 'rapier_physics/rapier_ffi.xcframework'
   s.static_framework = true
 
   s.pod_target_xcconfig = {

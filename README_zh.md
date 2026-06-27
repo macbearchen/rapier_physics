@@ -1,12 +1,13 @@
 # Rapier Physics for Flutter (繁體中文)
 
-這是一個基於 [Rapier](https://rapier.rs/) 的 Flutter 高性能 3D 物理引擎。本套件透過 Rust 與 WebAssembly 提供跨平台（Android, iOS, macOS, Web）的物理模擬支援。
+[![pub package](https://img.shields.io/pub/v/rapier_physics.svg)](https://pub.dev/packages/rapier_physics)
+**版本: 0.4.0**
 
-[**網頁版線上展示**](https://macbearchen.github.io/rapier_physics/)
+這是一個基於 [Rapier](https://rapier.rs/) 的 Flutter 高性能物理引擎。此套件透過 Rust 和 WebAssembly 提供 3D 物理模擬的跨平台支持。
 
 ## 特色
 
-- **跨平台**: 支持 Android、iOS、macOS 和 Web。
+- **跨平台**: 支持 Android、iOS、macOS、Windows 和 Web。
 - **高性能**: 核心物理模擬使用 Rust 編寫。
 - **靈活的物理**: 支持多種剛體類型（動態 Dynamic、固定 Fixed、運動學 Kinematic）。
 - **力與衝量**: 完整支持 `addForce`、`applyImpulse` 及其 `AtPoint` 變體。
@@ -17,8 +18,18 @@
 - **CCD**: 提供連續碰撞檢測 (Continuous Collision Detection)，防止高速物體穿透。
 - **步進控制 (Timestep)**: 通過 `RapierWorld.timestep` 獲取與設定物理模擬的集成步進大小 (`dt`)。
 - **現代 Web 支持**: 使用 `dart:js_interop` 實現高效的 WASM 調用。
+- **現代 Apple 平台整合**: 完整支持 Swift Package Manager (SPM) 與 CocoaPods。
 
 ## 開始使用
+
+### 安裝 (Installation)
+
+在您的 `pubspec.yaml` 中添加 `rapier_physics` 依賴：
+
+```yaml
+dependencies:
+  rapier_physics: ^0.4.0
+```
 
 ### 設置
 
@@ -42,10 +53,11 @@
 此腳本將執行以下操作：
 
 - 編譯適用於 Android 的 `.so` 文件並放入 `android/src/main/jniLibs`。
-- 編譯適用於 iOS/macOS 的 `.a` 文件並創建 `.xcframework`。
+- 編譯適用於 iOS/macOS 的 `.a` 文件，包裝成 `.xcframework` 並發布到各自平台子目錄以支持 Swift Package Manager (SPM)。
+- 編譯適用於 Windows 的 `.dll` 文件（需在 Windows 主機上執行）並放入 `prebuilt/` 目錄。
 - 編譯適用於 Web 的 `.wasm` 並放入範例專案中。
 
-### 2. 基本用法
+### 基本用法
 
 初始化 `RapierWorld` 並開始模擬：
 
@@ -76,6 +88,23 @@ void main() async {
   });
 }
 ```
+
+### 3D 互動範例 (3D Interactive Demos)
+
+範例專案中包含多個使用 [macbear_3d](https://pub.dev/packages/macbear_3d) 渲染引擎開發的 3D 互動範例，並透過 `M3RapierPhysicsEngine` 與物理引擎進行整合。
+
+運行 3D 物理模擬範例命令：
+
+```bash
+cd example
+flutter run -t lib/main_3d.dart
+```
+
+這些範例包括：
+1. **基礎物理場景 (Basic Physics Scene)**：展示各種剛體（方塊、球體、圓柱體、膠囊體、圓錐體）的碰撞、重力動態，以及一個互動的馬達旋轉關節。
+2. **牛頓擺 (Newton's Cradle)**：使用球形關節約束模擬動量守恆。
+3. **雙擺 (Double Pendulum)**：使用旋轉與球形關節模擬混沌運動。
+4. **複合形狀 (Compound Shapes)**：由多個碰撞體組成的單個剛體（例如具有四隻腳的桌子）。
 
 ## 支持的剛體類型 (Rigid Body Types)
 

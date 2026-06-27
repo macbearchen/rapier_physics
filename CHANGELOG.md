@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.0
+- **Windows Platform Support**: Added support for the Windows platform, including a C++ plugin implementation, CMake configuration, and bundling of the prebuilt native `rapier_ffi.dll` library.
+- **Swift Package Manager (SPM) Support**: Restructured iOS and macOS native directories (`ios/rapier_physics` and `macos/rapier_physics`) and added `Package.swift` to support integration via Swift Package Manager.
+- **Build Script Automation**: Refactored `native/rapier_ffi/build.sh` to output `.xcframework` directly to the iOS and macOS `rapier_physics` subfolders to match the SPM structure.
+
 ## 0.3.1
 - **Timestep API**: Added `timestep` getter and setter to `RapierWorld`, allowing users to control the simulation's integration step size (`dt`).
 - **FFI Naming Refactor**: Standardized all FFI function names to the `rapier_[component]_[action]` convention (e.g., `rapier_rigid_body_create`, `rapier_collider_get_position_x`) for better consistency across Native and Web platforms.

@@ -70,7 +70,10 @@ pub extern "C" fn rapier_version() -> *const c_char {
     use std::sync::OnceLock;
     static VERSION_CSTR: OnceLock<std::ffi::CString> = OnceLock::new();
     VERSION_CSTR
-        .get_or_init(|| std::ffi::CString::new(rapier3d::VERSION).unwrap())
+        .get_or_init(|| {
+            let version_str = format!("{}+20260627", rapier3d::VERSION);
+            std::ffi::CString::new(version_str).unwrap()
+        })
         .as_ptr()
 }
 

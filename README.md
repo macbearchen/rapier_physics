@@ -1,14 +1,15 @@
 # Rapier Physics for Flutter
 
+[![pub package](https://img.shields.io/pub/v/rapier_physics.svg)](https://pub.dev/packages/rapier_physics)
+**Version: 0.4.0**
+
 [繁體中文](./README_zh.md)
 
 A high-performance physics engine for Flutter, powered by [Rapier](https://rapier.rs/). This plugin provides cross-platform support for 3D physics simulation using Rust and WebAssembly.
 
-[**Live Web Demo**](https://macbearchen.github.io/rapier_physics/)
-
 ## Features
 
-- **Cross-Platform**: Support for Android, iOS, macOS, and Web.
+- **Cross-Platform**: Support for Android, iOS, macOS, Windows, and Web.
 - **High Performance**: Core physics simulation written in Rust.
 - **Flexible Physics**: Support for various rigid body types (Dynamic, Fixed, Kinematic).
 - **Force & Impulse**: Full support for `addForce`, `applyImpulse`, and their `AtPoint` variants.
@@ -19,8 +20,18 @@ A high-performance physics engine for Flutter, powered by [Rapier](https://rapie
 - **CCD**: Continuous Collision Detection for high-speed simulation.
 - **Timestep Control**: Get and set the simulation integration step size (`dt`) via `RapierWorld.timestep`.
 - **Modern Web Support**: Efficient WASM implementation using `dart:js_interop`.
+- **Modern Apple Platform Integration**: Full Swift Package Manager (SPM) support alongside CocoaPods.
 
 ## Getting Started
+
+### Installation
+
+Add `rapier_physics` to your `pubspec.yaml` dependencies:
+
+```yaml
+dependencies:
+  rapier_physics: ^0.4.0
+```
 
 ### Setup
 
@@ -44,10 +55,11 @@ To build the library from source, follow these steps:
 This script will:
 
 - Compile `.so` files for Android and place them in `android/src/main/jniLibs`.
-- Compile `.a` files for iOS/macOS and create a `.xcframework`.
+- Compile `.a` files for iOS/macOS, packaging them into `.xcframework` bundles, and distribute them into the platform subdirectories to support Swift Package Manager (SPM).
+- Compile `.dll` files for Windows (when run on Windows host) and place them in the `prebuilt/` directory.
 - Compile `.wasm` for the Web and place it in the example project.
 
-### 2. Basic Usage
+### Basic Usage
 
 Initialize the `RapierWorld` and start simulating:
 
@@ -78,6 +90,23 @@ void main() async {
   });
 }
 ```
+
+### 3D Interactive Demos
+
+The example project contains multiple interactive 3D physics demos powered by the [macbear_3d](https://pub.dev/packages/macbear_3d) rendering engine and integrated via `M3RapierPhysicsEngine`.
+
+To run the 3D physics demos:
+
+```bash
+cd example
+flutter run -t lib/main_3d.dart
+```
+
+These demos include:
+1. **Basic Physics Scene**: Rigid body dynamics, gravity, and basic collisions (Box, Sphere, Cylinder, Capsule, Cone) with an interactive motorized joint.
+2. **Newton's Cradle**: Momentum conservation demo using spherical joint constraints.
+3. **Double Pendulum**: Chaotic motion simulation with revolute and spherical joints.
+4. **Compound Shapes**: Rigid bodies consisting of multiple colliders (e.g., table with four legs).
 
 ## Supported Rigid Body Types
 

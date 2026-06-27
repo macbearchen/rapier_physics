@@ -2,8 +2,8 @@
 set -e
 
 DIST=../../prebuilt
-DIST_ios=../../ios
-DIST_macos=../../macos
+DIST_ios=../../ios/rapier_physics
+DIST_macos=../../macos/rapier_physics
 DIST_android=../../android/src/main/jniLibs
 #rm -rf $DIST
 mkdir -p $DIST

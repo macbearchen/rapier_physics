@@ -9,6 +9,8 @@ export 'src/rigid_body.dart';
 export 'src/rigid_body_desc.dart';
 
 class RapierPhysics {
+  static const String version = "rapier_physics 0.4.0";
+
   Future<String?> getPlatformVersion() {
     return RapierPhysicsPlatform.instance.getPlatformVersion();
   }
