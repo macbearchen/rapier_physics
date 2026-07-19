@@ -1,7 +1,7 @@
 # Rapier Physics for Flutter
 
 [![pub package](https://img.shields.io/pub/v/rapier_physics.svg)](https://pub.dev/packages/rapier_physics)
-**Version: 0.4.0**
+**Version: 0.4.1**
 
 [繁體中文](./README_zh.md)
 
@@ -32,7 +32,7 @@ Add `rapier_physics` to your `pubspec.yaml` dependencies:
 
 ```yaml
 dependencies:
-  rapier_physics: ^0.4.0
+  rapier_physics: ^0.4.1
 ```
 
 ### Setup

@@ -1,6 +1,6 @@
 name: rapier_physics
 description: A high-performance 3D physics engine for Flutter, powered by Rapier (Rust/WASM).
-version: 0.4.0
+version: 0.4.1
 homepage: https://github.com/macbearchen/rapier_physics
 repository: https://github.com/macbearchen/rapier_physics
 topics:
@@ -12,7 +12,7 @@ topics:
 
 environment:
   sdk: ^3.11.0
-  flutter: '>=3.3.0'
+  flutter: '>=3.44.0'
 
 dependencies:
   flutter:

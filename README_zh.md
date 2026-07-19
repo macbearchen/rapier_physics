@@ -1,7 +1,7 @@
 # Rapier Physics for Flutter (繁體中文)
 
 [![pub package](https://img.shields.io/pub/v/rapier_physics.svg)](https://pub.dev/packages/rapier_physics)
-**版本: 0.4.0**
+**版本: 0.4.1**
 
 這是一個基於 [Rapier](https://rapier.rs/) 的 Flutter 高性能物理引擎。此套件透過 Rust 和 WebAssembly 提供 3D 物理模擬的跨平台支持。
 
@@ -30,7 +30,7 @@
 
 ```yaml
 dependencies:
-  rapier_physics: ^0.4.0
+  rapier_physics: ^0.4.1
 ```
 
 ### 設置

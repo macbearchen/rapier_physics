@@ -16,7 +16,7 @@ void main() async {
 }
 
 Future<void> onDidInit() async {
-  debugPrint('main.dart: onDidInit');
+  M3Log.i('main.dart', 'onDidInit');
   final appEngine = M3AppEngine.instance;
   appEngine.renderEngine.createShadowMap(width: 2048, height: 4096);
 
@@ -64,10 +64,11 @@ class MyApp extends StatelessWidget {
                   renderOptions.shadows = true;
                   scene.camera.csmCount = 0;
                   final halfView = 8;
-                  scene.light.target = Vector3.zero();
-                  scene.light.setViewport(-halfView, -halfView, halfView * 2, halfView * 2, fovy: 0, far: 50);
-                  scene.light.setEuler(pi / 5, -pi / 3, 0, distance: 30); // rotate light
-                  scene.light.refreshProjectionMatrix();
+                  final lightViewer = scene.dirLight.lightViewer;
+                  lightViewer.target = Vector3.zero();
+                  lightViewer.setViewport(-halfView, -halfView, halfView * 2, halfView * 2, fovy: 0, far: 50);
+                  lightViewer.setEuler(pi / 5, -pi / 3, 0, distance: 30); // rotate light
+                  lightViewer.refreshProjectionMatrix();
                 } else {
                   renderOptions.shadows = true;
                   scene.camera.csmCount = 4;

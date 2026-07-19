@@ -39,6 +39,13 @@ class M3RapierPhysicsEngine implements M3PhysicsEngine {
   }
 
   @override
+  void removeRigidBody(M3RigidBody body) {
+    if (body is M3RapierRigidBody) {
+      world.removeRigidBody(body);
+    }
+  }
+
+  @override
   M3Collider createCollider(M3RigidBody body, M3ColliderDesc desc) {
     if (body is! M3RapierRigidBody) {
       throw ArgumentError('Body must be an M3RapierRigidBody');
@@ -56,7 +63,7 @@ class M3RapierPhysicsEngine implements M3PhysicsEngine {
   }
 
   @override
-  String get info => '${rapier.RapierPhysics.version} (core ${world.version})';
+  String get info => 'rapier physics (v${world.version})';
 
   rapier.RigidBodyDesc _mapRigidBodyDesc(M3RigidBodyDesc desc) {
     rapier.RigidBodyDesc rapierDesc;

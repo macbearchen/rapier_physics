@@ -10,6 +10,28 @@ class PhysicsScene extends BaseScene {
 
   PrismaticJoint? _liftJoint;
 
+  // ── Spawner state ──────────────────────────────────────────────────────────
+  static final Vector3 _spawnOrigin = Vector3(0, 0, 12);
+  static const int _maxSpawnedBodies = 1000;
+  static const double _spawnInterval = 0.1; // 10 bodies/sec
+  int _spawnedCount = 0;
+  double _spawnAccum = 0.0;
+  final Random _rng = Random();
+
+  // Vivid colour palette for spawned bodies
+  static final List<Vector4> _palette = [
+    Colors.red,
+    Colors.orange,
+    Colors.yellow,
+    Colors.skyBlue,
+    Colors.lightGreen,
+    Colors.pink,
+    Colors.purple,
+    Colors.lightCoral,
+    Colors.white,
+    Colors.cyan,
+  ];
+
   // constructor
   PhysicsScene({required super.physics});
 
@@ -20,12 +42,12 @@ class PhysicsScene extends BaseScene {
 
     M3AppEngine.backgroundColor = Vector3(0.1, 0.3, 0.15);
 
-    camera.setEuler(pi / 6, -pi / 6, 0, distance: 30);
-    light.setEuler(pi / 5, -pi / 3, 0, distance: 30); // rotate light
+    camera.setEuler(pi / 6, -pi / 4.5, 0, distance: 36);
+    dirLight.lightViewer.setEuler(pi / 5, -pi / 3, 0, distance: 30); // rotate light
 
     // addMesh(M3Mesh(M3PlaneGeom(10, 10)), Vector3(0, 0, -1)).color = Colors.skyBlue;
 
-    final entityCapsule = addMesh(capsuleMesh, Vector3(0, 0, 1.2))..color = Colors.lime;
+    final entityCapsule = addMesh(capsuleMesh, Vector3(0, 0, 1.2))..color = Colors.red;
     final rbCapsule = physicsSystem.addCapsule(0.5, 0.5, M3RigidBodyDesc.dynamic()..position = Vector3(2, -4, 3));
     physicsSystem.attachEntity(entityCapsule, rbCapsule);
 
@@ -34,7 +56,7 @@ class PhysicsScene extends BaseScene {
       world.addSphericalJointToWorld(
         rbCapsule,
         Vector3(0, 1, 0), // Local anchor on Capsule (top)
-        Vector3(2, -4, 5), // Absolute world anchor
+        Vector3(2, -2, 12), // Absolute world anchor
       );
     }
 
@@ -58,11 +80,12 @@ class PhysicsScene extends BaseScene {
 
     // walls, falling, fan, lift, rope
     addWalls();
-    addGridFall();
+    // addGridFall();
     // addFalling();
     addFan(Vector3(0, -12, 4));
     addLift(Vector3(5, -12, 8));
     addRope(12, Vector3(12, 0, 8));
+    // time-based spawner starts automatically via update()
 
     addHeightGeom();
 
@@ -243,12 +266,60 @@ class PhysicsScene extends BaseScene {
     rbHeightfield.setRotation(q);
   }
 
+  // ── Spawner ────────────────────────────────────────────────────────────────
+  /// Spawns one random rigid body thrown from [_spawnOrigin] with random velocity.
+  void _spawnBody() {
+    if (_spawnedCount >= _maxSpawnedBodies) return;
+
+    // Random lateral velocity (XY) + slight inward push toward origin
+    final vx = (_rng.nextDouble() - 0.5) * 12.0;
+    final vy = (_rng.nextDouble() - 0.5) * 12.0;
+    final vz = (_rng.nextDouble() * 5.0 + 6.0); // downward
+    final vel = Vector3(vx, vy, vz);
+
+    final desc = M3RigidBodyDesc.dynamic()
+      ..position = Vector3(_spawnOrigin.x, _spawnOrigin.y, _spawnOrigin.z)
+      ..linearVelocity = vel;
+
+    final color = _palette[_rng.nextInt(_palette.length)];
+    final shapeType = _rng.nextInt(3); // 0 = sphere, 1 = box, 2 = capsule
+
+    switch (shapeType) {
+      case 0: // sphere
+        final entity = addMesh(ballMesh, desc.position)..color = color;
+        final rb = physicsSystem.addSphere(0.45, desc);
+        physicsSystem.attachEntity(entity, rb);
+        break;
+      case 1: // box
+        final entity = addMesh(M3Mesh(M3Resources.unitCube), desc.position)..color = color;
+        final rb = physicsSystem.addBox(0.45, 0.45, 0.45, desc);
+        physicsSystem.attachEntity(entity, rb);
+        break;
+      case 2: // capsule
+        final entity = addMesh(capsuleMesh, desc.position)..color = color;
+        final rb = physicsSystem.addCapsule(0.35, 0.45, desc);
+        physicsSystem.attachEntity(entity, rb);
+        break;
+    }
+
+    _spawnedCount++;
+  }
+
   @override
   void update(double delta) {
     // Oscillate along X: targetPos 0 = (-2,-2,6), targetPos 6 = (4,-2,6)
     final t = DateTime.now().millisecondsSinceEpoch / 1200.0;
     final targetX = (sin(t) + 1.0) / 2.0 * 6.0; // smooth 0..6
     world.configurePrismaticMotor(_liftJoint!, targetPos: targetX, stiffness: 100.0, damping: 20.0);
+
+    // Spawn bodies at 10/sec up to _maxSpawnedBodies
+    if (_spawnedCount < _maxSpawnedBodies) {
+      _spawnAccum += delta;
+      while (_spawnAccum >= _spawnInterval && _spawnedCount < _maxSpawnedBodies) {
+        _spawnBody();
+        _spawnAccum -= _spawnInterval;
+      }
+    }
 
     super.update(delta);
   }

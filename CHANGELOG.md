@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.1
+- **CompoundScene Dumbbell Spawner**: Added time-based dumbbell spawning in `CompoundScene`, continuously spawning compound rigid bodies from `(0, 0, 20)` at 10/sec up to a configurable cap.
+- **BaseScene Camera & Ground**: Increased default camera distance to 30 and expanded ground plane half-size to 10 with a larger checkerboard texture.
+
 ## 0.4.0
 - **Windows Platform Support**: Added support for the Windows platform, including a C++ plugin implementation, CMake configuration, and bundling of the prebuilt native `rapier_ffi.dll` library.
 - **Swift Package Manager (SPM) Support**: Restructured iOS and macOS native directories (`ios/rapier_physics` and `macos/rapier_physics`) and added `Package.swift` to support integration via Swift Package Manager.

@@ -42,13 +42,13 @@ class BaseScene extends M3Scene {
 
     M3AppEngine.backgroundColor = Vector3(0.04, 0.04, 0.8);
 
-    camera.setEuler(pi / 9, -pi / 5, 0, distance: 20);
-    light.setEuler(pi / 5, -pi / 3, 0, distance: 30);
+    camera.setEuler(pi / 9, -pi / 5, 0, distance: 30);
+    dirLight.lightViewer.setEuler(pi / 5, -pi / 3, 0, distance: 30);
 
     addGround();
 
     // sample cubemap
-    skybox = M3Skybox(M3Texture.createSampleCubemap());
+    skybox = M3Skybox(M3Texture.createDefaultIBLCube());
   }
 
   M3Mesh createPendulum(double radius, double length) {
@@ -64,11 +64,11 @@ class BaseScene extends M3Scene {
 
   // ── Ground ──────────────────────────────────────────────────────────────────
   void addGround() {
-    M3Texture texGrid = M3Texture.createCheckerboard(size: 6);
+    M3Texture texGrid = M3Texture.createCheckerboard(size: 10);
     M3Material mtr = M3Material();
     mtr.diffuseTexture = texGrid;
 
-    const hs = 9.0;
+    const hs = 10.0;
     // Fixed physics floor — top surface sits at z = 0
     final rb = physicsSystem.addBox(hs, hs, 0.5, M3RigidBodyDesc.fixed()..position = Vector3(0, 0, -0.5));
     final floor = addMesh(M3Mesh(M3PlaneGeom(hs * 2, hs * 2), material: mtr), Vector3(0, 0, 0));
@@ -82,6 +82,6 @@ class BaseScene extends M3Scene {
     super.update(delta);
 
     double sec = totalTime;
-    light.setEuler(sec * pi / 18, -pi / 3, 0, distance: light.distanceToTarget); // rotate light
+    dirLight.lightViewer.setEuler(sec * pi / 18, -pi / 3, 0); // rotate light
   }
 }
