@@ -286,4 +286,59 @@ class RapierBindingsImpl extends RapierBindings {
     double stiffness,
     double damping,
   ) => throw UnsupportedError('Stub');
+
+  // ==========================================
+  // Kinematic Character Controller
+  // ==========================================
+
+  @override
+  int createCharacterController(double offset) => throw UnsupportedError('Stub');
+
+  @override
+  void destroyCharacterController(int ctrl) => throw UnsupportedError('Stub');
+
+  @override
+  void setCharacterControllerUp(int ctrl, double x, double y, double z) =>
+      throw UnsupportedError('Stub');
+
+  @override
+  void setCharacterControllerMaxSlope(int ctrl, double angleRadians) =>
+      throw UnsupportedError('Stub');
+
+  @override
+  void setCharacterControllerMinSlope(int ctrl, double angleRadians) =>
+      throw UnsupportedError('Stub');
+
+  @override
+  void setCharacterControllerSnapToGround(int ctrl, double distance, bool enabled) =>
+      throw UnsupportedError('Stub');
+
+  @override
+  void setCharacterControllerAutoStep(
+    int ctrl,
+    double maxHeight,
+    double minWidth,
+    bool includeDynamicBodies,
+  ) => throw UnsupportedError('Stub');
+
+  @override
+  Vector3 moveCharacter(
+    int world,
+    int ctrl,
+    int colliderHandle,
+    double dx,
+    double dy,
+    double dz,
+    double dt,
+  ) => throw UnsupportedError('Stub');
+
+  @override
+  bool isCharacterGrounded(int ctrl) => throw UnsupportedError('Stub');
+
+  @override
+  bool isCharacterOnWall(int ctrl) => throw UnsupportedError('Stub');
+
+  @override
+  bool isCharacterOnCeiling(int ctrl) => throw UnsupportedError('Stub');
 }
+

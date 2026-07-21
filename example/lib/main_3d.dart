@@ -7,6 +7,7 @@ import 'demos/physics_scene.dart';
 import 'demos/compound_scene.dart';
 import 'demos/double_pendulum.dart';
 import 'demos/newton_cradle.dart';
+import 'demos/character_controller_scene.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -107,10 +108,11 @@ class _PanelWidgetState extends State<PanelWidget> {
       scene = BaseScene.createPhysicsScene((physicsSystem) => NewtonCradleScene(physics: physicsSystem));
     } else if (index == 2) {
       scene = BaseScene.createPhysicsScene((physicsSystem) => DoublePendulumScene(physics: physicsSystem));
-    } else {
+    } else if (index == 3) {
       scene = BaseScene.createPhysicsScene((physicsSystem) => CompoundScene(physics: physicsSystem));
+    } else {
+      scene = BaseScene.createPhysicsScene((physicsSystem) => CharacterControllerScene(physics: physicsSystem));
     }
-
     await M3AppEngine.instance.setScene(scene);
   }
 
@@ -146,6 +148,13 @@ class _PanelWidgetState extends State<PanelWidget> {
           backgroundColor: _selectedIndex == 3 ? Colors.lightGreen : Colors.grey,
           onPressed: () => _loadScene(3),
           child: const Icon(Icons.filter_4),
+        ),
+        const SizedBox(width: 10),
+        FloatingActionButton(
+          heroTag: 'scene_05',
+          backgroundColor: _selectedIndex == 4 ? Colors.lightGreen : Colors.grey,
+          onPressed: () => _loadScene(4),
+          child: const Icon(Icons.filter_5),
         ),
       ],
     );

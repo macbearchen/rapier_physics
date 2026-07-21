@@ -11,6 +11,7 @@ import 'package:vector_math/vector_math.dart' show Vector3, Quaternion;
 export 'package:vector_math/vector_math.dart' show Vector3, Quaternion;
 
 import 'collider.dart';
+import 'character_controller.dart';
 import 'joint.dart';
 import 'joint_axis.dart';
 import 'rigid_body.dart';
@@ -502,5 +503,25 @@ class RapierWorld {
       _bodyJoints[j.body1]?.remove(j);
       _bodyJoints[j.body2]?.remove(j);
     }
+  }
+
+  //--------------------------
+  // kinematic character controller
+  //--------------------------
+
+  /// Creates a [KinematicCharacterController] for [body] using [collider] as
+  /// the swept shape.
+  ///
+  /// [offset] is the skin distance (gap kept between the character and
+  /// surfaces). Typical value: 0.01.
+  ///
+  /// The returned controller must be [KinematicCharacterController.dispose]d
+  /// when no longer needed.
+  KinematicCharacterController createCharacterController(
+    RigidBody body,
+    Collider collider, {
+    double offset = 0.01,
+  }) {
+    return KinematicCharacterController.create(this, body, collider, offset: offset);
   }
 }

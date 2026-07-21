@@ -1,5 +1,6 @@
 import 'rapier_physics_platform_interface.dart';
 
+export 'src/character_controller.dart';
 export 'src/collider.dart';
 export 'src/collider_desc.dart';
 export 'src/joint.dart';

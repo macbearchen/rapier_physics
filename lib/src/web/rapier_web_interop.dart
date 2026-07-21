@@ -202,36 +202,14 @@ external void rapier_joint_configure_prismatic_motor(
 
 // Getters
 @JS()
-external JSNumber rapier_rigid_body_get_position_x(JSNumber world, JSNumber body);
+external JSNumber rapier_rigid_body_get_position(JSNumber world, JSNumber body);
 @JS()
-external JSNumber rapier_rigid_body_get_position_y(JSNumber world, JSNumber body);
-@JS()
-external JSNumber rapier_rigid_body_get_position_z(JSNumber world, JSNumber body);
+external JSNumber rapier_rigid_body_get_rotation(JSNumber world, JSNumber body);
 
 @JS()
-external JSNumber rapier_rigid_body_get_rotation_x(JSNumber world, JSNumber body);
+external JSNumber rapier_collider_get_position(JSNumber world, JSNumber handle);
 @JS()
-external JSNumber rapier_rigid_body_get_rotation_y(JSNumber world, JSNumber body);
-@JS()
-external JSNumber rapier_rigid_body_get_rotation_z(JSNumber world, JSNumber body);
-@JS()
-external JSNumber rapier_rigid_body_get_rotation_w(JSNumber world, JSNumber body);
-
-@JS()
-external JSNumber rapier_collider_get_position_x(JSNumber world, JSNumber handle);
-@JS()
-external JSNumber rapier_collider_get_position_y(JSNumber world, JSNumber handle);
-@JS()
-external JSNumber rapier_collider_get_position_z(JSNumber world, JSNumber handle);
-
-@JS()
-external JSNumber rapier_collider_get_rotation_x(JSNumber world, JSNumber handle);
-@JS()
-external JSNumber rapier_collider_get_rotation_y(JSNumber world, JSNumber handle);
-@JS()
-external JSNumber rapier_collider_get_rotation_z(JSNumber world, JSNumber handle);
-@JS()
-external JSNumber rapier_collider_get_rotation_w(JSNumber world, JSNumber handle);
+external JSNumber rapier_collider_get_rotation(JSNumber world, JSNumber handle);
 
 @JS()
 external JSNumber rapier_collider_get_friction(JSNumber world, JSNumber handle);
@@ -330,3 +308,86 @@ external void rapier_collider_remove(JSNumber world, JSNumber handle);
 
 @JS()
 external void rapier_joint_remove(JSNumber world, JSNumber handle);
+
+// ==========================================
+// Kinematic Character Controller
+// ==========================================
+
+@JS()
+external JSNumber rapier_character_controller_create(JSNumber offset);
+
+@JS()
+external void rapier_character_controller_destroy(JSNumber ctrl);
+
+@JS()
+external void rapier_character_controller_set_up(
+  JSNumber ctrl,
+  JSNumber x,
+  JSNumber y,
+  JSNumber z,
+);
+
+@JS()
+external void rapier_character_controller_set_max_slope(JSNumber ctrl, JSNumber angleRadians);
+
+@JS()
+external void rapier_character_controller_set_min_slope(JSNumber ctrl, JSNumber angleRadians);
+
+@JS()
+external void rapier_character_controller_set_snap_to_ground(
+  JSNumber ctrl,
+  JSNumber distance,
+  JSBoolean enabled,
+);
+
+@JS()
+external void rapier_character_controller_set_autostep(
+  JSNumber ctrl,
+  JSNumber maxHeight,
+  JSNumber minWidth,
+  JSBoolean includeDynamicBodies,
+);
+
+/// Returns a pointer/index to a Vec3 result on the Wasm heap.
+@JS()
+external JSNumber rapier_character_controller_move(
+  JSNumber world,
+  JSNumber ctrl,
+  JSNumber colliderHandle,
+  JSNumber dx,
+  JSNumber dy,
+  JSNumber dz,
+  JSNumber dt,
+);
+
+@JS()
+external JSBoolean rapier_character_controller_is_grounded(JSNumber ctrl);
+
+@JS()
+external JSBoolean rapier_character_controller_is_on_wall(JSNumber ctrl);
+
+@JS()
+external JSBoolean rapier_character_controller_is_on_ceiling(JSNumber ctrl);
+
+/// Helpers to unpack a Vec3 result returned as a pointer from Wasm.
+@JS()
+external JSNumber rapier_vec3_get_x(JSNumber ptr);
+
+@JS()
+external JSNumber rapier_vec3_get_y(JSNumber ptr);
+
+@JS()
+external JSNumber rapier_vec3_get_z(JSNumber ptr);
+
+/// Helpers to unpack a Quat result returned as a pointer from Wasm.
+@JS()
+external JSNumber rapier_quat_get_x(JSNumber ptr);
+
+@JS()
+external JSNumber rapier_quat_get_y(JSNumber ptr);
+
+@JS()
+external JSNumber rapier_quat_get_z(JSNumber ptr);
+
+@JS()
+external JSNumber rapier_quat_get_w(JSNumber ptr);

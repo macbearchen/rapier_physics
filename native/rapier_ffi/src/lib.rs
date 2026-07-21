@@ -1,3 +1,4 @@
+use rapier3d::control::{CharacterAutostep, CharacterLength, KinematicCharacterController};
 use rapier3d::na::{Isometry3 as Isometry, Translation3 as Translation};
 pub use rapier3d::prelude::*;
 use std::alloc::{alloc, dealloc, Layout};
@@ -71,7 +72,7 @@ pub extern "C" fn rapier_version() -> *const c_char {
     static VERSION_CSTR: OnceLock<std::ffi::CString> = OnceLock::new();
     VERSION_CSTR
         .get_or_init(|| {
-            let version_str = format!("{}+20260627", rapier3d::VERSION);
+            let version_str = format!("{}+20260721-c", rapier3d::VERSION);
             std::ffi::CString::new(version_str).unwrap()
         })
         .as_ptr()
@@ -229,55 +230,6 @@ pub extern "C" fn rapier_rigid_body_get_rotation(world: *mut RapierWorld, body_h
 }
 
 #[no_mangle]
-pub extern "C" fn rapier_rigid_body_get_position_x(world: *mut RapierWorld, body_handle: u32) -> f32 {
-    let world = unsafe { &mut *world };
-    let handle = RigidBodyHandle::from_raw_parts(body_handle, 0);
-    world.bodies.get(handle).map(|b| b.translation().x).unwrap_or(0.0)
-}
-
-#[no_mangle]
-pub extern "C" fn rapier_rigid_body_get_position_y(world: *mut RapierWorld, body_handle: u32) -> f32 {
-    let world = unsafe { &mut *world };
-    let handle = RigidBodyHandle::from_raw_parts(body_handle, 0);
-    world.bodies.get(handle).map(|b| b.translation().y).unwrap_or(0.0)
-}
-
-#[no_mangle]
-pub extern "C" fn rapier_rigid_body_get_position_z(world: *mut RapierWorld, body_handle: u32) -> f32 {
-    let world = unsafe { &mut *world };
-    let handle = RigidBodyHandle::from_raw_parts(body_handle, 0);
-    world.bodies.get(handle).map(|b| b.translation().z).unwrap_or(0.0)
-}
-
-#[no_mangle]
-pub extern "C" fn rapier_rigid_body_get_rotation_x(world: *mut RapierWorld, body_handle: u32) -> f32 {
-    let world = unsafe { &mut *world };
-    let handle = RigidBodyHandle::from_raw_parts(body_handle, 0);
-    world.bodies.get(handle).map(|b| b.rotation().x).unwrap_or(0.0)
-}
-
-#[no_mangle]
-pub extern "C" fn rapier_rigid_body_get_rotation_y(world: *mut RapierWorld, body_handle: u32) -> f32 {
-    let world = unsafe { &mut *world };
-    let handle = RigidBodyHandle::from_raw_parts(body_handle, 0);
-    world.bodies.get(handle).map(|b| b.rotation().y).unwrap_or(0.0)
-}
-
-#[no_mangle]
-pub extern "C" fn rapier_rigid_body_get_rotation_z(world: *mut RapierWorld, body_handle: u32) -> f32 {
-    let world = unsafe { &mut *world };
-    let handle = RigidBodyHandle::from_raw_parts(body_handle, 0);
-    world.bodies.get(handle).map(|b| b.rotation().z).unwrap_or(0.0)
-}
-
-#[no_mangle]
-pub extern "C" fn rapier_rigid_body_get_rotation_w(world: *mut RapierWorld, body_handle: u32) -> f32 {
-    let world = unsafe { &mut *world };
-    let handle = RigidBodyHandle::from_raw_parts(body_handle, 0);
-    world.bodies.get(handle).map(|b| b.rotation().w).unwrap_or(1.0)
-}
-
-#[no_mangle]
 pub extern "C" fn rapier_rigid_body_set_position(world: *mut RapierWorld, body_handle: u32, x: f32, y: f32, z: f32) {
     let world = unsafe { &mut *world };
     let handle = RigidBodyHandle::from_raw_parts(body_handle, 0);
@@ -288,7 +240,14 @@ pub extern "C" fn rapier_rigid_body_set_position(world: *mut RapierWorld, body_h
 }
 
 #[no_mangle]
-pub extern "C" fn rapier_rigid_body_set_rotation(world: *mut RapierWorld, body_handle: u32, x: f32, y: f32, z: f32, w: f32) {
+pub extern "C" fn rapier_rigid_body_set_rotation(
+    world: *mut RapierWorld,
+    body_handle: u32,
+    x: f32,
+    y: f32,
+    z: f32,
+    w: f32,
+) {
     let world = unsafe { &mut *world };
     let handle = RigidBodyHandle::from_raw_parts(body_handle, 0);
 
@@ -554,52 +513,43 @@ pub extern "C" fn rapier_collider_set_rotation(world: *mut RapierWorld, handle: 
 }
 
 #[no_mangle]
-pub extern "C" fn rapier_collider_get_position_x(world: *mut RapierWorld, handle: u32) -> f32 {
+pub extern "C" fn rapier_collider_get_position(world: *mut RapierWorld, handle: u32) -> Vec3 {
     let world = unsafe { &mut *world };
     let handle = ColliderHandle::from_raw_parts(handle, 0);
-    world.colliders.get(handle).map(|c| c.translation().x).unwrap_or(0.0)
+
+    if let Some(collider) = world.colliders.get(handle) {
+        let pos = collider.translation();
+        Vec3 {
+            x: pos.x,
+            y: pos.y,
+            z: pos.z,
+        }
+    } else {
+        Vec3 { x: 0.0, y: 0.0, z: 0.0 }
+    }
 }
 
 #[no_mangle]
-pub extern "C" fn rapier_collider_get_position_y(world: *mut RapierWorld, handle: u32) -> f32 {
+pub extern "C" fn rapier_collider_get_rotation(world: *mut RapierWorld, handle: u32) -> Quat {
     let world = unsafe { &mut *world };
     let handle = ColliderHandle::from_raw_parts(handle, 0);
-    world.colliders.get(handle).map(|c| c.translation().y).unwrap_or(0.0)
-}
 
-#[no_mangle]
-pub extern "C" fn rapier_collider_get_position_z(world: *mut RapierWorld, handle: u32) -> f32 {
-    let world = unsafe { &mut *world };
-    let handle = ColliderHandle::from_raw_parts(handle, 0);
-    world.colliders.get(handle).map(|c| c.translation().z).unwrap_or(0.0)
-}
-
-#[no_mangle]
-pub extern "C" fn rapier_collider_get_rotation_x(world: *mut RapierWorld, handle: u32) -> f32 {
-    let world = unsafe { &mut *world };
-    let handle = ColliderHandle::from_raw_parts(handle, 0);
-    world.colliders.get(handle).map(|c| c.rotation().x).unwrap_or(0.0)
-}
-
-#[no_mangle]
-pub extern "C" fn rapier_collider_get_rotation_y(world: *mut RapierWorld, handle: u32) -> f32 {
-    let world = unsafe { &mut *world };
-    let handle = ColliderHandle::from_raw_parts(handle, 0);
-    world.colliders.get(handle).map(|c| c.rotation().y).unwrap_or(0.0)
-}
-
-#[no_mangle]
-pub extern "C" fn rapier_collider_get_rotation_z(world: *mut RapierWorld, handle: u32) -> f32 {
-    let world = unsafe { &mut *world };
-    let handle = ColliderHandle::from_raw_parts(handle, 0);
-    world.colliders.get(handle).map(|c| c.rotation().z).unwrap_or(0.0)
-}
-
-#[no_mangle]
-pub extern "C" fn rapier_collider_get_rotation_w(world: *mut RapierWorld, handle: u32) -> f32 {
-    let world = unsafe { &mut *world };
-    let handle = ColliderHandle::from_raw_parts(handle, 0);
-    world.colliders.get(handle).map(|c| c.rotation().w).unwrap_or(1.0)
+    if let Some(collider) = world.colliders.get(handle) {
+        let rot = collider.rotation();
+        Quat {
+            x: rot.x,
+            y: rot.y,
+            z: rot.z,
+            w: rot.w,
+        }
+    } else {
+        Quat {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+            w: 1.0,
+        }
+    }
 }
 
 #[no_mangle]
@@ -892,6 +842,177 @@ pub extern "C" fn rapier_joint_configure_prismatic_motor(
             joint.data.set_motor_velocity(axis, target_vel, damping);
         }
     }
+}
+
+// ==========================================
+// Kinematic Character Controller
+// ==========================================
+
+pub struct CharacterController {
+    controller: KinematicCharacterController,
+    /// Result of the last `move_shape` call.
+    grounded: bool,
+    on_wall: bool,
+    on_ceiling: bool,
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_character_controller_create(offset: f32) -> *mut CharacterController {
+    let mut controller = KinematicCharacterController::default();
+    controller.offset = CharacterLength::Absolute(offset);
+    // Slide along slopes instead of stopping
+    controller.slide = true;
+    let ctrl = CharacterController {
+        controller,
+        grounded: false,
+        on_wall: false,
+        on_ceiling: false,
+    };
+    Box::into_raw(Box::new(ctrl))
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_character_controller_destroy(ctrl: *mut CharacterController) {
+    if !ctrl.is_null() {
+        unsafe { drop(Box::from_raw(ctrl)) };
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_character_controller_set_up(ctrl: *mut CharacterController, x: f32, y: f32, z: f32) {
+    let ctrl = unsafe { &mut *ctrl };
+    ctrl.controller.up = Vector::new(x, y, z).normalize().into();
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_character_controller_set_max_slope(ctrl: *mut CharacterController, angle_radians: f32) {
+    let ctrl = unsafe { &mut *ctrl };
+    ctrl.controller.max_slope_climb_angle = angle_radians;
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_character_controller_set_min_slope(ctrl: *mut CharacterController, angle_radians: f32) {
+    let ctrl = unsafe { &mut *ctrl };
+    ctrl.controller.min_slope_slide_angle = angle_radians;
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_character_controller_set_snap_to_ground(
+    ctrl: *mut CharacterController,
+    distance: f32,
+    enabled: bool,
+) {
+    let ctrl = unsafe { &mut *ctrl };
+    if enabled {
+        ctrl.controller.snap_to_ground = Some(CharacterLength::Absolute(distance));
+    } else {
+        ctrl.controller.snap_to_ground = None;
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_character_controller_set_autostep(
+    ctrl: *mut CharacterController,
+    max_height: f32,
+    min_width: f32,
+    include_dynamic_bodies: bool,
+) {
+    let ctrl = unsafe { &mut *ctrl };
+    if max_height > 0.0 {
+        ctrl.controller.autostep = Some(CharacterAutostep {
+            max_height: CharacterLength::Absolute(max_height),
+            min_width: CharacterLength::Absolute(min_width),
+            include_dynamic_bodies,
+        });
+    } else {
+        ctrl.controller.autostep = None;
+    }
+}
+
+/// Compute the corrected movement for a kinematic character.
+///
+/// - `world`          : pointer to the RapierWorld
+/// - `ctrl`           : pointer to the CharacterController
+/// - `collider_handle`: the character's own collider (excluded from the sweep)
+/// - `dx, dy, dz`     : desired movement this frame
+/// - `dt`             : simulation timestep
+///
+/// Returns the corrected movement Vec3. Call `rapier_character_controller_is_grounded`
+/// etc. after this to query contact state.
+#[no_mangle]
+pub extern "C" fn rapier_character_controller_move(
+    world: *mut RapierWorld,
+    ctrl: *mut CharacterController,
+    collider_handle: u32,
+    dx: f32,
+    dy: f32,
+    dz: f32,
+    dt: f32,
+) -> Vec3 {
+    let world = unsafe { &mut *world };
+    let ctrl = unsafe { &mut *ctrl };
+
+    let handle = ColliderHandle::from_raw_parts(collider_handle, 0);
+
+    // Retrieve the current shape + position from the collider.
+    let (shape, shape_pos) = if let Some(collider) = world.colliders.get(handle) {
+        (collider.shared_shape().clone(), *collider.position())
+    } else {
+        ctrl.grounded = false;
+        ctrl.on_wall = false;
+        ctrl.on_ceiling = false;
+        return Vec3 { x: 0.0, y: 0.0, z: 0.0 };
+    };
+
+    // Build a query filter that excludes the character's own collider.
+    let filter = QueryFilter::default().exclude_collider(handle);
+
+    let query_pipeline = world.broad_phase.as_query_pipeline(
+        world.narrow_phase.query_dispatcher(),
+        &world.bodies,
+        &world.colliders,
+        filter,
+    );
+
+    let desired = Vector::new(dx, dy, dz);
+
+    let result = ctrl
+        .controller
+        .move_shape(dt, &query_pipeline, shape.as_ref(), &shape_pos, desired, |_| {});
+
+    // Cache grounded/wall/ceiling for query functions.
+    ctrl.grounded = result.grounded;
+    let translation_len = (result.translation.x * result.translation.x
+        + result.translation.y * result.translation.y
+        + result.translation.z * result.translation.z)
+        .sqrt();
+    let desired_len = (dx * dx + dy * dy + dz * dz).sqrt();
+    ctrl.on_wall = translation_len < desired_len * 0.9 && !result.grounded;
+    let up = ctrl.controller.up;
+    let tr = result.translation;
+    ctrl.on_ceiling =
+        (up.x * tr.x + up.y * tr.y + up.z * tr.z) < 0.0 && ((-up.x) * dx + (-up.y) * dy + (-up.z) * dz) > 0.0;
+
+    Vec3 {
+        x: result.translation.x,
+        y: result.translation.y,
+        z: result.translation.z,
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_character_controller_is_grounded(ctrl: *mut CharacterController) -> bool {
+    unsafe { (*ctrl).grounded }
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_character_controller_is_on_wall(ctrl: *mut CharacterController) -> bool {
+    unsafe { (*ctrl).on_wall }
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_character_controller_is_on_ceiling(ctrl: *mut CharacterController) -> bool {
+    unsafe { (*ctrl).on_ceiling }
 }
 
 // ==========================================

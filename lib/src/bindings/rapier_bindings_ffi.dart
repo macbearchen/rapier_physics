@@ -32,6 +32,28 @@ typedef _SetBodyDampingC = Void Function(Pointer<Void>, Uint32, Float);
 typedef _BodyForceC = Void Function(Pointer<Void>, Uint32, Float, Float, Float);
 typedef _BodyForceAtPointC = Void Function(Pointer<Void>, Uint32, Float, Float, Float, Float, Float, Float);
 
+// Vec3 returned by value
+final class _Vec3Struct extends Struct {
+  @Float()
+  external double x;
+  @Float()
+  external double y;
+  @Float()
+  external double z;
+}
+
+// Quat returned by value
+final class _QuatStruct extends Struct {
+  @Float()
+  external double x;
+  @Float()
+  external double y;
+  @Float()
+  external double z;
+  @Float()
+  external double w;
+}
+
 // Collider
 final class _ColliderDesc extends Struct {
   @Uint32()
@@ -116,6 +138,22 @@ typedef _ConfigureJointMotorC = Void Function(Pointer<Void>, Uint32, Uint8, Floa
 
 // Helpers
 typedef _GetFloatC = Float Function(Pointer<Void>, Uint32);
+typedef _GetVec3C = _Vec3Struct Function(Pointer<Void>, Uint32);
+typedef _GetQuatC = _QuatStruct Function(Pointer<Void>, Uint32);
+typedef _GetVec3Dart = _Vec3Struct Function(Pointer<Void>, int);
+typedef _GetQuatDart = _QuatStruct Function(Pointer<Void>, int);
+
+// Character Controller
+typedef _CreateCharacterControllerC = Pointer<Void> Function(Float);
+typedef _DestroyCharacterControllerC = Void Function(Pointer<Void>);
+typedef _SetCharacterControllerUpC = Void Function(Pointer<Void>, Float, Float, Float);
+typedef _SetCharacterControllerSlopeC = Void Function(Pointer<Void>, Float);
+typedef _SetCharacterControllerSnapC = Void Function(Pointer<Void>, Float, Bool);
+typedef _SetCharacterControllerAutoStepC =
+    Void Function(Pointer<Void>, Float, Float, Bool);
+typedef _MoveCharacterC = _Vec3Struct Function(
+    Pointer<Void>, Pointer<Void>, Uint32, Float, Float, Float, Float);
+typedef _CharacterBoolC = Bool Function(Pointer<Void>);
 
 // ==========================================
 // Dart Signatures
@@ -190,6 +228,18 @@ typedef _ConfigureJointMotorDart = void Function(Pointer<Void>, int, int, double
 // Helpers
 typedef _GetFloatDart = double Function(Pointer<Void>, int);
 
+// Character Controller
+typedef _CreateCharacterControllerDart = Pointer<Void> Function(double);
+typedef _DestroyCharacterControllerDart = void Function(Pointer<Void>);
+typedef _SetCharacterControllerUpDart = void Function(Pointer<Void>, double, double, double);
+typedef _SetCharacterControllerSlopeDart = void Function(Pointer<Void>, double);
+typedef _SetCharacterControllerSnapDart = void Function(Pointer<Void>, double, bool);
+typedef _SetCharacterControllerAutoStepDart =
+    void Function(Pointer<Void>, double, double, bool);
+typedef _MoveCharacterDart = _Vec3Struct Function(
+    Pointer<Void>, Pointer<Void>, int, double, double, double, double);
+typedef _CharacterBoolDart = bool Function(Pointer<Void>);
+
 // ==========================================
 // Implementation
 // ==========================================
@@ -211,13 +261,8 @@ class RapierBindingsImpl extends RapierBindings {
   // RigidBody
   late _CreateRigidBodyDart _createRigidBodyNative;
   late _WakeBodyDart _removeRigidBodyNative;
-  late _GetFloatDart _getPosX;
-  late _GetFloatDart _getPosY;
-  late _GetFloatDart _getPosZ;
-  late _GetFloatDart _getRotX;
-  late _GetFloatDart _getRotY;
-  late _GetFloatDart _getRotZ;
-  late _GetFloatDart _getRotW;
+  late _GetVec3Dart _getBodyPositionNative;
+  late _GetQuatDart _getBodyRotationNative;
   late _SetPositionDart _setPositionNative;
   late _SetRotationDart _setRotationNative;
   late _WakeBodyDart _wakeBodyNative;
@@ -237,13 +282,8 @@ class RapierBindingsImpl extends RapierBindings {
   late _CreateColliderDart _createColliderNative;
   late _CreateHeightfieldColliderDart _createHeightfieldColliderNative;
   late _WakeBodyDart _removeColliderNative;
-  late _GetFloatDart _getColPosX;
-  late _GetFloatDart _getColPosY;
-  late _GetFloatDart _getColPosZ;
-  late _GetFloatDart _getColRotX;
-  late _GetFloatDart _getColRotY;
-  late _GetFloatDart _getColRotZ;
-  late _GetFloatDart _getColRotW;
+  late _GetVec3Dart _getColliderPositionNative;
+  late _GetQuatDart _getColliderRotationNative;
   late _GetFloatDart _getColFriction;
   late _GetFloatDart _getColRestitution;
   late _GetFloatDart _getColDensity;
@@ -266,6 +306,19 @@ class RapierBindingsImpl extends RapierBindings {
   late _ConfigureJointMotorDart _configureJointMotorNative;
   late _ConfigureMotorDart _configureRevoluteMotorNative;
   late _ConfigureMotorDart _configurePrismaticMotorNative;
+
+  // Character Controller
+  late _CreateCharacterControllerDart _createCharacterControllerNative;
+  late _DestroyCharacterControllerDart _destroyCharacterControllerNative;
+  late _SetCharacterControllerUpDart _setCharacterControllerUpNative;
+  late _SetCharacterControllerSlopeDart _setCharacterControllerMaxSlopeNative;
+  late _SetCharacterControllerSlopeDart _setCharacterControllerMinSlopeNative;
+  late _SetCharacterControllerSnapDart _setCharacterControllerSnapNative;
+  late _SetCharacterControllerAutoStepDart _setCharacterControllerAutoStepNative;
+  late _MoveCharacterDart _moveCharacterNative;
+  late _CharacterBoolDart _isCharacterGroundedNative;
+  late _CharacterBoolDart _isCharacterOnWallNative;
+  late _CharacterBoolDart _isCharacterOnCeilingNative;
 
   @override
   Future<void> init() async {
@@ -299,13 +352,8 @@ class RapierBindingsImpl extends RapierBindings {
     // RigidBody
     _createRigidBodyNative = _dylib.lookupFunction<_CreateRigidBodyC, _CreateRigidBodyDart>('rapier_rigid_body_create');
     _removeRigidBodyNative = _dylib.lookupFunction<_WakeBodyC, _WakeBodyDart>('rapier_rigid_body_remove');
-    _getPosX = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_rigid_body_get_position_x');
-    _getPosY = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_rigid_body_get_position_y');
-    _getPosZ = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_rigid_body_get_position_z');
-    _getRotX = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_rigid_body_get_rotation_x');
-    _getRotY = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_rigid_body_get_rotation_y');
-    _getRotZ = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_rigid_body_get_rotation_z');
-    _getRotW = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_rigid_body_get_rotation_w');
+    _getBodyPositionNative = _dylib.lookupFunction<_GetVec3C, _GetVec3Dart>('rapier_rigid_body_get_position');
+    _getBodyRotationNative = _dylib.lookupFunction<_GetQuatC, _GetQuatDart>('rapier_rigid_body_get_rotation');
     _setPositionNative = _dylib.lookupFunction<_SetPositionC, _SetPositionDart>('rapier_rigid_body_set_position');
     _setRotationNative = _dylib.lookupFunction<_SetRotationC, _SetRotationDart>('rapier_rigid_body_set_rotation');
     _wakeBodyNative = _dylib.lookupFunction<_WakeBodyC, _WakeBodyDart>('rapier_rigid_body_wake');
@@ -336,13 +384,8 @@ class RapierBindingsImpl extends RapierBindings {
           'rapier_collider_create_heightfield',
         );
     _removeColliderNative = _dylib.lookupFunction<_WakeBodyC, _WakeBodyDart>('rapier_collider_remove');
-    _getColPosX = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_collider_get_position_x');
-    _getColPosY = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_collider_get_position_y');
-    _getColPosZ = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_collider_get_position_z');
-    _getColRotX = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_collider_get_rotation_x');
-    _getColRotY = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_collider_get_rotation_y');
-    _getColRotZ = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_collider_get_rotation_z');
-    _getColRotW = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_collider_get_rotation_w');
+    _getColliderPositionNative = _dylib.lookupFunction<_GetVec3C, _GetVec3Dart>('rapier_collider_get_position');
+    _getColliderRotationNative = _dylib.lookupFunction<_GetQuatC, _GetQuatDart>('rapier_collider_get_rotation');
     _getColFriction = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_collider_get_friction');
     _getColRestitution = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_collider_get_restitution');
     _getColDensity = _dylib.lookupFunction<_GetFloatC, _GetFloatDart>('rapier_collider_get_density');
@@ -391,6 +434,52 @@ class RapierBindingsImpl extends RapierBindings {
     _configurePrismaticMotorNative = _dylib.lookupFunction<_ConfigureMotorC, _ConfigureMotorDart>(
       'rapier_joint_configure_prismatic_motor',
     );
+
+    // Character Controller
+    _createCharacterControllerNative =
+        _dylib.lookupFunction<_CreateCharacterControllerC, _CreateCharacterControllerDart>(
+          'rapier_character_controller_create',
+        );
+    _destroyCharacterControllerNative =
+        _dylib.lookupFunction<_DestroyCharacterControllerC, _DestroyCharacterControllerDart>(
+          'rapier_character_controller_destroy',
+        );
+    _setCharacterControllerUpNative =
+        _dylib.lookupFunction<_SetCharacterControllerUpC, _SetCharacterControllerUpDart>(
+          'rapier_character_controller_set_up',
+        );
+    _setCharacterControllerMaxSlopeNative =
+        _dylib.lookupFunction<_SetCharacterControllerSlopeC, _SetCharacterControllerSlopeDart>(
+          'rapier_character_controller_set_max_slope',
+        );
+    _setCharacterControllerMinSlopeNative =
+        _dylib.lookupFunction<_SetCharacterControllerSlopeC, _SetCharacterControllerSlopeDart>(
+          'rapier_character_controller_set_min_slope',
+        );
+    _setCharacterControllerSnapNative =
+        _dylib.lookupFunction<_SetCharacterControllerSnapC, _SetCharacterControllerSnapDart>(
+          'rapier_character_controller_set_snap_to_ground',
+        );
+    _setCharacterControllerAutoStepNative =
+        _dylib.lookupFunction<_SetCharacterControllerAutoStepC, _SetCharacterControllerAutoStepDart>(
+          'rapier_character_controller_set_autostep',
+        );
+    _moveCharacterNative =
+        _dylib.lookupFunction<_MoveCharacterC, _MoveCharacterDart>(
+          'rapier_character_controller_move',
+        );
+    _isCharacterGroundedNative =
+        _dylib.lookupFunction<_CharacterBoolC, _CharacterBoolDart>(
+          'rapier_character_controller_is_grounded',
+        );
+    _isCharacterOnWallNative =
+        _dylib.lookupFunction<_CharacterBoolC, _CharacterBoolDart>(
+          'rapier_character_controller_is_on_wall',
+        );
+    _isCharacterOnCeilingNative =
+        _dylib.lookupFunction<_CharacterBoolC, _CharacterBoolDart>(
+          'rapier_character_controller_is_on_ceiling',
+        );
   }
 
   // ==========================================
@@ -465,13 +554,15 @@ class RapierBindingsImpl extends RapierBindings {
   @override
   Vector3 getBodyPosition(int world, int body) {
     final handle = Pointer<Void>.fromAddress(world);
-    return Vector3(_getPosX(handle, body), _getPosY(handle, body), _getPosZ(handle, body));
+    final pos = _getBodyPositionNative(handle, body);
+    return Vector3(pos.x, pos.y, pos.z);
   }
 
   @override
   Quaternion getBodyRotation(int world, int body) {
     final handle = Pointer<Void>.fromAddress(world);
-    return Quaternion(_getRotX(handle, body), _getRotY(handle, body), _getRotZ(handle, body), _getRotW(handle, body));
+    final rot = _getBodyRotationNative(handle, body);
+    return Quaternion(rot.x, rot.y, rot.z, rot.w);
   }
 
   @override
@@ -592,18 +683,15 @@ class RapierBindingsImpl extends RapierBindings {
   @override
   Vector3 getColliderPosition(int world, int handle) {
     final worldPtr = Pointer<Void>.fromAddress(world);
-    return Vector3(_getColPosX(worldPtr, handle), _getColPosY(worldPtr, handle), _getColPosZ(worldPtr, handle));
+    final pos = _getColliderPositionNative(worldPtr, handle);
+    return Vector3(pos.x, pos.y, pos.z);
   }
 
   @override
   Quaternion getColliderRotation(int world, int handle) {
     final worldPtr = Pointer<Void>.fromAddress(world);
-    return Quaternion(
-      _getColRotX(worldPtr, handle),
-      _getColRotY(worldPtr, handle),
-      _getColRotZ(worldPtr, handle),
-      _getColRotW(worldPtr, handle),
-    );
+    final rot = _getColliderRotationNative(worldPtr, handle);
+    return Quaternion(rot.x, rot.y, rot.z, rot.w);
   }
 
   @override
@@ -826,4 +914,79 @@ class RapierBindingsImpl extends RapierBindings {
     double damping,
   ) =>
       _configurePrismaticMotorNative(Pointer<Void>.fromAddress(world), joint, targetPos, targetVel, stiffness, damping);
+
+  // ==========================================
+  // Kinematic Character Controller
+  // ==========================================
+
+  @override
+  int createCharacterController(double offset) =>
+      _createCharacterControllerNative(offset).address;
+
+  @override
+  void destroyCharacterController(int ctrl) =>
+      _destroyCharacterControllerNative(Pointer<Void>.fromAddress(ctrl));
+
+  @override
+  void setCharacterControllerUp(int ctrl, double x, double y, double z) =>
+      _setCharacterControllerUpNative(Pointer<Void>.fromAddress(ctrl), x, y, z);
+
+  @override
+  void setCharacterControllerMaxSlope(int ctrl, double angleRadians) =>
+      _setCharacterControllerMaxSlopeNative(Pointer<Void>.fromAddress(ctrl), angleRadians);
+
+  @override
+  void setCharacterControllerMinSlope(int ctrl, double angleRadians) =>
+      _setCharacterControllerMinSlopeNative(Pointer<Void>.fromAddress(ctrl), angleRadians);
+
+  @override
+  void setCharacterControllerSnapToGround(int ctrl, double distance, bool enabled) =>
+      _setCharacterControllerSnapNative(Pointer<Void>.fromAddress(ctrl), distance, enabled);
+
+  @override
+  void setCharacterControllerAutoStep(
+    int ctrl,
+    double maxHeight,
+    double minWidth,
+    bool includeDynamicBodies,
+  ) => _setCharacterControllerAutoStepNative(
+    Pointer<Void>.fromAddress(ctrl),
+    maxHeight,
+    minWidth,
+    includeDynamicBodies,
+  );
+
+  @override
+  Vector3 moveCharacter(
+    int world,
+    int ctrl,
+    int colliderHandle,
+    double dx,
+    double dy,
+    double dz,
+    double dt,
+  ) {
+    final result = _moveCharacterNative(
+      Pointer<Void>.fromAddress(world),
+      Pointer<Void>.fromAddress(ctrl),
+      colliderHandle,
+      dx,
+      dy,
+      dz,
+      dt,
+    );
+    return Vector3(result.x, result.y, result.z);
+  }
+
+  @override
+  bool isCharacterGrounded(int ctrl) =>
+      _isCharacterGroundedNative(Pointer<Void>.fromAddress(ctrl));
+
+  @override
+  bool isCharacterOnWall(int ctrl) =>
+      _isCharacterOnWallNative(Pointer<Void>.fromAddress(ctrl));
+
+  @override
+  bool isCharacterOnCeiling(int ctrl) =>
+      _isCharacterOnCeilingNative(Pointer<Void>.fromAddress(ctrl));
 }

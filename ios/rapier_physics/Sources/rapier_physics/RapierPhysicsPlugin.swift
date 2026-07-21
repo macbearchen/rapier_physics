@@ -16,14 +16,6 @@ import UIKit
 @_silgen_name("rapier_rigid_body_create") @discardableResult func rapier_rigid_body_create(_ world: UnsafeMutableRawPointer?, _ x: Float, _ y: Float, _ z: Float, _ type: UInt8) -> UInt32
 @_silgen_name("rapier_rigid_body_remove") func rapier_rigid_body_remove(_ world: UnsafeMutableRawPointer?, _ handle: UInt32) -> Void
 
-@_silgen_name("rapier_rigid_body_get_position_x") @discardableResult func rapier_rigid_body_get_position_x(_ world: UnsafeMutableRawPointer?, _ body: UInt32) -> Float
-@_silgen_name("rapier_rigid_body_get_position_y") @discardableResult func rapier_rigid_body_get_position_y(_ world: UnsafeMutableRawPointer?, _ body: UInt32) -> Float
-@_silgen_name("rapier_rigid_body_get_position_z") @discardableResult func rapier_rigid_body_get_position_z(_ world: UnsafeMutableRawPointer?, _ body: UInt32) -> Float
-@_silgen_name("rapier_rigid_body_get_rotation_x") @discardableResult func rapier_rigid_body_get_rotation_x(_ world: UnsafeMutableRawPointer?, _ body: UInt32) -> Float
-@_silgen_name("rapier_rigid_body_get_rotation_y") @discardableResult func rapier_rigid_body_get_rotation_y(_ world: UnsafeMutableRawPointer?, _ body: UInt32) -> Float
-@_silgen_name("rapier_rigid_body_get_rotation_z") @discardableResult func rapier_rigid_body_get_rotation_z(_ world: UnsafeMutableRawPointer?, _ body: UInt32) -> Float
-@_silgen_name("rapier_rigid_body_get_rotation_w") @discardableResult func rapier_rigid_body_get_rotation_w(_ world: UnsafeMutableRawPointer?, _ body: UInt32) -> Float
-
 @_silgen_name("rapier_rigid_body_set_position") func rapier_rigid_body_set_position(_ world: UnsafeMutableRawPointer?, _ body: UInt32, _ x: Float, _ y: Float, _ z: Float) -> Void
 @_silgen_name("rapier_rigid_body_set_rotation") func rapier_rigid_body_set_rotation(_ world: UnsafeMutableRawPointer?, _ body: UInt32, _ x: Float, _ y: Float, _ z: Float, _ w: Float) -> Void
 @_silgen_name("rapier_rigid_body_wake") func rapier_rigid_body_wake(_ world: UnsafeMutableRawPointer?, _ body: UInt32) -> Void
@@ -65,13 +57,6 @@ struct ColliderDesc {
 @_silgen_name("rapier_collider_create_heightfield") @discardableResult func rapier_collider_create_heightfield(_ world: UnsafeMutableRawPointer?, _ body: UInt32, _ heights: UnsafePointer<Float>?, _ nrows: Int, _ ncols: Int, _ sx: Float, _ sy: Float, _ sz: Float) -> UInt32
 @_silgen_name("rapier_collider_remove") func rapier_collider_remove(_ world: UnsafeMutableRawPointer?, _ handle: UInt32) -> Void
 
-@_silgen_name("rapier_collider_get_position_x") @discardableResult func rapier_collider_get_position_x(_ world: UnsafeMutableRawPointer?, _ handle: UInt32) -> Float
-@_silgen_name("rapier_collider_get_position_y") @discardableResult func rapier_collider_get_position_y(_ world: UnsafeMutableRawPointer?, _ handle: UInt32) -> Float
-@_silgen_name("rapier_collider_get_position_z") @discardableResult func rapier_collider_get_position_z(_ world: UnsafeMutableRawPointer?, _ handle: UInt32) -> Float
-@_silgen_name("rapier_collider_get_rotation_x") @discardableResult func rapier_collider_get_rotation_x(_ world: UnsafeMutableRawPointer?, _ handle: UInt32) -> Float
-@_silgen_name("rapier_collider_get_rotation_y") @discardableResult func rapier_collider_get_rotation_y(_ world: UnsafeMutableRawPointer?, _ handle: UInt32) -> Float
-@_silgen_name("rapier_collider_get_rotation_z") @discardableResult func rapier_collider_get_rotation_z(_ world: UnsafeMutableRawPointer?, _ handle: UInt32) -> Float
-@_silgen_name("rapier_collider_get_rotation_w") @discardableResult func rapier_collider_get_rotation_w(_ world: UnsafeMutableRawPointer?, _ handle: UInt32) -> Float
 @_silgen_name("rapier_collider_get_friction") @discardableResult func rapier_collider_get_friction(_ world: UnsafeMutableRawPointer?, _ handle: UInt32) -> Float
 @_silgen_name("rapier_collider_get_restitution") @discardableResult func rapier_collider_get_restitution(_ world: UnsafeMutableRawPointer?, _ handle: UInt32) -> Float
 @_silgen_name("rapier_collider_get_density") @discardableResult func rapier_collider_get_density(_ world: UnsafeMutableRawPointer?, _ handle: UInt32) -> Float
@@ -96,6 +81,36 @@ struct ColliderDesc {
 @_silgen_name("rapier_joint_configure_motor") func rapier_joint_configure_motor(_ world: UnsafeMutableRawPointer?, _ joint: UInt32, _ axis: UInt8, _ targetPos: Float, _ targetVel: Float, _ stiffness: Float, _ damping: Float) -> Void
 @_silgen_name("rapier_joint_configure_revolute_motor") func rapier_joint_configure_revolute_motor(_ world: UnsafeMutableRawPointer?, _ joint: UInt32, _ targetPos: Float, _ targetVel: Float, _ stiffness: Float, _ damping: Float) -> Void
 @_silgen_name("rapier_joint_configure_prismatic_motor") func rapier_joint_configure_prismatic_motor(_ world: UnsafeMutableRawPointer?, _ joint: UInt32, _ targetPos: Float, _ targetVel: Float, _ stiffness: Float, _ damping: Float) -> Void
+// --- Character Controller ---
+struct Vec3 {
+    var x: Float
+    var y: Float
+    var z: Float
+}
+
+struct Quat {
+    var x: Float
+    var y: Float
+    var z: Float
+    var w: Float
+}
+
+@_silgen_name("rapier_rigid_body_get_position") @discardableResult func rapier_rigid_body_get_position(_ world: UnsafeMutableRawPointer?, _ body: UInt32) -> Vec3
+@_silgen_name("rapier_rigid_body_get_rotation") @discardableResult func rapier_rigid_body_get_rotation(_ world: UnsafeMutableRawPointer?, _ body: UInt32) -> Quat
+@_silgen_name("rapier_collider_get_position") @discardableResult func rapier_collider_get_position(_ world: UnsafeMutableRawPointer?, _ handle: UInt32) -> Vec3
+@_silgen_name("rapier_collider_get_rotation") @discardableResult func rapier_collider_get_rotation(_ world: UnsafeMutableRawPointer?, _ handle: UInt32) -> Quat
+
+@_silgen_name("rapier_character_controller_create") @discardableResult func rapier_character_controller_create(_ offset: Float) -> UnsafeMutableRawPointer?
+@_silgen_name("rapier_character_controller_destroy") func rapier_character_controller_destroy(_ ctrl: UnsafeMutableRawPointer?) -> Void
+@_silgen_name("rapier_character_controller_set_up") func rapier_character_controller_set_up(_ ctrl: UnsafeMutableRawPointer?, _ x: Float, _ y: Float, _ z: Float) -> Void
+@_silgen_name("rapier_character_controller_set_max_slope") func rapier_character_controller_set_max_slope(_ ctrl: UnsafeMutableRawPointer?, _ angle_radians: Float) -> Void
+@_silgen_name("rapier_character_controller_set_min_slope") func rapier_character_controller_set_min_slope(_ ctrl: UnsafeMutableRawPointer?, _ angle_radians: Float) -> Void
+@_silgen_name("rapier_character_controller_set_snap_to_ground") func rapier_character_controller_set_snap_to_ground(_ ctrl: UnsafeMutableRawPointer?, _ distance: Float, _ enabled: Bool) -> Void
+@_silgen_name("rapier_character_controller_set_autostep") func rapier_character_controller_set_autostep(_ ctrl: UnsafeMutableRawPointer?, _ max_height: Float, _ min_width: Float, _ include_dynamic_bodies: Bool) -> Void
+@_silgen_name("rapier_character_controller_move") @discardableResult func rapier_character_controller_move(_ world: UnsafeMutableRawPointer?, _ ctrl: UnsafeMutableRawPointer?, _ collider_handle: UInt32, _ dx: Float, _ dy: Float, _ dz: Float, _ dt: Float) -> Vec3
+@_silgen_name("rapier_character_controller_is_grounded") @discardableResult func rapier_character_controller_is_grounded(_ ctrl: UnsafeMutableRawPointer?) -> Bool
+@_silgen_name("rapier_character_controller_is_on_wall") @discardableResult func rapier_character_controller_is_on_wall(_ ctrl: UnsafeMutableRawPointer?) -> Bool
+@_silgen_name("rapier_character_controller_is_on_ceiling") @discardableResult func rapier_character_controller_is_on_ceiling(_ ctrl: UnsafeMutableRawPointer?) -> Bool
 
 public class RapierPhysicsPlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
@@ -118,13 +133,8 @@ public class RapierPhysicsPlugin: NSObject, FlutterPlugin {
 
         // --- RigidBody ---
         rapier_rigid_body_create(dummyWorld, 0, 0, 0, 0)
-        rapier_rigid_body_get_position_x(dummyWorld, 0)
-        rapier_rigid_body_get_position_y(dummyWorld, 0)
-        rapier_rigid_body_get_position_z(dummyWorld, 0)
-        rapier_rigid_body_get_rotation_x(dummyWorld, 0)
-        rapier_rigid_body_get_rotation_y(dummyWorld, 0)
-        rapier_rigid_body_get_rotation_z(dummyWorld, 0)
-        rapier_rigid_body_get_rotation_w(dummyWorld, 0)
+        rapier_rigid_body_get_position(dummyWorld, 0)
+        rapier_rigid_body_get_rotation(dummyWorld, 0)
         rapier_rigid_body_set_position(dummyWorld, 0, 0, 0, 0)
         rapier_rigid_body_set_rotation(dummyWorld, 0, 0, 0, 0, 0)
         rapier_rigid_body_wake(dummyWorld, 0)
@@ -144,13 +154,8 @@ public class RapierPhysicsPlugin: NSObject, FlutterPlugin {
         // --- Collider ---
         rapier_collider_create(dummyWorld, 0, nil)
         rapier_collider_create_heightfield(dummyWorld, 0, nil, 0, 0, 0, 0, 0)
-        rapier_collider_get_position_x(dummyWorld, 0)
-        rapier_collider_get_position_y(dummyWorld, 0)
-        rapier_collider_get_position_z(dummyWorld, 0)
-        rapier_collider_get_rotation_x(dummyWorld, 0)
-        rapier_collider_get_rotation_y(dummyWorld, 0)
-        rapier_collider_get_rotation_z(dummyWorld, 0)
-        rapier_collider_get_rotation_w(dummyWorld, 0)
+        rapier_collider_get_position(dummyWorld, 0)
+        rapier_collider_get_rotation(dummyWorld, 0)
         rapier_collider_get_friction(dummyWorld, 0)
         rapier_collider_get_restitution(dummyWorld, 0)
         rapier_collider_get_density(dummyWorld, 0)
@@ -174,6 +179,19 @@ public class RapierPhysicsPlugin: NSObject, FlutterPlugin {
         rapier_joint_configure_revolute_motor(dummyWorld, 0, 0, 0, 0, 0)
         rapier_joint_configure_prismatic_motor(dummyWorld, 0, 0, 0, 0, 0)
         rapier_joint_remove(dummyWorld, 0)
+
+        // --- Character Controller ---
+        let dummyCtrl = rapier_character_controller_create(0)
+        rapier_character_controller_set_up(dummyCtrl, 0, 0, 0)
+        rapier_character_controller_set_max_slope(dummyCtrl, 0)
+        rapier_character_controller_set_min_slope(dummyCtrl, 0)
+        rapier_character_controller_set_snap_to_ground(dummyCtrl, 0, false)
+        rapier_character_controller_set_autostep(dummyCtrl, 0, 0, false)
+        rapier_character_controller_move(dummyWorld, dummyCtrl, 0, 0, 0, 0, 0)
+        rapier_character_controller_is_grounded(dummyCtrl)
+        rapier_character_controller_is_on_wall(dummyCtrl)
+        rapier_character_controller_is_on_ceiling(dummyCtrl)
+        rapier_character_controller_destroy(dummyCtrl)
     }
   }
 

@@ -84,19 +84,25 @@ class RapierBindingsImpl extends RapierBindings {
   void removeRigidBody(int world, int handle) => web_ffi.rapier_rigid_body_remove(world.toJS, handle.toJS);
 
   @override
-  Vector3 getBodyPosition(int world, int body) => Vector3(
-    web_ffi.rapier_rigid_body_get_position_x(world.toJS, body.toJS).toDartDouble,
-    web_ffi.rapier_rigid_body_get_position_y(world.toJS, body.toJS).toDartDouble,
-    web_ffi.rapier_rigid_body_get_position_z(world.toJS, body.toJS).toDartDouble,
-  );
+  Vector3 getBodyPosition(int world, int body) {
+    final ptr = web_ffi.rapier_rigid_body_get_position(world.toJS, body.toJS);
+    return Vector3(
+      web_ffi.rapier_vec3_get_x(ptr).toDartDouble,
+      web_ffi.rapier_vec3_get_y(ptr).toDartDouble,
+      web_ffi.rapier_vec3_get_z(ptr).toDartDouble,
+    );
+  }
 
   @override
-  Quaternion getBodyRotation(int world, int body) => Quaternion(
-    web_ffi.rapier_rigid_body_get_rotation_x(world.toJS, body.toJS).toDartDouble,
-    web_ffi.rapier_rigid_body_get_rotation_y(world.toJS, body.toJS).toDartDouble,
-    web_ffi.rapier_rigid_body_get_rotation_z(world.toJS, body.toJS).toDartDouble,
-    web_ffi.rapier_rigid_body_get_rotation_w(world.toJS, body.toJS).toDartDouble,
-  );
+  Quaternion getBodyRotation(int world, int body) {
+    final ptr = web_ffi.rapier_rigid_body_get_rotation(world.toJS, body.toJS);
+    return Quaternion(
+      web_ffi.rapier_quat_get_x(ptr).toDartDouble,
+      web_ffi.rapier_quat_get_y(ptr).toDartDouble,
+      web_ffi.rapier_quat_get_z(ptr).toDartDouble,
+      web_ffi.rapier_quat_get_w(ptr).toDartDouble,
+    );
+  }
 
   @override
   void setBodyPosition(int world, int body, double x, double y, double z) =>
@@ -231,19 +237,25 @@ class RapierBindingsImpl extends RapierBindings {
   void removeCollider(int world, int handle) => web_ffi.rapier_collider_remove(world.toJS, handle.toJS);
 
   @override
-  Vector3 getColliderPosition(int world, int handle) => Vector3(
-    web_ffi.rapier_collider_get_position_x(world.toJS, handle.toJS).toDartDouble,
-    web_ffi.rapier_collider_get_position_y(world.toJS, handle.toJS).toDartDouble,
-    web_ffi.rapier_collider_get_position_z(world.toJS, handle.toJS).toDartDouble,
-  );
+  Vector3 getColliderPosition(int world, int handle) {
+    final ptr = web_ffi.rapier_collider_get_position(world.toJS, handle.toJS);
+    return Vector3(
+      web_ffi.rapier_vec3_get_x(ptr).toDartDouble,
+      web_ffi.rapier_vec3_get_y(ptr).toDartDouble,
+      web_ffi.rapier_vec3_get_z(ptr).toDartDouble,
+    );
+  }
 
   @override
-  Quaternion getColliderRotation(int world, int handle) => Quaternion(
-    web_ffi.rapier_collider_get_rotation_x(world.toJS, handle.toJS).toDartDouble,
-    web_ffi.rapier_collider_get_rotation_y(world.toJS, handle.toJS).toDartDouble,
-    web_ffi.rapier_collider_get_rotation_z(world.toJS, handle.toJS).toDartDouble,
-    web_ffi.rapier_collider_get_rotation_w(world.toJS, handle.toJS).toDartDouble,
-  );
+  Quaternion getColliderRotation(int world, int handle) {
+    final ptr = web_ffi.rapier_collider_get_rotation(world.toJS, handle.toJS);
+    return Quaternion(
+      web_ffi.rapier_quat_get_x(ptr).toDartDouble,
+      web_ffi.rapier_quat_get_y(ptr).toDartDouble,
+      web_ffi.rapier_quat_get_z(ptr).toDartDouble,
+      web_ffi.rapier_quat_get_w(ptr).toDartDouble,
+    );
+  }
 
   @override
   double getColliderFriction(int world, int handle) =>
@@ -524,4 +536,83 @@ class RapierBindingsImpl extends RapierBindings {
     stiffness.toJS,
     damping.toJS,
   );
+
+  // ==========================================
+  // Kinematic Character Controller
+  // ==========================================
+
+  @override
+  int createCharacterController(double offset) =>
+      web_ffi.rapier_character_controller_create(offset.toJS).toDartInt;
+
+  @override
+  void destroyCharacterController(int ctrl) =>
+      web_ffi.rapier_character_controller_destroy(ctrl.toJS);
+
+  @override
+  void setCharacterControllerUp(int ctrl, double x, double y, double z) =>
+      web_ffi.rapier_character_controller_set_up(ctrl.toJS, x.toJS, y.toJS, z.toJS);
+
+  @override
+  void setCharacterControllerMaxSlope(int ctrl, double angleRadians) =>
+      web_ffi.rapier_character_controller_set_max_slope(ctrl.toJS, angleRadians.toJS);
+
+  @override
+  void setCharacterControllerMinSlope(int ctrl, double angleRadians) =>
+      web_ffi.rapier_character_controller_set_min_slope(ctrl.toJS, angleRadians.toJS);
+
+  @override
+  void setCharacterControllerSnapToGround(int ctrl, double distance, bool enabled) =>
+      web_ffi.rapier_character_controller_set_snap_to_ground(ctrl.toJS, distance.toJS, enabled.toJS);
+
+  @override
+  void setCharacterControllerAutoStep(
+    int ctrl,
+    double maxHeight,
+    double minWidth,
+    bool includeDynamicBodies,
+  ) => web_ffi.rapier_character_controller_set_autostep(
+    ctrl.toJS,
+    maxHeight.toJS,
+    minWidth.toJS,
+    includeDynamicBodies.toJS,
+  );
+
+  @override
+  Vector3 moveCharacter(
+    int world,
+    int ctrl,
+    int colliderHandle,
+    double dx,
+    double dy,
+    double dz,
+    double dt,
+  ) {
+    final result = web_ffi.rapier_character_controller_move(
+      world.toJS,
+      ctrl.toJS,
+      colliderHandle.toJS,
+      dx.toJS,
+      dy.toJS,
+      dz.toJS,
+      dt.toJS,
+    );
+    return Vector3(
+      web_ffi.rapier_vec3_get_x(result).toDartDouble,
+      web_ffi.rapier_vec3_get_y(result).toDartDouble,
+      web_ffi.rapier_vec3_get_z(result).toDartDouble,
+    );
+  }
+
+  @override
+  bool isCharacterGrounded(int ctrl) =>
+      web_ffi.rapier_character_controller_is_grounded(ctrl.toJS).toDart;
+
+  @override
+  bool isCharacterOnWall(int ctrl) =>
+      web_ffi.rapier_character_controller_is_on_wall(ctrl.toJS).toDart;
+
+  @override
+  bool isCharacterOnCeiling(int ctrl) =>
+      web_ffi.rapier_character_controller_is_on_ceiling(ctrl.toJS).toDart;
 }

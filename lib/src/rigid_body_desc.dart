@@ -22,4 +22,26 @@ class RigidBodyDesc {
   RigidBodyDesc.fixed() : type = RigidBodyType.fixed;
   RigidBodyDesc.kinematicPositionBased() : type = RigidBodyType.kinematicPositionBased;
   RigidBodyDesc.kinematicVelocityBased() : type = RigidBodyType.kinematicVelocityBased;
+
+  // --- Builder-style setters ---
+  RigidBodyDesc setPosition(Vector3 position) {
+    this.position.setFrom(position);
+    return this;
+  }
+
+  RigidBodyDesc setRotation(Quaternion rotation) {
+    this.rotation.setFrom(rotation);
+    this.rotation.normalize();
+    return this;
+  }
+
+  RigidBodyDesc setLinearVelocity(Vector3 velocity) {
+    linearVelocity.setFrom(velocity);
+    return this;
+  }
+
+  RigidBodyDesc setAngularVelocity(Vector3 velocity) {
+    angularVelocity.setFrom(velocity);
+    return this;
+  }
 }
