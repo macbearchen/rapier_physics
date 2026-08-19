@@ -1,6 +1,13 @@
 import 'rapier_world.dart';
 
-enum RigidBodyType { dynamic, fixed, kinematicPositionBased, kinematicVelocityBased }
+// dart format off
+enum RigidBodyType {
+  dynamic,
+  fixed,
+  kinematicPositionBased,
+  kinematicVelocityBased
+}
+// dart format on
 
 class RigidBodyDesc {
   // world position (maps to Rapier translation)

@@ -298,39 +298,24 @@ class RapierBindingsImpl extends RapierBindings {
   void destroyCharacterController(int ctrl) => throw UnsupportedError('Stub');
 
   @override
-  void setCharacterControllerUp(int ctrl, double x, double y, double z) =>
+  void setCharacterControllerUp(int ctrl, double x, double y, double z) => throw UnsupportedError('Stub');
+
+  @override
+  void setCharacterControllerMaxSlope(int ctrl, double angleRadians) => throw UnsupportedError('Stub');
+
+  @override
+  void setCharacterControllerMinSlope(int ctrl, double angleRadians) => throw UnsupportedError('Stub');
+
+  @override
+  void setCharacterControllerSnapToGround(int ctrl, double distance, bool enabled) => throw UnsupportedError('Stub');
+
+  @override
+  void setCharacterControllerAutoStep(int ctrl, double maxHeight, double minWidth, bool includeDynamicBodies) =>
       throw UnsupportedError('Stub');
 
   @override
-  void setCharacterControllerMaxSlope(int ctrl, double angleRadians) =>
+  Vector3 moveCharacter(int world, int ctrl, int colliderHandle, double dx, double dy, double dz, double dt) =>
       throw UnsupportedError('Stub');
-
-  @override
-  void setCharacterControllerMinSlope(int ctrl, double angleRadians) =>
-      throw UnsupportedError('Stub');
-
-  @override
-  void setCharacterControllerSnapToGround(int ctrl, double distance, bool enabled) =>
-      throw UnsupportedError('Stub');
-
-  @override
-  void setCharacterControllerAutoStep(
-    int ctrl,
-    double maxHeight,
-    double minWidth,
-    bool includeDynamicBodies,
-  ) => throw UnsupportedError('Stub');
-
-  @override
-  Vector3 moveCharacter(
-    int world,
-    int ctrl,
-    int colliderHandle,
-    double dx,
-    double dy,
-    double dz,
-    double dt,
-  ) => throw UnsupportedError('Stub');
 
   @override
   bool isCharacterGrounded(int ctrl) => throw UnsupportedError('Stub');
@@ -340,5 +325,95 @@ class RapierBindingsImpl extends RapierBindings {
 
   @override
   bool isCharacterOnCeiling(int ctrl) => throw UnsupportedError('Stub');
+
+  // ==========================================
+  // Scene Queries (QueryPipeline)
+  // ==========================================
+
+  @override
+  RayHitData? castRay(
+    int world,
+    double ox,
+    double oy,
+    double oz,
+    double dx,
+    double dy,
+    double dz,
+    double maxToi,
+    bool solid,
+    int excludeCollider,
+    int excludeRigidBody,
+  ) => throw UnsupportedError('Stub');
+
+  @override
+  RayHitData? castRayAndGetNormal(
+    int world,
+    double ox,
+    double oy,
+    double oz,
+    double dx,
+    double dy,
+    double dz,
+    double maxToi,
+    bool solid,
+    int excludeCollider,
+    int excludeRigidBody,
+  ) => throw UnsupportedError('Stub');
+
+  @override
+  ShapeHitData? castShape(
+    int world,
+    double px,
+    double py,
+    double pz,
+    double rx,
+    double ry,
+    double rz,
+    double rw,
+    double vx,
+    double vy,
+    double vz,
+    ColliderDesc desc,
+    double maxToi,
+    bool stopAtPenetration,
+    int excludeCollider,
+    int excludeRigidBody,
+  ) => throw UnsupportedError('Stub');
+
+  @override
+  PointProjectionData? projectPoint(
+    int world,
+    double px,
+    double py,
+    double pz,
+    bool solid,
+    int excludeCollider,
+    int excludeRigidBody,
+  ) => throw UnsupportedError('Stub');
+
+  @override
+  List<int> intersectionsWithPoint(
+    int world,
+    double px,
+    double py,
+    double pz,
+    int excludeCollider,
+    int excludeRigidBody,
+  ) => throw UnsupportedError('Stub');
+
+  @override
+  int intersectionWithShape(
+    int world,
+    double px,
+    double py,
+    double pz,
+    double rx,
+    double ry,
+    double rz,
+    double rw,
+    ColliderDesc desc,
+    int excludeCollider,
+    int excludeRigidBody,
+  ) => throw UnsupportedError('Stub');
 }
 

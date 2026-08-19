@@ -1,6 +1,17 @@
 import 'package:vector_math/vector_math.dart' show Vector3;
 import 'rigid_body.dart';
 
+// dart format off
+enum JointAxis {
+  x,
+  y,
+  z,
+  angX,
+  angY,
+  angZ,
+}
+// dart format on
+
 /// Base class for all physics joints.
 class Joint {
   final int handle;

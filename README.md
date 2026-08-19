@@ -1,7 +1,8 @@
 # Rapier Physics for Flutter
 
 [![pub package](https://img.shields.io/pub/v/rapier_physics.svg)](https://pub.dev/packages/rapier_physics)
-**Version: 0.4.1**
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![Platform](https://img.shields.io/badge/platform-ios%20%7C%20android%20%7C%20macos%20%7C%20windows%20%7C%20web-blue)
 
 [繁體中文](./README_zh.md)
 
@@ -14,9 +15,11 @@ A high-performance physics engine for Flutter, powered by [Rapier](https://rapie
 - **Cross-Platform**: Support for Android, iOS, macOS, Windows, and Web.
 - **High Performance**: Core physics simulation written in Rust.
 - **Flexible Physics**: Support for various rigid body types (Dynamic, Fixed, Kinematic).
+- **Character Controller**: Kinematic character controller supporting auto-stepping, slope sliding, ground snapping, and dynamic body pushing.
+- **Scene Queries**: Raycasting (`castRay`, `castRayAndGetNormal`, `intersectionWithRay`, `intersectionsWithRay`) and shape casting (`castShape`, `intersectionsWithShape`) with filter flags.
 - **Force & Impulse**: Full support for `addForce`, `applyImpulse`, and their `AtPoint` variants.
 - **Velocity Control**: Set linear and angular velocities directly for precise state control.
-- **Colliders**: Box, Sphere, Cylinder, Capsule, Cone, and **Heightfield** colliders with **native local transform support** (`localPosition`, `localRotation`).
+- **Colliders**: Box, Sphere, Cylinder, Capsule (`capsuleX`, `capsuleY`, `capsuleZ`), Cone, and **Heightfield** colliders with **native local transform support** (`localPosition`, `localRotation`).
 - **Joints Support**: Fixed, Spherical, Revolute, Prismatic, and Rope joints with motor support.
 - **Lifecycle Management**: Robust API for adding and **removing** rigid bodies, colliders, and joints with automatic relationship cleanup.
 - **CCD**: Continuous Collision Detection for high-speed simulation.
@@ -32,7 +35,7 @@ Add `rapier_physics` to your `pubspec.yaml` dependencies:
 
 ```yaml
 dependencies:
-  rapier_physics: ^0.4.1
+  rapier_physics: ^0.5.0
 ```
 
 ### Setup
@@ -109,6 +112,8 @@ These demos include:
 2. **Newton's Cradle**: Momentum conservation demo using spherical joint constraints.
 3. **Double Pendulum**: Chaotic motion simulation with revolute and spherical joints.
 4. **Compound Shapes**: Rigid bodies consisting of multiple colliders (e.g., table with four legs).
+5. **Character Controller**: 3D player movement with auto-stepping, slope sliding, and pushing dynamic obstacles.
+6. **Scene Queries**: Raycasting and shape casting with dynamic visualization and hit filtering.
 
 ## Supported Rigid Body Types
 

@@ -54,12 +54,7 @@ class KinematicCharacterController {
   final RigidBody _body;
   final Collider _collider;
 
-  KinematicCharacterController._(
-    this._ctrlHandle,
-    this._world,
-    this._body,
-    this._collider,
-  );
+  KinematicCharacterController._(this._ctrlHandle, this._world, this._body, this._collider);
 
   /// Creates a new character controller.
   ///
@@ -104,17 +99,9 @@ class KinematicCharacterController {
   /// Set to null to disable.
   set snapToGround(double? distance) {
     if (distance != null && distance > 0) {
-      RapierWorld.bindings.setCharacterControllerSnapToGround(
-        _ctrlHandle,
-        distance,
-        true,
-      );
+      RapierWorld.bindings.setCharacterControllerSnapToGround(_ctrlHandle, distance, true);
     } else {
-      RapierWorld.bindings.setCharacterControllerSnapToGround(
-        _ctrlHandle,
-        0.0,
-        false,
-      );
+      RapierWorld.bindings.setCharacterControllerSnapToGround(_ctrlHandle, 0.0, false);
     }
   }
 
@@ -124,17 +111,8 @@ class KinematicCharacterController {
   ///   Set to 0 or null to disable.
   /// [minWidth] — minimum step width required for climbing.
   /// [includeDynamicBodies] — whether dynamic (non-static) bodies count as steps.
-  void setAutoStep({
-    double maxHeight = 0.0,
-    double minWidth = 0.1,
-    bool includeDynamicBodies = false,
-  }) {
-    RapierWorld.bindings.setCharacterControllerAutoStep(
-      _ctrlHandle,
-      maxHeight,
-      minWidth,
-      includeDynamicBodies,
-    );
+  void setAutoStep({double maxHeight = 0.0, double minWidth = 0.1, bool includeDynamicBodies = false}) {
+    RapierWorld.bindings.setCharacterControllerAutoStep(_ctrlHandle, maxHeight, minWidth, includeDynamicBodies);
   }
 
   // ==========================================

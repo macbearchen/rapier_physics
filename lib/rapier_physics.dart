@@ -4,13 +4,13 @@ export 'src/character_controller.dart';
 export 'src/collider.dart';
 export 'src/collider_desc.dart';
 export 'src/joint.dart';
-export 'src/joint_axis.dart';
 export 'src/rapier_world.dart';
 export 'src/rigid_body.dart';
 export 'src/rigid_body_desc.dart';
+export 'src/scene_query.dart';
 
 class RapierPhysics {
-  static const String version = "rapier_physics 0.4.1";
+  static const String version = "rapier_physics 0.5.0";
 
   Future<String?> getPlatformVersion() {
     return RapierPhysicsPlatform.instance.getPlatformVersion();

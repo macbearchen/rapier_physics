@@ -5,8 +5,8 @@ import 'base_scene.dart';
 class PhysicsScene extends BaseScene {
   final ballMesh = M3Mesh(M3Resources.unitSphere);
   final boxMesh = M3Mesh(M3Resources.unitCube);
-  final capsuleMesh = M3Mesh(M3CapsuleGeom(0.5, 1.0, axis: M3Axis.y));
-  final coneMesh = M3Mesh(M3CylinderGeom(0.0, 0.8, 2.0, axis: M3Axis.y));
+  final capsuleMesh = M3Mesh(M3CapsuleGeom(radius: 0.5, height: 1.0, axis: M3Axis.y));
+  final coneMesh = M3Mesh(M3CylinderGeom(topRadius: 0.0, bottomRadius: 0.8, height: 2.0, axis: M3Axis.y));
 
   PrismaticJoint? _liftJoint;
 
@@ -48,7 +48,11 @@ class PhysicsScene extends BaseScene {
     // addMesh(M3Mesh(M3PlaneGeom(10, 10)), Vector3(0, 0, -1)).color = Colors.skyBlue;
 
     final entityCapsule = addMesh(capsuleMesh, Vector3(0, 0, 1.2))..color = Colors.red;
-    final rbCapsule = physicsSystem.addCapsule(0.5, 0.5, M3RigidBodyDesc.dynamic()..position = Vector3(2, -4, 3));
+    final rbCapsule = physicsSystem.addCapsule(
+      radius: 0.5,
+      halfHeight: 0.5,
+      desc: M3RigidBodyDesc.dynamic()..position = Vector3(2, -4, 3),
+    );
     physicsSystem.attachEntity(entityCapsule, rbCapsule);
 
     if (rbCapsule is M3RapierRigidBody) {
@@ -63,7 +67,7 @@ class PhysicsScene extends BaseScene {
     // Cylindrical Joint (GenericJoint)
     // Locked: X, Y, AngX, AngY. Free: Z, AngZ.
     final box = addMesh(M3Mesh(M3BoxGeom(1, 1, 1)), Vector3(-4, 4, 7))..color = Colors.lightGreen;
-    final rbBox = physicsSystem.addBox(0.5, 0.5, 0.5, M3RigidBodyDesc.dynamic()..position = Vector3(-4, 4, 7));
+    final rbBox = physicsSystem.addBox(0.5, 0.5, 0.5, desc: M3RigidBodyDesc.dynamic()..position = Vector3(-4, 4, 7));
     physicsSystem.attachEntity(box, rbBox);
 
     if (rbBox is M3RapierRigidBody) {
@@ -126,7 +130,7 @@ class PhysicsScene extends BaseScene {
           Vector3 ballPos = Vector3((i - size / 2) * 1.2, (j - size / 2) * 1.2, 6 + k * 3);
           // swapYZ(ballPos);
           final ball = addMesh(ballMesh, ballPos);
-          final rbBall = physicsSystem.addSphere(0.5, M3RigidBodyDesc.dynamic()..position = ballPos);
+          final rbBall = physicsSystem.addSphere(0.5, desc: M3RigidBodyDesc.dynamic()..position = ballPos);
           physicsSystem.attachEntity(ball, rbBall);
 
           if (i == 0) {
@@ -146,7 +150,7 @@ class PhysicsScene extends BaseScene {
   }
 
   void addFalling() {
-    final cylGeom = M3CylinderGeom(0.5, 0.5, 1, axis: M3Axis.y);
+    final cylGeom = M3CylinderGeom(topRadius: 0.5, bottomRadius: 0.5, height: 1.0, axis: M3Axis.y);
     // vertical falling
     final random = Random();
     for (int i = 0; i < 30; i++) {
@@ -156,17 +160,21 @@ class PhysicsScene extends BaseScene {
 
       // ball
       final ball = addMesh(ballMesh, ballPos)..color = Colors.skyBlue;
-      final rbBall = physicsSystem.addSphere(0.5, M3RigidBodyDesc.dynamic()..position = ballPos);
+      final rbBall = physicsSystem.addSphere(0.5, desc: M3RigidBodyDesc.dynamic()..position = ballPos);
       physicsSystem.attachEntity(ball, rbBall);
 
       // box
       final box = addMesh(M3Mesh(M3Resources.unitCube), boxPos)..color = Colors.yellow;
-      final rbBox = physicsSystem.addBox(0.5, 0.5, 0.5, M3RigidBodyDesc.dynamic()..position = boxPos);
+      final rbBox = physicsSystem.addBox(0.5, 0.5, 0.5, desc: M3RigidBodyDesc.dynamic()..position = boxPos);
       physicsSystem.attachEntity(box, rbBox);
 
       // cylinder
       final cylinder = addMesh(M3Mesh(cylGeom), cylPos)..color = Colors.lightGreen;
-      final rbCyl = physicsSystem.addCylinder(0.5, 0.5, M3RigidBodyDesc.dynamic()..position = cylPos);
+      final rbCyl = physicsSystem.addCylinder(
+        radius: 0.5,
+        halfHeight: 0.5,
+        desc: M3RigidBodyDesc.dynamic()..position = cylPos,
+      );
       physicsSystem.attachEntity(cylinder, rbCyl);
     }
   }
@@ -174,7 +182,7 @@ class PhysicsScene extends BaseScene {
   void addFan(Vector3 pos) {
     // Motorized Fan (Revolute)
     final entityFan = addMesh(M3Mesh(M3BoxGeom(3, 0.6, 0.2)), pos)..color = Colors.orange;
-    final rbFan = physicsSystem.addBox(1.5, 0.3, 0.1, M3RigidBodyDesc.dynamic()..position = pos);
+    final rbFan = physicsSystem.addBox(1.5, 0.3, 0.1, desc: M3RigidBodyDesc.dynamic()..position = pos);
     physicsSystem.attachEntity(entityFan, rbFan);
 
     // Get world body and joint to it
@@ -189,7 +197,7 @@ class PhysicsScene extends BaseScene {
     // Motorized Lift (Prismatic) — slides along X: (-2,-2,6) <-> (4,-2,6)
     // Anchor is fixed at the start position; targetPos is the offset along X (0=start, 6=end).
     final entityLift = addMesh(M3Mesh(M3BoxGeom(2, 2, 0.2)), pos)..color = Colors.purple;
-    final rbLift = physicsSystem.addBox(1, 1, 0.1, M3RigidBodyDesc.dynamic()..position = pos);
+    final rbLift = physicsSystem.addBox(1, 1, 0.1, desc: M3RigidBodyDesc.dynamic()..position = pos);
     physicsSystem.attachEntity(entityLift, rbLift);
 
     if (rbLift is M3RapierRigidBody) {
@@ -209,7 +217,7 @@ class PhysicsScene extends BaseScene {
       final ropePos = Vector3(i.toDouble(), 0, 0) + startPos;
       // Use thin segments along X axis
       final rope = addMesh(ropeMesh, ropePos)..color = Colors.lightCoral;
-      final rbRope = physicsSystem.addBox(0.5, 0.1, 0.1, M3RigidBodyDesc.dynamic()..position = ropePos);
+      final rbRope = physicsSystem.addBox(0.5, 0.1, 0.1, desc: M3RigidBodyDesc.dynamic()..position = ropePos);
       physicsSystem.attachEntity(rope, rbRope);
 
       if (rbRope is M3RapierRigidBody) {
@@ -287,17 +295,17 @@ class PhysicsScene extends BaseScene {
     switch (shapeType) {
       case 0: // sphere
         final entity = addMesh(ballMesh, desc.position)..color = color;
-        final rb = physicsSystem.addSphere(0.45, desc);
+        final rb = physicsSystem.addSphere(0.45, desc: desc);
         physicsSystem.attachEntity(entity, rb);
         break;
       case 1: // box
         final entity = addMesh(M3Mesh(M3Resources.unitCube), desc.position)..color = color;
-        final rb = physicsSystem.addBox(0.45, 0.45, 0.45, desc);
+        final rb = physicsSystem.addBox(0.45, 0.45, 0.45, desc: desc);
         physicsSystem.attachEntity(entity, rb);
         break;
       case 2: // capsule
         final entity = addMesh(capsuleMesh, desc.position)..color = color;
-        final rb = physicsSystem.addCapsule(0.35, 0.45, desc);
+        final rb = physicsSystem.addCapsule(radius: 0.35, halfHeight: 0.45, desc: desc);
         physicsSystem.attachEntity(entity, rb);
         break;
     }

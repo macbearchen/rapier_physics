@@ -1,6 +1,7 @@
 // ignore_for_file: unused_local_variable, unused_field
 import 'dart:math' as math;
 
+import 'package:material_ui/material_ui.dart' as fm;
 import 'package:flutter/services.dart';
 
 import 'base_scene.dart';
@@ -13,7 +14,7 @@ import 'base_scene.dart';
 /// collision resolution.
 class CharacterControllerScene extends BaseScene {
   // ── Meshes ──────────────────────────────────────────────────────────────────
-  final _capsuleMesh = M3Mesh(M3CapsuleGeom(0.4, 0.9, axis: M3Axis.y));
+  final _capsuleMesh = M3Mesh(M3CapsuleGeom(radius: 0.25, height: 0.6, axis: M3Axis.z));
   final _rampMesh = M3Mesh(M3BoxGeom(8, 6, 0.6));
   final _boxMesh = M3Mesh(M3BoxGeom(3, 3, 0.3));
 
@@ -70,7 +71,7 @@ class CharacterControllerScene extends BaseScene {
       4,
       3,
       0.3,
-      M3RigidBodyDesc.fixed()
+      desc: M3RigidBodyDesc.fixed()
         ..position = Vector3(5, 0, 0.6)
         ..rotation = Quaternion.axisAngle(Vector3(0, 1, 0), math.pi / 8),
     );
@@ -81,7 +82,7 @@ class CharacterControllerScene extends BaseScene {
     // Step ladder
     for (int i = 0; i < 8; i++) {
       final pos = Vector3(-6, 6 - 2.0 * i, 0.15 + i * 0.3);
-      final step1Rb = physicsSystem.addBox(1.5, 1.5, 0.15, M3RigidBodyDesc.fixed()..position = pos);
+      final step1Rb = physicsSystem.addBox(1.5, 1.5, 0.15, desc: M3RigidBodyDesc.fixed()..position = pos);
       final step1 = addMesh(_boxMesh, pos);
       step1.color = Colors.lightBlue;
       physicsSystem.attachEntity(step1, step1Rb);
@@ -94,8 +95,8 @@ class CharacterControllerScene extends BaseScene {
     // rapier.RigidBody reference needed by the character controller.
     _characterBody = world.createRigidBody(RigidBodyDesc.kinematicPositionBased()..position.setValues(0, 2, 1.5));
 
-    // Capsule collider: half-height 0.45 m, radius 0.35 m
-    final colDesc = ColliderDesc.capsule(0.45, 0.35);
+    // Capsule collider: half-height 0.3 m, radius 0.25 m
+    final colDesc = ColliderDesc.capsuleZ(halfHeight: 0.3, radius: 0.25);
     colDesc.density = 6.0;
     _characterCollider = world.createCollider(_characterBody, colDesc);
 
@@ -119,7 +120,7 @@ class CharacterControllerScene extends BaseScene {
       for (int j = 0; j < count; j++) {
         final pos = Vector3((i - count * 0.5) * 2, j * 2 - 5, 5);
         // cube
-        final rb = physicsSystem.addBox(0.5, 0.5, 0.5, M3RigidBodyDesc.dynamic()..position = pos);
+        final rb = physicsSystem.addBox(0.5, 0.5, 0.5, desc: M3RigidBodyDesc.dynamic()..position = pos);
         // final rb = physicsSystem.addSphere(0.5, M3RigidBodyDesc.dynamic()..position = pos);
         final box = addMesh(M3Mesh(M3Resources.unitCube), pos);
         box.color = Vector4(1.0, 1.0, 0.3, 1);
@@ -151,6 +152,61 @@ class CharacterControllerScene extends BaseScene {
     _onCeiling = result.isOnCeiling;
 
     _characterEntity.position = _characterBody.position;
+  }
+
+  @override
+  fm.Widget buildUI(fm.BuildContext context) {
+    final joystickCenter = _inputCtrl._joystickCenter;
+    final joystickDelta = _inputCtrl._joystickDelta;
+    final isTouched = _inputCtrl._joystickTouchId != null;
+
+    if (!isTouched || joystickCenter == null) {
+      return const fm.SizedBox.shrink();
+    }
+
+    final knobOffset = joystickDelta * CharControllerKeyboardInput._joystickRadius;
+    final radius = CharControllerKeyboardInput._joystickRadius;
+
+    return fm.IgnorePointer(
+      child: fm.Stack(
+        children: [
+          fm.Positioned(
+            left: joystickCenter.dx - radius,
+            top: joystickCenter.dy - radius,
+            child: _buildJoystickCircle(isTouched: true, knobOffset: knobOffset, radius: radius),
+          ),
+        ],
+      ),
+    );
+  }
+
+  fm.Widget _buildJoystickCircle({required bool isTouched, required fm.Offset knobOffset, required double radius}) {
+    return fm.Opacity(
+      opacity: isTouched ? 0.85 : 0.45,
+      child: fm.Container(
+        width: radius * 2,
+        height: radius * 2,
+        decoration: fm.BoxDecoration(
+          shape: fm.BoxShape.circle,
+          color: fm.Colors.black.withValues(alpha: 0.35),
+          border: fm.Border.all(color: fm.Colors.white70, width: 2),
+        ),
+        child: fm.Center(
+          child: fm.Transform.translate(
+            offset: knobOffset,
+            child: fm.Container(
+              width: 44,
+              height: 44,
+              decoration: fm.BoxDecoration(
+                shape: fm.BoxShape.circle,
+                color: isTouched ? fm.Colors.lightBlueAccent : fm.Colors.white,
+                boxShadow: const [fm.BoxShadow(color: fm.Colors.black26, blurRadius: 4, spreadRadius: 1)],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -189,19 +245,45 @@ class CharControllerKeyboardInput extends M3InputController {
     // TODO: implement onScroll
   }
 
+  // Virtual joystick touch state
+  int? _joystickTouchId;
+  Offset? _joystickCenter;
+  Offset _joystickDelta = Offset.zero;
+  static const double _joystickRadius = 60.0;
+
   @override
   void onTouchDown(M3Touch touch) {
-    // TODO: implement onTouchDown
+    // If joystick isn't active and touch is on the bottom-left half of screen
+    if (_joystickTouchId == null && touch.x < 300) {
+      _joystickTouchId = touch.id;
+      _joystickCenter = Offset(touch.x, touch.y);
+      _joystickDelta = Offset.zero;
+      M3AppEngine.instance.refresh();
+    }
   }
 
   @override
   void onTouchMove(M3Touch touch) {
-    // TODO: implement onTouchMove
+    if (touch.id == _joystickTouchId && _joystickCenter != null) {
+      final pos = Offset(touch.x, touch.y);
+      final diff = pos - _joystickCenter!;
+      if (diff.distance > _joystickRadius) {
+        _joystickDelta = diff / diff.distance;
+      } else {
+        _joystickDelta = diff / _joystickRadius;
+      }
+      M3AppEngine.instance.refresh();
+    }
   }
 
   @override
   void onTouchUp(M3Touch touch) {
-    // TODO: implement onTouchUp
+    if (touch.id == _joystickTouchId) {
+      _joystickTouchId = null;
+      _joystickCenter = null;
+      _joystickDelta = Offset.zero;
+      M3AppEngine.instance.refresh();
+    }
   }
 
   @override
@@ -230,6 +312,11 @@ class CharControllerKeyboardInput extends M3InputController {
     }
     if (keyboard.isPressed(LogicalKeyboardKey.keyD) || keyboard.isPressed(LogicalKeyboardKey.arrowRight)) {
       moveDelta += Vector3(speed, 0, 0);
+    }
+
+    // Add joystick input (X -> +X right/-X left, Y -> -Y up in screen coords maps to +Y forward)
+    if (_joystickDelta != Offset.zero) {
+      moveDelta += Vector3(_joystickDelta.dx * speed, -_joystickDelta.dy * speed, 0);
     }
 
     moveDelta.z = scene._verticalVelocity;

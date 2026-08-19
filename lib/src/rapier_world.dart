@@ -3,7 +3,7 @@ import 'package:rapier_physics/src/collider_desc.dart';
 
 import 'bindings/rapier_bindings.dart';
 import 'bindings/rapier_bindings_stub.dart'
-    if (dart.library.ffi) 'bindings/rapier_bindings_ffi.dart'
+    if (dart.library.ffi) 'bindings/ffi/rapier_bindings_impl.dart'
     if (dart.library.js_interop) 'bindings/rapier_bindings_web.dart'
     as rapier_bindings;
 
@@ -13,9 +13,10 @@ export 'package:vector_math/vector_math.dart' show Vector3, Quaternion;
 import 'collider.dart';
 import 'character_controller.dart';
 import 'joint.dart';
-import 'joint_axis.dart';
 import 'rigid_body.dart';
 import 'rigid_body_desc.dart';
+import 'scene_query.dart';
+export 'scene_query.dart';
 
 class RapierWorld {
   static final RapierBindings bindings = rapier_bindings.RapierBindingsImpl();
@@ -58,7 +59,7 @@ class RapierWorld {
   }
 
   String get version => bindings.getVersion();
-  
+
   /// Gets the current simulation timestep (dt).
   double get timestep => bindings.getTimestep(_worldHandle);
 
@@ -100,19 +101,32 @@ class RapierWorld {
 
   RigidBody addCylinder({required double halfHeight, required double radius, RigidBodyDesc? desc}) {
     final body = createRigidBody(desc ?? RigidBodyDesc.dynamic());
-    createCollider(body, ColliderDesc.cylinder(halfHeight, radius));
+    createCollider(body, ColliderDesc.cylinder(halfHeight: halfHeight, radius: radius));
     return body;
   }
 
   RigidBody addCone({required double halfHeight, required double radius, RigidBodyDesc? desc}) {
     final body = createRigidBody(desc ?? RigidBodyDesc.dynamic());
-    createCollider(body, ColliderDesc.cone(halfHeight, radius));
+    createCollider(body, ColliderDesc.cone(halfHeight: halfHeight, radius: radius));
     return body;
   }
 
-  RigidBody addCapsule({required double halfHeight, required double radius, RigidBodyDesc? desc}) {
+  RigidBody addCapsule({
+    required double halfHeight,
+    required double radius,
+    RigidBodyDesc? desc,
+    ColliderShapeType shapeType = .capsuleY,
+  }) {
     final body = createRigidBody(desc ?? RigidBodyDesc.dynamic());
-    createCollider(body, ColliderDesc.capsule(halfHeight, radius));
+    ColliderDesc colliderDesc;
+    if (shapeType == .capsuleX) {
+      colliderDesc = ColliderDesc.capsuleX(radius: radius, halfHeight: halfHeight);
+    } else if (shapeType == .capsuleZ) {
+      colliderDesc = ColliderDesc.capsuleZ(radius: radius, halfHeight: halfHeight);
+    } else {
+      colliderDesc = ColliderDesc.capsuleY(radius: radius, halfHeight: halfHeight);
+    }
+    createCollider(body, colliderDesc);
     return body;
   }
 
@@ -517,11 +531,197 @@ class RapierWorld {
   ///
   /// The returned controller must be [KinematicCharacterController.dispose]d
   /// when no longer needed.
-  KinematicCharacterController createCharacterController(
-    RigidBody body,
-    Collider collider, {
-    double offset = 0.01,
-  }) {
+  KinematicCharacterController createCharacterController(RigidBody body, Collider collider, {double offset = 0.01}) {
     return KinematicCharacterController.create(this, body, collider, offset: offset);
+  }
+
+  //--------------------------
+  // Scene Queries (QueryPipeline)
+  //--------------------------
+
+  /// Look up a [Collider] registered in this world by its handle.
+  Collider? getColliderByHandle(int handle) {
+    for (final c in _colliders) {
+      if (c.handle == handle) return c;
+    }
+    return null;
+  }
+
+  /// Look up a [RigidBody] registered in this world by its handle.
+  RigidBody? getRigidBodyByHandle(int handle) {
+    if (_groundBodyHandle == handle) return groundBody;
+    for (final b in _bodies) {
+      if (b.handle == handle) return b;
+    }
+    return null;
+  }
+
+  /// Casts a ray defined by [origin] and [dir] up to [maxToi].
+  RayIntersection? castRay(
+    Vector3 origin,
+    Vector3 dir, {
+    double maxToi = double.infinity,
+    bool solid = true,
+    QueryFilter filter = QueryFilter.none,
+  }) {
+    final raw = bindings.castRay(
+      _worldHandle,
+      origin.x,
+      origin.y,
+      origin.z,
+      dir.x,
+      dir.y,
+      dir.z,
+      maxToi,
+      solid,
+      filter.excludeCollider?.handle ?? 0xFFFFFFFF,
+      filter.excludeRigidBody?.handle ?? 0xFFFFFFFF,
+    );
+    if (raw == null) return null;
+    final collider = getColliderByHandle(raw.colliderHandle);
+    final rigidBody = getRigidBodyByHandle(raw.rigidBodyHandle);
+    if (collider == null || rigidBody == null) return null;
+    return RayIntersection(
+      collider: collider,
+      rigidBody: rigidBody,
+      toi: raw.toi,
+      point: raw.point,
+      normal: raw.normal,
+    );
+  }
+
+  /// Casts a ray defined by [origin] and [dir] up to [maxToi] and returns impact normal.
+  RayIntersection? castRayAndGetNormal(
+    Vector3 origin,
+    Vector3 dir, {
+    double maxToi = double.infinity,
+    bool solid = true,
+    QueryFilter filter = QueryFilter.none,
+  }) {
+    final raw = bindings.castRayAndGetNormal(
+      _worldHandle,
+      origin.x,
+      origin.y,
+      origin.z,
+      dir.x,
+      dir.y,
+      dir.z,
+      maxToi,
+      solid,
+      filter.excludeCollider?.handle ?? 0xFFFFFFFF,
+      filter.excludeRigidBody?.handle ?? 0xFFFFFFFF,
+    );
+    if (raw == null) return null;
+    final collider = getColliderByHandle(raw.colliderHandle);
+    final rigidBody = getRigidBodyByHandle(raw.rigidBodyHandle);
+    if (collider == null || rigidBody == null) return null;
+    return RayIntersection(
+      collider: collider,
+      rigidBody: rigidBody,
+      toi: raw.toi,
+      point: raw.point,
+      normal: raw.normal,
+    );
+  }
+
+  /// Sweeps a shape defined by [shapeDesc] from [pos] with [rot] along velocity vector [vel] up to [maxToi].
+  ShapeIntersection? castShape(
+    Vector3 pos,
+    Quaternion rot,
+    Vector3 vel,
+    ColliderDesc shapeDesc, {
+    double maxToi = double.infinity,
+    bool stopAtPenetration = true,
+    QueryFilter filter = QueryFilter.none,
+  }) {
+    final raw = bindings.castShape(
+      _worldHandle,
+      pos.x,
+      pos.y,
+      pos.z,
+      rot.x,
+      rot.y,
+      rot.z,
+      rot.w,
+      vel.x,
+      vel.y,
+      vel.z,
+      shapeDesc,
+      maxToi,
+      stopAtPenetration,
+      filter.excludeCollider?.handle ?? 0xFFFFFFFF,
+      filter.excludeRigidBody?.handle ?? 0xFFFFFFFF,
+    );
+    if (raw == null) return null;
+    final collider = getColliderByHandle(raw.colliderHandle);
+    final rigidBody = getRigidBodyByHandle(raw.rigidBodyHandle);
+    if (collider == null || rigidBody == null) return null;
+    return ShapeIntersection(
+      collider: collider,
+      rigidBody: rigidBody,
+      toi: raw.toi,
+      point: raw.point,
+      normal: raw.normal,
+    );
+  }
+
+  /// Projects a point [pt] onto the nearest collider.
+  PointProjection? projectPoint(Vector3 pt, {bool solid = true, QueryFilter filter = QueryFilter.none}) {
+    final raw = bindings.projectPoint(
+      _worldHandle,
+      pt.x,
+      pt.y,
+      pt.z,
+      solid,
+      filter.excludeCollider?.handle ?? 0xFFFFFFFF,
+      filter.excludeRigidBody?.handle ?? 0xFFFFFFFF,
+    );
+    if (raw == null) return null;
+    final collider = getColliderByHandle(raw.colliderHandle);
+    final rigidBody = getRigidBodyByHandle(raw.rigidBodyHandle);
+    if (collider == null || rigidBody == null) return null;
+    return PointProjection(collider: collider, rigidBody: rigidBody, point: raw.point, isInside: raw.isInside);
+  }
+
+  /// Finds all colliders containing point [pt].
+  List<Collider> intersectionsWithPoint(Vector3 pt, {QueryFilter filter = QueryFilter.none}) {
+    final handles = bindings.intersectionsWithPoint(
+      _worldHandle,
+      pt.x,
+      pt.y,
+      pt.z,
+      filter.excludeCollider?.handle ?? 0xFFFFFFFF,
+      filter.excludeRigidBody?.handle ?? 0xFFFFFFFF,
+    );
+    final colliders = <Collider>[];
+    for (final h in handles) {
+      final c = getColliderByHandle(h);
+      if (c != null) colliders.add(c);
+    }
+    return colliders;
+  }
+
+  /// Tests if a shape at [pos] and [rot] intersects any collider in the world.
+  Collider? intersectionWithShape(
+    Vector3 pos,
+    Quaternion rot,
+    ColliderDesc shapeDesc, {
+    QueryFilter filter = QueryFilter.none,
+  }) {
+    final handle = bindings.intersectionWithShape(
+      _worldHandle,
+      pos.x,
+      pos.y,
+      pos.z,
+      rot.x,
+      rot.y,
+      rot.z,
+      rot.w,
+      shapeDesc,
+      filter.excludeCollider?.handle ?? 0xFFFFFFFF,
+      filter.excludeRigidBody?.handle ?? 0xFFFFFFFF,
+    );
+    if (handle == 0xFFFFFFFF) return null;
+    return getColliderByHandle(handle);
   }
 }

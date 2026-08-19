@@ -1,6 +1,6 @@
 // ignore_for_file: unused_import
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'demos/base_scene.dart' hide Colors;
 import 'demos/physics_scene.dart';
@@ -8,6 +8,7 @@ import 'demos/compound_scene.dart';
 import 'demos/double_pendulum.dart';
 import 'demos/newton_cradle.dart';
 import 'demos/character_controller_scene.dart';
+import 'demos/scene_query_scene.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,9 +27,14 @@ Future<void> onDidInit() async {
   await appEngine.setScene(testScene);
 }
 
-class MyApp extends StatelessWidget {
-  MyApp({super.key});
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   // 0 - no shadow
   // 1 - shadowmap
   // 2 - csm
@@ -43,9 +49,20 @@ class MyApp extends StatelessWidget {
           title: Text(RapierPhysics.version),
           actions: [
             IconButton(
-              icon: const Icon(Icons.info),
+              icon: renderOptions.debug.showHelpers == M3HelperType.none
+                  ? const Icon(Icons.info)
+                  : Text(
+                      renderOptions.debug.showHelpers == M3HelperType.entity
+                          ? 'Ent'
+                          : (renderOptions.debug.showHelpers == M3HelperType.subMesh ? 'Sub' : 'Both'),
+                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                    ),
               onPressed: () async {
-                renderOptions.debug.showHelpers = !renderOptions.debug.showHelpers;
+                setState(() {
+                  final current = renderOptions.debug.showHelpers;
+                  final next = M3HelperType.values[(current.index + 1) % M3HelperType.values.length];
+                  renderOptions.debug.showHelpers = next;
+                });
               },
             ),
             IconButton(
@@ -78,7 +95,19 @@ class MyApp extends StatelessWidget {
             ),
           ],
         ),
-        body: const M3View(),
+        body: ListenableBuilder(
+          listenable: M3AppEngine.instance,
+          builder: (context, _) {
+            final activeScene = M3AppEngine.instance.activeScene;
+            final sceneUi = activeScene?.buildUI(context);
+            return Stack(
+              children: [
+                const M3View(),
+                if (sceneUi != null) IgnorePointer(ignoring: false, child: sceneUi),
+              ],
+            );
+          },
+        ),
         floatingActionButton: const PanelWidget(),
       ),
     );
@@ -110,8 +139,10 @@ class _PanelWidgetState extends State<PanelWidget> {
       scene = BaseScene.createPhysicsScene((physicsSystem) => DoublePendulumScene(physics: physicsSystem));
     } else if (index == 3) {
       scene = BaseScene.createPhysicsScene((physicsSystem) => CompoundScene(physics: physicsSystem));
-    } else {
+    } else if (index == 4) {
       scene = BaseScene.createPhysicsScene((physicsSystem) => CharacterControllerScene(physics: physicsSystem));
+    } else {
+      scene = BaseScene.createPhysicsScene((physicsSystem) => SceneQueryScene(physics: physicsSystem));
     }
     await M3AppEngine.instance.setScene(scene);
   }
@@ -155,6 +186,13 @@ class _PanelWidgetState extends State<PanelWidget> {
           backgroundColor: _selectedIndex == 4 ? Colors.lightGreen : Colors.grey,
           onPressed: () => _loadScene(4),
           child: const Icon(Icons.filter_5),
+        ),
+        const SizedBox(width: 10),
+        FloatingActionButton(
+          heroTag: 'scene_06',
+          backgroundColor: _selectedIndex == 5 ? Colors.lightGreen : Colors.grey,
+          onPressed: () => _loadScene(5),
+          child: const Icon(Icons.filter_6),
         ),
       ],
     );

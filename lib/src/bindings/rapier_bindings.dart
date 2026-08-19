@@ -221,26 +221,13 @@ abstract class RapierBindings {
 
   /// Enable/disable automatic step-climbing.
   /// Set [maxHeight] ≤ 0 to disable.
-  void setCharacterControllerAutoStep(
-    int ctrl,
-    double maxHeight,
-    double minWidth,
-    bool includeDynamicBodies,
-  );
+  void setCharacterControllerAutoStep(int ctrl, double maxHeight, double minWidth, bool includeDynamicBodies);
 
   /// Compute the corrected movement for the character this frame.
   ///
   /// The character's own [colliderHandle] is excluded from the sweep query.
   /// Returns the effective (collision-resolved) movement vector.
-  Vector3 moveCharacter(
-    int world,
-    int ctrl,
-    int colliderHandle,
-    double dx,
-    double dy,
-    double dz,
-    double dt,
-  );
+  Vector3 moveCharacter(int world, int ctrl, int colliderHandle, double dx, double dy, double dz, double dt);
 
   /// Returns true if the character was touching the ground after the last [moveCharacter] call.
   bool isCharacterGrounded(int ctrl);
@@ -250,4 +237,135 @@ abstract class RapierBindings {
 
   /// Returns true if the character was touching a ceiling after the last [moveCharacter] call.
   bool isCharacterOnCeiling(int ctrl);
+
+  // ==========================================
+  // Scene Queries (QueryPipeline)
+  // ==========================================
+
+  RayHitData? castRay(
+    int world,
+    double ox,
+    double oy,
+    double oz,
+    double dx,
+    double dy,
+    double dz,
+    double maxToi,
+    bool solid,
+    int excludeCollider,
+    int excludeRigidBody,
+  );
+
+  RayHitData? castRayAndGetNormal(
+    int world,
+    double ox,
+    double oy,
+    double oz,
+    double dx,
+    double dy,
+    double dz,
+    double maxToi,
+    bool solid,
+    int excludeCollider,
+    int excludeRigidBody,
+  );
+
+  ShapeHitData? castShape(
+    int world,
+    double px,
+    double py,
+    double pz,
+    double rx,
+    double ry,
+    double rz,
+    double rw,
+    double vx,
+    double vy,
+    double vz,
+    ColliderDesc desc,
+    double maxToi,
+    bool stopAtPenetration,
+    int excludeCollider,
+    int excludeRigidBody,
+  );
+
+  PointProjectionData? projectPoint(
+    int world,
+    double px,
+    double py,
+    double pz,
+    bool solid,
+    int excludeCollider,
+    int excludeRigidBody,
+  );
+
+  List<int> intersectionsWithPoint(
+    int world,
+    double px,
+    double py,
+    double pz,
+    int excludeCollider,
+    int excludeRigidBody,
+  );
+
+  int intersectionWithShape(
+    int world,
+    double px,
+    double py,
+    double pz,
+    double rx,
+    double ry,
+    double rz,
+    double rw,
+    ColliderDesc desc,
+    int excludeCollider,
+    int excludeRigidBody,
+  );
 }
+
+class RayHitData {
+  final int colliderHandle;
+  final int rigidBodyHandle;
+  final double toi;
+  final Vector3 point;
+  final Vector3 normal;
+
+  const RayHitData({
+    required this.colliderHandle,
+    required this.rigidBodyHandle,
+    required this.toi,
+    required this.point,
+    required this.normal,
+  });
+}
+
+class ShapeHitData {
+  final int colliderHandle;
+  final int rigidBodyHandle;
+  final double toi;
+  final Vector3 point;
+  final Vector3 normal;
+
+  const ShapeHitData({
+    required this.colliderHandle,
+    required this.rigidBodyHandle,
+    required this.toi,
+    required this.point,
+    required this.normal,
+  });
+}
+
+class PointProjectionData {
+  final int colliderHandle;
+  final int rigidBodyHandle;
+  final Vector3 point;
+  final bool isInside;
+
+  const PointProjectionData({
+    required this.colliderHandle,
+    required this.rigidBodyHandle,
+    required this.point,
+    required this.isInside,
+  });
+}
+

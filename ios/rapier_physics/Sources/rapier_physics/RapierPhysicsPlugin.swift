@@ -112,6 +112,50 @@ struct Quat {
 @_silgen_name("rapier_character_controller_is_on_wall") @discardableResult func rapier_character_controller_is_on_wall(_ ctrl: UnsafeMutableRawPointer?) -> Bool
 @_silgen_name("rapier_character_controller_is_on_ceiling") @discardableResult func rapier_character_controller_is_on_ceiling(_ ctrl: UnsafeMutableRawPointer?) -> Bool
 
+// --- Scene Queries ---
+struct RayIntersectionC {
+    var collider_handle: UInt32
+    var rigid_body_handle: UInt32
+    var toi: Float
+    var point_x: Float
+    var point_y: Float
+    var point_z: Float
+    var normal_x: Float
+    var normal_y: Float
+    var normal_z: Float
+    var hit: Bool
+}
+
+struct ShapeCastHitC {
+    var collider_handle: UInt32
+    var rigid_body_handle: UInt32
+    var toi: Float
+    var point_x: Float
+    var point_y: Float
+    var point_z: Float
+    var normal_x: Float
+    var normal_y: Float
+    var normal_z: Float
+    var hit: Bool
+}
+
+struct PointProjectionC {
+    var collider_handle: UInt32
+    var rigid_body_handle: UInt32
+    var point_x: Float
+    var point_y: Float
+    var point_z: Float
+    var is_inside: Bool
+    var hit: Bool
+}
+
+@_silgen_name("rapier_world_cast_ray") @discardableResult func rapier_world_cast_ray(_ world: UnsafeMutableRawPointer?, _ ox: Float, _ oy: Float, _ oz: Float, _ dx: Float, _ dy: Float, _ dz: Float, _ max_toi: Float, _ solid: Bool, _ exclude_collider: UInt32, _ exclude_rigid_body: UInt32) -> RayIntersectionC
+@_silgen_name("rapier_world_cast_ray_and_get_normal") @discardableResult func rapier_world_cast_ray_and_get_normal(_ world: UnsafeMutableRawPointer?, _ ox: Float, _ oy: Float, _ oz: Float, _ dx: Float, _ dy: Float, _ dz: Float, _ max_toi: Float, _ solid: Bool, _ exclude_collider: UInt32, _ exclude_rigid_body: UInt32) -> RayIntersectionC
+@_silgen_name("rapier_world_cast_shape") @discardableResult func rapier_world_cast_shape(_ world: UnsafeMutableRawPointer?, _ px: Float, _ py: Float, _ pz: Float, _ rx: Float, _ ry: Float, _ rz: Float, _ rw: Float, _ vx: Float, _ vy: Float, _ vz: Float, _ shape_desc: UnsafePointer<ColliderDesc>?, _ max_toi: Float, _ stop_at_penetration: Bool, _ exclude_collider: UInt32, _ exclude_rigid_body: UInt32) -> ShapeCastHitC
+@_silgen_name("rapier_world_project_point") @discardableResult func rapier_world_project_point(_ world: UnsafeMutableRawPointer?, _ px: Float, _ py: Float, _ pz: Float, _ solid: Bool, _ exclude_collider: UInt32, _ exclude_rigid_body: UInt32) -> PointProjectionC
+@_silgen_name("rapier_world_intersections_with_point") @discardableResult func rapier_world_intersections_with_point(_ world: UnsafeMutableRawPointer?, _ px: Float, _ py: Float, _ pz: Float, _ exclude_collider: UInt32, _ exclude_rigid_body: UInt32, _ out_colliders: UnsafeMutablePointer<UInt32>?, _ max_out_colliders: Int) -> Int
+@_silgen_name("rapier_world_intersection_with_shape") @discardableResult func rapier_world_intersection_with_shape(_ world: UnsafeMutableRawPointer?, _ px: Float, _ py: Float, _ pz: Float, _ rx: Float, _ ry: Float, _ rz: Float, _ rw: Float, _ shape_desc: UnsafePointer<ColliderDesc>?, _ exclude_collider: UInt32, _ exclude_rigid_body: UInt32) -> UInt32
+
 public class RapierPhysicsPlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
     let channel = FlutterMethodChannel(name: "rapier_physics", binaryMessenger: registrar.messenger())
@@ -192,6 +236,13 @@ public class RapierPhysicsPlugin: NSObject, FlutterPlugin {
         rapier_character_controller_is_on_wall(dummyCtrl)
         rapier_character_controller_is_on_ceiling(dummyCtrl)
         rapier_character_controller_destroy(dummyCtrl)
+        // --- Scene Queries ---
+        rapier_world_cast_ray(dummyWorld, 0, 0, 0, 0, 0, 0, 0, false, 0, 0)
+        rapier_world_cast_ray_and_get_normal(dummyWorld, 0, 0, 0, 0, 0, 0, 0, false, 0, 0)
+        rapier_world_cast_shape(dummyWorld, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, nil, 0, false, 0, 0)
+        rapier_world_project_point(dummyWorld, 0, 0, 0, false, 0, 0)
+        rapier_world_intersections_with_point(dummyWorld, 0, 0, 0, 0, 0, nil, 0)
+        rapier_world_intersection_with_shape(dummyWorld, 0, 0, 0, 0, 0, 0, 0, nil, 0, 0)
     }
   }
 
