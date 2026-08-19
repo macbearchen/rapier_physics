@@ -70,7 +70,7 @@ class BaseScene extends M3Scene {
 
     const hs = 10.0;
     // Fixed physics floor — top surface sits at z = 0
-    final rb = physicsSystem.addBox(hs, hs, 0.5, M3RigidBodyDesc.fixed()..position = Vector3(0, 0, -0.5));
+    final rb = physicsSystem.addBox(hs, hs, 0.5, desc: M3RigidBodyDesc.fixed()..position = Vector3(0, 0, -0.5));
     final floor = addMesh(M3Mesh(M3PlaneGeom(hs * 2, hs * 2), material: mtr), Vector3(0, 0, 0));
     floor.mesh.subMeshes[0].localMatrix.setTranslation(Vector3(0, 0, 0.5));
     floor.color = Colors.limeGreen;

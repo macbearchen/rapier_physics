@@ -194,4 +194,178 @@ abstract class RapierBindings {
     double stiffness,
     double damping,
   );
+
+  // ==========================================
+  // Kinematic Character Controller
+  // ==========================================
+
+  /// Allocates a new KinematicCharacterController. [offset] is the skin distance
+  /// (distance kept between the character and surfaces, e.g. 0.01).
+  int createCharacterController(double offset);
+
+  /// Frees a previously created controller.
+  void destroyCharacterController(int ctrl);
+
+  /// Sets the world-space "up" axis used by the controller.
+  void setCharacterControllerUp(int ctrl, double x, double y, double z);
+
+  /// Maximum slope angle (radians) the character can climb.
+  void setCharacterControllerMaxSlope(int ctrl, double angleRadians);
+
+  /// Minimum slope angle (radians) below which sliding is suppressed.
+  void setCharacterControllerMinSlope(int ctrl, double angleRadians);
+
+  /// Enable/disable ground-snapping (pulls the character toward the ground when
+  /// falling small distances so it doesn't float off steps).
+  void setCharacterControllerSnapToGround(int ctrl, double distance, bool enabled);
+
+  /// Enable/disable automatic step-climbing.
+  /// Set [maxHeight] ≤ 0 to disable.
+  void setCharacterControllerAutoStep(int ctrl, double maxHeight, double minWidth, bool includeDynamicBodies);
+
+  /// Compute the corrected movement for the character this frame.
+  ///
+  /// The character's own [colliderHandle] is excluded from the sweep query.
+  /// Returns the effective (collision-resolved) movement vector.
+  Vector3 moveCharacter(int world, int ctrl, int colliderHandle, double dx, double dy, double dz, double dt);
+
+  /// Returns true if the character was touching the ground after the last [moveCharacter] call.
+  bool isCharacterGrounded(int ctrl);
+
+  /// Returns true if the character was touching a wall after the last [moveCharacter] call.
+  bool isCharacterOnWall(int ctrl);
+
+  /// Returns true if the character was touching a ceiling after the last [moveCharacter] call.
+  bool isCharacterOnCeiling(int ctrl);
+
+  // ==========================================
+  // Scene Queries (QueryPipeline)
+  // ==========================================
+
+  RayHitData? castRay(
+    int world,
+    double ox,
+    double oy,
+    double oz,
+    double dx,
+    double dy,
+    double dz,
+    double maxToi,
+    bool solid,
+    int excludeCollider,
+    int excludeRigidBody,
+  );
+
+  RayHitData? castRayAndGetNormal(
+    int world,
+    double ox,
+    double oy,
+    double oz,
+    double dx,
+    double dy,
+    double dz,
+    double maxToi,
+    bool solid,
+    int excludeCollider,
+    int excludeRigidBody,
+  );
+
+  ShapeHitData? castShape(
+    int world,
+    double px,
+    double py,
+    double pz,
+    double rx,
+    double ry,
+    double rz,
+    double rw,
+    double vx,
+    double vy,
+    double vz,
+    ColliderDesc desc,
+    double maxToi,
+    bool stopAtPenetration,
+    int excludeCollider,
+    int excludeRigidBody,
+  );
+
+  PointProjectionData? projectPoint(
+    int world,
+    double px,
+    double py,
+    double pz,
+    bool solid,
+    int excludeCollider,
+    int excludeRigidBody,
+  );
+
+  List<int> intersectionsWithPoint(
+    int world,
+    double px,
+    double py,
+    double pz,
+    int excludeCollider,
+    int excludeRigidBody,
+  );
+
+  int intersectionWithShape(
+    int world,
+    double px,
+    double py,
+    double pz,
+    double rx,
+    double ry,
+    double rz,
+    double rw,
+    ColliderDesc desc,
+    int excludeCollider,
+    int excludeRigidBody,
+  );
 }
+
+class RayHitData {
+  final int colliderHandle;
+  final int rigidBodyHandle;
+  final double toi;
+  final Vector3 point;
+  final Vector3 normal;
+
+  const RayHitData({
+    required this.colliderHandle,
+    required this.rigidBodyHandle,
+    required this.toi,
+    required this.point,
+    required this.normal,
+  });
+}
+
+class ShapeHitData {
+  final int colliderHandle;
+  final int rigidBodyHandle;
+  final double toi;
+  final Vector3 point;
+  final Vector3 normal;
+
+  const ShapeHitData({
+    required this.colliderHandle,
+    required this.rigidBodyHandle,
+    required this.toi,
+    required this.point,
+    required this.normal,
+  });
+}
+
+class PointProjectionData {
+  final int colliderHandle;
+  final int rigidBodyHandle;
+  final Vector3 point;
+  final bool isInside;
+
+  const PointProjectionData({
+    required this.colliderHandle,
+    required this.rigidBodyHandle,
+    required this.point,
+    required this.isInside,
+  });
+}
+

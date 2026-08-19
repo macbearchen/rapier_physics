@@ -1,15 +1,27 @@
 # Changelog
 
+## 0.5.0
+#### 2026-08-19
+- **Kinematic Character Controller**: Introduced `KinematicCharacterController` for 3D character physics navigation, supporting auto-stepping, slope sliding, ground snapping, and dynamic body impulse pushing (`applyImpulsesToDynamicBodies`).
+- **Scene Queries**: Added comprehensive `SceneQuery` API featuring raycasting (`castRay`, `castRayAndGetNormal`, `intersectionWithRay`, `intersectionsWithRay`) and shape casting (`castShape`, `intersectionsWithShape`) with customizable query filter flags (`QueryFilterFlags`).
+- **Explicit Capsule Axis Alignment**: Refactored `ColliderShapeType` and `ColliderDesc` to explicitly support axis-aligned capsule variants (`capsuleX`, `capsuleY`, `capsuleZ`) across Dart API and Rust FFI.
+- **FFI Modularization**: Modularized native Rust FFI code into structured files (`world`, `rigid_body`, `collider`, `joint`, `character_controller`, `scene_query`) and split Dart FFI bindings into dedicated implementation modules (`lib/src/bindings/ffi/`).
+- **New Interactive Demos**: Added 3D Character Controller demo and Scene Query raycasting/shape-casting demo in the example project (`example/lib/main_3d.dart`).
+- **Engine Upgrade**: Upgraded the underlying native engine dependency to `rapier3d v0.34.0`.
+
 ## 0.4.1
+#### 2026-07-19
 - **CompoundScene Dumbbell Spawner**: Added time-based dumbbell spawning in `CompoundScene`, continuously spawning compound rigid bodies from `(0, 0, 20)` at 10/sec up to a configurable cap.
 - **BaseScene Camera & Ground**: Increased default camera distance to 30 and expanded ground plane half-size to 10 with a larger checkerboard texture.
 
 ## 0.4.0
+#### 2026-06-27
 - **Windows Platform Support**: Added support for the Windows platform, including a C++ plugin implementation, CMake configuration, and bundling of the prebuilt native `rapier_ffi.dll` library.
 - **Swift Package Manager (SPM) Support**: Restructured iOS and macOS native directories (`ios/rapier_physics` and `macos/rapier_physics`) and added `Package.swift` to support integration via Swift Package Manager.
 - **Build Script Automation**: Refactored `native/rapier_ffi/build.sh` to output `.xcframework` directly to the iOS and macOS `rapier_physics` subfolders to match the SPM structure.
 
 ## 0.3.1
+#### 2026-05-07
 - **Timestep API**: Added `timestep` getter and setter to `RapierWorld`, allowing users to control the simulation's integration step size (`dt`).
 - **FFI Naming Refactor**: Standardized all FFI function names to the `rapier_[component]_[action]` convention (e.g., `rapier_rigid_body_create`, `rapier_collider_get_position_x`) for better consistency across Native and Web platforms.
 - **API Refinement**: Updated `ColliderDesc` constructors for `cylinder`, `cone`, and `capsule` to follow a more intuitive parameter order: `(radius, halfHeight)` instead of `(halfHeight, radius)`.
@@ -17,6 +29,7 @@
 
 
 ## 0.3.0
+#### 2026-05-03
 - **Unified Collider API**: Introduced `ColliderDesc` architecture for more robust and extensible collider creation.
 - **Native Local Transform Support**: 
     - Added `localPosition` and `localRotation` support directly in the native FFI layer.
@@ -28,6 +41,7 @@
 - **Platform Sync**: Updated iOS/macOS Swift plugins and Web/WASM interop to support the expanded native collider transformation data.
 
 ## 0.2.0
+#### 2026-04-23
 - **Force & Impulse API**: Added `addForce`, `addTorque`, `applyImpulse`, `applyTorqueImpulse`, and their `AtPoint` variants to `RigidBody`.
 - **Velocity Controls**: Added `setLinearVelocity` and `setAngularVelocity` for fine-grained rigid body motion control.
 - **Entity Removal API**: 
@@ -55,6 +69,7 @@
 - **Example App enhancements**: Added Newton's Cradle demo, debug toggles (helpers, wireframe), shadow controls, and physics restart.
 
 ## 0.1.0
+#### 2026-04-09
 - **Cross-Platform Refactoring**: Major architectural update to support Native and Web platforms seamlessly using abstract bindings and conditional imports.
 - **Web Support**: Full WebAssembly (WASM) implementation via `dart:js_interop`.
 - **Android Fix**: Resolved native library loading issues by adopting standard `jniLibs` directory structure and loading from name.
@@ -65,4 +80,5 @@
 - **Automated Tooling**: Updated `build.sh` to automate the distribution of Android, iOS, macOS, and Web binaries.
 
 ## 0.0.1
+#### 2026-04-03
 - Initial release with basic Rapier physics FFI bridge.

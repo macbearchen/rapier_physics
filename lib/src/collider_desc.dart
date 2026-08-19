@@ -1,13 +1,17 @@
 import 'rapier_world.dart';
 
+// dart format off
 enum ColliderShapeType {
   cuboid,
   ball,
   cylinder,
   cone,
-  capsule,
+  capsuleX,
+  capsuleY,
+  capsuleZ,
   heightfield,
 }
+// dart format on
 
 class ColliderDesc {
   final ColliderShapeType shapeType;
@@ -28,7 +32,9 @@ class ColliderDesc {
 
   ColliderDesc.cuboid(this.hx, this.hy, this.hz) : shapeType = ColliderShapeType.cuboid;
   ColliderDesc.ball(this.radius) : shapeType = ColliderShapeType.ball;
-  ColliderDesc.cylinder(this.radius, this.halfHeight) : shapeType = ColliderShapeType.cylinder;
-  ColliderDesc.cone(this.radius, this.halfHeight) : shapeType = ColliderShapeType.cone;
-  ColliderDesc.capsule(this.radius, this.halfHeight) : shapeType = ColliderShapeType.capsule;
+  ColliderDesc.cylinder({required this.radius, required this.halfHeight}) : shapeType = ColliderShapeType.cylinder;
+  ColliderDesc.cone({required this.radius, required this.halfHeight}) : shapeType = ColliderShapeType.cone;
+  ColliderDesc.capsuleX({required this.radius, required this.halfHeight}) : shapeType = ColliderShapeType.capsuleX;
+  ColliderDesc.capsuleY({required this.radius, required this.halfHeight}) : shapeType = ColliderShapeType.capsuleY;
+  ColliderDesc.capsuleZ({required this.radius, required this.halfHeight}) : shapeType = ColliderShapeType.capsuleZ;
 }

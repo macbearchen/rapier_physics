@@ -84,19 +84,25 @@ class RapierBindingsImpl extends RapierBindings {
   void removeRigidBody(int world, int handle) => web_ffi.rapier_rigid_body_remove(world.toJS, handle.toJS);
 
   @override
-  Vector3 getBodyPosition(int world, int body) => Vector3(
-    web_ffi.rapier_rigid_body_get_position_x(world.toJS, body.toJS).toDartDouble,
-    web_ffi.rapier_rigid_body_get_position_y(world.toJS, body.toJS).toDartDouble,
-    web_ffi.rapier_rigid_body_get_position_z(world.toJS, body.toJS).toDartDouble,
-  );
+  Vector3 getBodyPosition(int world, int body) {
+    final ptr = web_ffi.rapier_rigid_body_get_position(world.toJS, body.toJS);
+    return Vector3(
+      web_ffi.rapier_vec3_get_x(ptr).toDartDouble,
+      web_ffi.rapier_vec3_get_y(ptr).toDartDouble,
+      web_ffi.rapier_vec3_get_z(ptr).toDartDouble,
+    );
+  }
 
   @override
-  Quaternion getBodyRotation(int world, int body) => Quaternion(
-    web_ffi.rapier_rigid_body_get_rotation_x(world.toJS, body.toJS).toDartDouble,
-    web_ffi.rapier_rigid_body_get_rotation_y(world.toJS, body.toJS).toDartDouble,
-    web_ffi.rapier_rigid_body_get_rotation_z(world.toJS, body.toJS).toDartDouble,
-    web_ffi.rapier_rigid_body_get_rotation_w(world.toJS, body.toJS).toDartDouble,
-  );
+  Quaternion getBodyRotation(int world, int body) {
+    final ptr = web_ffi.rapier_rigid_body_get_rotation(world.toJS, body.toJS);
+    return Quaternion(
+      web_ffi.rapier_quat_get_x(ptr).toDartDouble,
+      web_ffi.rapier_quat_get_y(ptr).toDartDouble,
+      web_ffi.rapier_quat_get_z(ptr).toDartDouble,
+      web_ffi.rapier_quat_get_w(ptr).toDartDouble,
+    );
+  }
 
   @override
   void setBodyPosition(int world, int body, double x, double y, double z) =>
@@ -231,19 +237,25 @@ class RapierBindingsImpl extends RapierBindings {
   void removeCollider(int world, int handle) => web_ffi.rapier_collider_remove(world.toJS, handle.toJS);
 
   @override
-  Vector3 getColliderPosition(int world, int handle) => Vector3(
-    web_ffi.rapier_collider_get_position_x(world.toJS, handle.toJS).toDartDouble,
-    web_ffi.rapier_collider_get_position_y(world.toJS, handle.toJS).toDartDouble,
-    web_ffi.rapier_collider_get_position_z(world.toJS, handle.toJS).toDartDouble,
-  );
+  Vector3 getColliderPosition(int world, int handle) {
+    final ptr = web_ffi.rapier_collider_get_position(world.toJS, handle.toJS);
+    return Vector3(
+      web_ffi.rapier_vec3_get_x(ptr).toDartDouble,
+      web_ffi.rapier_vec3_get_y(ptr).toDartDouble,
+      web_ffi.rapier_vec3_get_z(ptr).toDartDouble,
+    );
+  }
 
   @override
-  Quaternion getColliderRotation(int world, int handle) => Quaternion(
-    web_ffi.rapier_collider_get_rotation_x(world.toJS, handle.toJS).toDartDouble,
-    web_ffi.rapier_collider_get_rotation_y(world.toJS, handle.toJS).toDartDouble,
-    web_ffi.rapier_collider_get_rotation_z(world.toJS, handle.toJS).toDartDouble,
-    web_ffi.rapier_collider_get_rotation_w(world.toJS, handle.toJS).toDartDouble,
-  );
+  Quaternion getColliderRotation(int world, int handle) {
+    final ptr = web_ffi.rapier_collider_get_rotation(world.toJS, handle.toJS);
+    return Quaternion(
+      web_ffi.rapier_quat_get_x(ptr).toDartDouble,
+      web_ffi.rapier_quat_get_y(ptr).toDartDouble,
+      web_ffi.rapier_quat_get_z(ptr).toDartDouble,
+      web_ffi.rapier_quat_get_w(ptr).toDartDouble,
+    );
+  }
 
   @override
   double getColliderFriction(int world, int handle) =>
@@ -524,4 +536,331 @@ class RapierBindingsImpl extends RapierBindings {
     stiffness.toJS,
     damping.toJS,
   );
+
+  // ==========================================
+  // Kinematic Character Controller
+  // ==========================================
+
+  @override
+  int createCharacterController(double offset) => web_ffi.rapier_character_controller_create(offset.toJS).toDartInt;
+
+  @override
+  void destroyCharacterController(int ctrl) => web_ffi.rapier_character_controller_destroy(ctrl.toJS);
+
+  @override
+  void setCharacterControllerUp(int ctrl, double x, double y, double z) =>
+      web_ffi.rapier_character_controller_set_up(ctrl.toJS, x.toJS, y.toJS, z.toJS);
+
+  @override
+  void setCharacterControllerMaxSlope(int ctrl, double angleRadians) =>
+      web_ffi.rapier_character_controller_set_max_slope(ctrl.toJS, angleRadians.toJS);
+
+  @override
+  void setCharacterControllerMinSlope(int ctrl, double angleRadians) =>
+      web_ffi.rapier_character_controller_set_min_slope(ctrl.toJS, angleRadians.toJS);
+
+  @override
+  void setCharacterControllerSnapToGround(int ctrl, double distance, bool enabled) =>
+      web_ffi.rapier_character_controller_set_snap_to_ground(ctrl.toJS, distance.toJS, enabled.toJS);
+
+  @override
+  void setCharacterControllerAutoStep(int ctrl, double maxHeight, double minWidth, bool includeDynamicBodies) => web_ffi
+      .rapier_character_controller_set_autostep(ctrl.toJS, maxHeight.toJS, minWidth.toJS, includeDynamicBodies.toJS);
+
+  @override
+  Vector3 moveCharacter(int world, int ctrl, int colliderHandle, double dx, double dy, double dz, double dt) {
+    final result = web_ffi.rapier_character_controller_move(
+      world.toJS,
+      ctrl.toJS,
+      colliderHandle.toJS,
+      dx.toJS,
+      dy.toJS,
+      dz.toJS,
+      dt.toJS,
+    );
+    return Vector3(
+      web_ffi.rapier_vec3_get_x(result).toDartDouble,
+      web_ffi.rapier_vec3_get_y(result).toDartDouble,
+      web_ffi.rapier_vec3_get_z(result).toDartDouble,
+    );
+  }
+
+  @override
+  bool isCharacterGrounded(int ctrl) => web_ffi.rapier_character_controller_is_grounded(ctrl.toJS).toDart;
+
+  @override
+  bool isCharacterOnWall(int ctrl) => web_ffi.rapier_character_controller_is_on_wall(ctrl.toJS).toDart;
+
+  @override
+  bool isCharacterOnCeiling(int ctrl) => web_ffi.rapier_character_controller_is_on_ceiling(ctrl.toJS).toDart;
+
+  // ==========================================
+  // Scene Queries (QueryPipeline)
+  // ==========================================
+
+  @override
+  RayHitData? castRay(
+    int world,
+    double ox,
+    double oy,
+    double oz,
+    double dx,
+    double dy,
+    double dz,
+    double maxToi,
+    bool solid,
+    int excludeCollider,
+    int excludeRigidBody,
+  ) {
+    final ptr = web_ffi.rapier_world_cast_ray(
+      world.toJS,
+      ox.toJS,
+      oy.toJS,
+      oz.toJS,
+      dx.toJS,
+      dy.toJS,
+      dz.toJS,
+      maxToi.toJS,
+      solid.toJS,
+      excludeCollider.toJS,
+      excludeRigidBody.toJS,
+    );
+    if (!web_ffi.rapier_ray_get_hit(ptr).toDart) return null;
+    return RayHitData(
+      colliderHandle: web_ffi.rapier_ray_get_collider(ptr).toDartInt,
+      rigidBodyHandle: web_ffi.rapier_ray_get_rigid_body(ptr).toDartInt,
+      toi: web_ffi.rapier_ray_get_toi(ptr).toDartDouble,
+      point: Vector3(
+        web_ffi.rapier_ray_get_point_x(ptr).toDartDouble,
+        web_ffi.rapier_ray_get_point_y(ptr).toDartDouble,
+        web_ffi.rapier_ray_get_point_z(ptr).toDartDouble,
+      ),
+      normal: Vector3(
+        web_ffi.rapier_ray_get_normal_x(ptr).toDartDouble,
+        web_ffi.rapier_ray_get_normal_y(ptr).toDartDouble,
+        web_ffi.rapier_ray_get_normal_z(ptr).toDartDouble,
+      ),
+    );
+  }
+
+  @override
+  RayHitData? castRayAndGetNormal(
+    int world,
+    double ox,
+    double oy,
+    double oz,
+    double dx,
+    double dy,
+    double dz,
+    double maxToi,
+    bool solid,
+    int excludeCollider,
+    int excludeRigidBody,
+  ) {
+    final ptr = web_ffi.rapier_world_cast_ray_and_get_normal(
+      world.toJS,
+      ox.toJS,
+      oy.toJS,
+      oz.toJS,
+      dx.toJS,
+      dy.toJS,
+      dz.toJS,
+      maxToi.toJS,
+      solid.toJS,
+      excludeCollider.toJS,
+      excludeRigidBody.toJS,
+    );
+    if (!web_ffi.rapier_ray_get_hit(ptr).toDart) return null;
+    return RayHitData(
+      colliderHandle: web_ffi.rapier_ray_get_collider(ptr).toDartInt,
+      rigidBodyHandle: web_ffi.rapier_ray_get_rigid_body(ptr).toDartInt,
+      toi: web_ffi.rapier_ray_get_toi(ptr).toDartDouble,
+      point: Vector3(
+        web_ffi.rapier_ray_get_point_x(ptr).toDartDouble,
+        web_ffi.rapier_ray_get_point_y(ptr).toDartDouble,
+        web_ffi.rapier_ray_get_point_z(ptr).toDartDouble,
+      ),
+      normal: Vector3(
+        web_ffi.rapier_ray_get_normal_x(ptr).toDartDouble,
+        web_ffi.rapier_ray_get_normal_y(ptr).toDartDouble,
+        web_ffi.rapier_ray_get_normal_z(ptr).toDartDouble,
+      ),
+    );
+  }
+
+  @override
+  ShapeHitData? castShape(
+    int world,
+    double px,
+    double py,
+    double pz,
+    double rx,
+    double ry,
+    double rz,
+    double rw,
+    double vx,
+    double vy,
+    double vz,
+    ColliderDesc desc,
+    double maxToi,
+    bool stopAtPenetration,
+    int excludeCollider,
+    int excludeRigidBody,
+  ) {
+    final ptr = web_ffi.rapier_world_cast_shape(
+      world.toJS,
+      px.toJS,
+      py.toJS,
+      pz.toJS,
+      rx.toJS,
+      ry.toJS,
+      rz.toJS,
+      rw.toJS,
+      vx.toJS,
+      vy.toJS,
+      vz.toJS,
+      desc.shapeType.index.toJS,
+      desc.hx.toJS,
+      desc.hy.toJS,
+      desc.hz.toJS,
+      desc.radius.toJS,
+      desc.halfHeight.toJS,
+      desc.friction.toJS,
+      desc.restitution.toJS,
+      desc.density.toJS,
+      desc.localPosition.x.toJS,
+      desc.localPosition.y.toJS,
+      desc.localPosition.z.toJS,
+      desc.localRotation.x.toJS,
+      desc.localRotation.y.toJS,
+      desc.localRotation.z.toJS,
+      desc.localRotation.w.toJS,
+      desc.isSensor.toJS,
+      maxToi.toJS,
+      stopAtPenetration.toJS,
+      excludeCollider.toJS,
+      excludeRigidBody.toJS,
+    );
+    if (!web_ffi.rapier_ray_get_hit(ptr).toDart) return null;
+    return ShapeHitData(
+      colliderHandle: web_ffi.rapier_ray_get_collider(ptr).toDartInt,
+      rigidBodyHandle: web_ffi.rapier_ray_get_rigid_body(ptr).toDartInt,
+      toi: web_ffi.rapier_ray_get_toi(ptr).toDartDouble,
+      point: Vector3(
+        web_ffi.rapier_ray_get_point_x(ptr).toDartDouble,
+        web_ffi.rapier_ray_get_point_y(ptr).toDartDouble,
+        web_ffi.rapier_ray_get_point_z(ptr).toDartDouble,
+      ),
+      normal: Vector3(
+        web_ffi.rapier_ray_get_normal_x(ptr).toDartDouble,
+        web_ffi.rapier_ray_get_normal_y(ptr).toDartDouble,
+        web_ffi.rapier_ray_get_normal_z(ptr).toDartDouble,
+      ),
+    );
+  }
+
+  @override
+  PointProjectionData? projectPoint(
+    int world,
+    double px,
+    double py,
+    double pz,
+    bool solid,
+    int excludeCollider,
+    int excludeRigidBody,
+  ) {
+    final ptr = web_ffi.rapier_world_project_point(
+      world.toJS,
+      px.toJS,
+      py.toJS,
+      pz.toJS,
+      solid.toJS,
+      excludeCollider.toJS,
+      excludeRigidBody.toJS,
+    );
+    if (!web_ffi.rapier_proj_get_hit(ptr).toDart) return null;
+    return PointProjectionData(
+      colliderHandle: web_ffi.rapier_proj_get_collider(ptr).toDartInt,
+      rigidBodyHandle: web_ffi.rapier_proj_get_rigid_body(ptr).toDartInt,
+      point: Vector3(
+        web_ffi.rapier_proj_get_point_x(ptr).toDartDouble,
+        web_ffi.rapier_proj_get_point_y(ptr).toDartDouble,
+        web_ffi.rapier_proj_get_point_z(ptr).toDartDouble,
+      ),
+      isInside: web_ffi.rapier_proj_get_is_inside(ptr).toDart,
+    );
+  }
+
+  @override
+  List<int> intersectionsWithPoint(
+    int world,
+    double px,
+    double py,
+    double pz,
+    int excludeCollider,
+    int excludeRigidBody,
+  ) {
+    final jsArr = web_ffi.rapier_world_intersections_with_point(
+      world.toJS,
+      px.toJS,
+      py.toJS,
+      pz.toJS,
+      excludeCollider.toJS,
+      excludeRigidBody.toJS,
+    );
+    final result = <int>[];
+    for (var i = 0; i < jsArr.length; i++) {
+      final item = jsArr.toDart[i] as JSNumber;
+      result.add(item.toDartInt);
+    }
+    return result;
+  }
+
+  @override
+  int intersectionWithShape(
+    int world,
+    double px,
+    double py,
+    double pz,
+    double rx,
+    double ry,
+    double rz,
+    double rw,
+    ColliderDesc desc,
+    int excludeCollider,
+    int excludeRigidBody,
+  ) {
+    return web_ffi
+        .rapier_world_intersection_with_shape(
+          world.toJS,
+          px.toJS,
+          py.toJS,
+          pz.toJS,
+          rx.toJS,
+          ry.toJS,
+          rz.toJS,
+          rw.toJS,
+          desc.shapeType.index.toJS,
+          desc.hx.toJS,
+          desc.hy.toJS,
+          desc.hz.toJS,
+          desc.radius.toJS,
+          desc.halfHeight.toJS,
+          desc.friction.toJS,
+          desc.restitution.toJS,
+          desc.density.toJS,
+          desc.localPosition.x.toJS,
+          desc.localPosition.y.toJS,
+          desc.localPosition.z.toJS,
+          desc.localRotation.x.toJS,
+          desc.localRotation.y.toJS,
+          desc.localRotation.z.toJS,
+          desc.localRotation.w.toJS,
+          desc.isSensor.toJS,
+          excludeCollider.toJS,
+          excludeRigidBody.toJS,
+        )
+        .toDartInt;
+  }
 }
+

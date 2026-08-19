@@ -88,7 +88,7 @@ class NewtonCradleScene extends BaseScene {
       final pos = Vector3(x, 0.0, restZ);
 
       final entity = addMesh(ballMesh, pos)..color = Colors.skyBlue;
-      final rb = physicsSystem.addSphere(0.5, M3RigidBodyDesc.dynamic()..position = pos);
+      final rb = physicsSystem.addSphere(0.5, desc: M3RigidBodyDesc.dynamic()..position = pos);
       physicsSystem.attachEntity(entity, rb);
 
       if (rb is M3RapierRigidBody) {

@@ -18,11 +18,17 @@ class CompoundScene extends BaseScene {
 
     // Add a compound "Dumbbell" object
     addDumbbell(Vector3(0, 0, 5));
+
+    // Dynamic green sphere at (-3, -2, 5.0) — radius 0.8 for both physics & mesh
+    final pos2 = Vector3(-3, -2, 5.0);
+    final rb = physicsSystem.addSphere(0.8, desc: M3RigidBodyDesc.dynamic()..position = pos2);
+    final entity = addMesh(M3Mesh(M3SphereGeom(0.8)), pos2)..color = Colors.lime;
+    physicsSystem.attachEntity(entity, rb);
   }
 
   void addDumbbell(Vector3 pos) {
     // 1. Create a single dynamic rigid body, The handle (middle bar)
-    final rb = physicsSystem.addBox(1, 0.1, 0.1, M3RigidBodyDesc.dynamic()..position = pos);
+    final rb = physicsSystem.addBox(1, 0.1, 0.1, desc: M3RigidBodyDesc.dynamic()..position = pos);
 
     // 2. Add multiple colliders with offsets
     if (rb is M3RapierRigidBody) {

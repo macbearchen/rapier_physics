@@ -1,7 +1,8 @@
 # Rapier Physics for Flutter (繁體中文)
 
 [![pub package](https://img.shields.io/pub/v/rapier_physics.svg)](https://pub.dev/packages/rapier_physics)
-**版本: 0.4.1**
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![Platform](https://img.shields.io/badge/platform-ios%20%7C%20android%20%7C%20macos%20%7C%20windows%20%7C%20web-blue)
 
 這是一個基於 [Rapier](https://rapier.rs/) 的 Flutter 高性能物理引擎。此套件透過 Rust 和 WebAssembly 提供 3D 物理模擬的跨平台支持。
 
@@ -12,9 +13,11 @@
 - **跨平台**: 支持 Android、iOS、macOS、Windows 和 Web。
 - **高性能**: 核心物理模擬使用 Rust 編寫。
 - **靈活的物理**: 支持多種剛體類型（動態 Dynamic、固定 Fixed、運動學 Kinematic）。
+- **角色控制器 (Character Controller)**: 支持台階自動跨越、斜坡滑行、貼地吸附與動態物體衝量推擠。
+- **場景查詢 (Scene Queries)**: 射線檢測 (`castRay`, `castRayAndGetNormal`, `intersectionWithRay`, `intersectionsWithRay`) 與形狀檢測 (`castShape`, `intersectionsWithShape`)，支持過濾標記。
 - **力與衝量**: 完整支持 `addForce`、`applyImpulse` 及其 `AtPoint` 變體。
 - **速度控制**: 直接設定線速度與角速度，實現精確的物理狀態控制。
-- **碰撞體 (Colliders)**: 支持方塊 (Box)、球體 (Sphere)、圓柱體 (Cylinder)、膠囊體 (Capsule)、圓錐體 (Cone) 和 **高度場 (Heightfield)**，並支持**原生局部變換** (`localPosition`, `localRotation`)。
+- **碰撞體 (Colliders)**: 支持方塊 (Box)、球體 (Sphere)、圓柱體 (Cylinder)、軸向膠囊體 (`capsuleX`, `capsuleY`, `capsuleZ`)、圓錐體 (Cone) 和 **高度場 (Heightfield)**，並支持**原生局部變換** (`localPosition`, `localRotation`)。
 - **關節支持 (Joints)**: 支持固定關節 (Fixed)、球形關節 (Spherical)、旋轉關節 (Revolute)、棱柱關節 (Prismatic) 和繩索關節 (Rope)，並支持馬達 (Motor)。
 - **生命週期管理**: 提供完善的剛體、碰撞體與關節的 **新增與移除** API，並自動處理內部關連清理。
 - **CCD**: 提供連續碰撞檢測 (Continuous Collision Detection)，防止高速物體穿透。
@@ -30,7 +33,7 @@
 
 ```yaml
 dependencies:
-  rapier_physics: ^0.4.1
+  rapier_physics: ^0.5.0
 ```
 
 ### 設置
@@ -107,6 +110,8 @@ flutter run -t lib/main_3d.dart
 2. **牛頓擺 (Newton's Cradle)**：使用球形關節約束模擬動量守恆。
 3. **雙擺 (Double Pendulum)**：使用旋轉與球形關節模擬混沌運動。
 4. **複合形狀 (Compound Shapes)**：由多個碰撞體組成的單個剛體（例如具有四隻腳的桌子）。
+5. **角色控制器 (Character Controller)**：3D 玩家角色移動、台階跨越、斜坡滑行與動態障礙物推擠。
+6. **場景查詢 (Scene Queries)**：動態射線與形狀檢測、射線交點可視化與碰撞過濾。
 
 ## 支持的剛體類型 (Rigid Body Types)
 

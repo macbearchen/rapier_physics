@@ -16,14 +16,6 @@ import FlutterMacOS
 @_silgen_name("rapier_rigid_body_create") @discardableResult func rapier_rigid_body_create(_ world: UnsafeMutableRawPointer?, _ x: Float, _ y: Float, _ z: Float, _ type: UInt8) -> UInt32
 @_silgen_name("rapier_rigid_body_remove") func rapier_rigid_body_remove(_ world: UnsafeMutableRawPointer?, _ handle: UInt32) -> Void
 
-@_silgen_name("rapier_rigid_body_get_position_x") @discardableResult func rapier_rigid_body_get_position_x(_ world: UnsafeMutableRawPointer?, _ body: UInt32) -> Float
-@_silgen_name("rapier_rigid_body_get_position_y") @discardableResult func rapier_rigid_body_get_position_y(_ world: UnsafeMutableRawPointer?, _ body: UInt32) -> Float
-@_silgen_name("rapier_rigid_body_get_position_z") @discardableResult func rapier_rigid_body_get_position_z(_ world: UnsafeMutableRawPointer?, _ body: UInt32) -> Float
-@_silgen_name("rapier_rigid_body_get_rotation_x") @discardableResult func rapier_rigid_body_get_rotation_x(_ world: UnsafeMutableRawPointer?, _ body: UInt32) -> Float
-@_silgen_name("rapier_rigid_body_get_rotation_y") @discardableResult func rapier_rigid_body_get_rotation_y(_ world: UnsafeMutableRawPointer?, _ body: UInt32) -> Float
-@_silgen_name("rapier_rigid_body_get_rotation_z") @discardableResult func rapier_rigid_body_get_rotation_z(_ world: UnsafeMutableRawPointer?, _ body: UInt32) -> Float
-@_silgen_name("rapier_rigid_body_get_rotation_w") @discardableResult func rapier_rigid_body_get_rotation_w(_ world: UnsafeMutableRawPointer?, _ body: UInt32) -> Float
-
 @_silgen_name("rapier_rigid_body_set_position") func rapier_rigid_body_set_position(_ world: UnsafeMutableRawPointer?, _ body: UInt32, _ x: Float, _ y: Float, _ z: Float) -> Void
 @_silgen_name("rapier_rigid_body_set_rotation") func rapier_rigid_body_set_rotation(_ world: UnsafeMutableRawPointer?, _ body: UInt32, _ x: Float, _ y: Float, _ z: Float, _ w: Float) -> Void
 @_silgen_name("rapier_rigid_body_wake") func rapier_rigid_body_wake(_ world: UnsafeMutableRawPointer?, _ body: UInt32) -> Void
@@ -65,13 +57,6 @@ struct ColliderDesc {
 @_silgen_name("rapier_collider_create_heightfield") @discardableResult func rapier_collider_create_heightfield(_ world: UnsafeMutableRawPointer?, _ body: UInt32, _ heights: UnsafePointer<Float>?, _ nrows: Int, _ ncols: Int, _ sx: Float, _ sy: Float, _ sz: Float) -> UInt32
 @_silgen_name("rapier_collider_remove") func rapier_collider_remove(_ world: UnsafeMutableRawPointer?, _ handle: UInt32) -> Void
 
-@_silgen_name("rapier_collider_get_position_x") @discardableResult func rapier_collider_get_position_x(_ world: UnsafeMutableRawPointer?, _ handle: UInt32) -> Float
-@_silgen_name("rapier_collider_get_position_y") @discardableResult func rapier_collider_get_position_y(_ world: UnsafeMutableRawPointer?, _ handle: UInt32) -> Float
-@_silgen_name("rapier_collider_get_position_z") @discardableResult func rapier_collider_get_position_z(_ world: UnsafeMutableRawPointer?, _ handle: UInt32) -> Float
-@_silgen_name("rapier_collider_get_rotation_x") @discardableResult func rapier_collider_get_rotation_x(_ world: UnsafeMutableRawPointer?, _ handle: UInt32) -> Float
-@_silgen_name("rapier_collider_get_rotation_y") @discardableResult func rapier_collider_get_rotation_y(_ world: UnsafeMutableRawPointer?, _ handle: UInt32) -> Float
-@_silgen_name("rapier_collider_get_rotation_z") @discardableResult func rapier_collider_get_rotation_z(_ world: UnsafeMutableRawPointer?, _ handle: UInt32) -> Float
-@_silgen_name("rapier_collider_get_rotation_w") @discardableResult func rapier_collider_get_rotation_w(_ world: UnsafeMutableRawPointer?, _ handle: UInt32) -> Float
 @_silgen_name("rapier_collider_get_friction") @discardableResult func rapier_collider_get_friction(_ world: UnsafeMutableRawPointer?, _ handle: UInt32) -> Float
 @_silgen_name("rapier_collider_get_restitution") @discardableResult func rapier_collider_get_restitution(_ world: UnsafeMutableRawPointer?, _ handle: UInt32) -> Float
 @_silgen_name("rapier_collider_get_density") @discardableResult func rapier_collider_get_density(_ world: UnsafeMutableRawPointer?, _ handle: UInt32) -> Float
@@ -96,6 +81,80 @@ struct ColliderDesc {
 @_silgen_name("rapier_joint_configure_motor") func rapier_joint_configure_motor(_ world: UnsafeMutableRawPointer?, _ joint: UInt32, _ axis: UInt8, _ targetPos: Float, _ targetVel: Float, _ stiffness: Float, _ damping: Float) -> Void
 @_silgen_name("rapier_joint_configure_revolute_motor") func rapier_joint_configure_revolute_motor(_ world: UnsafeMutableRawPointer?, _ joint: UInt32, _ targetPos: Float, _ targetVel: Float, _ stiffness: Float, _ damping: Float) -> Void
 @_silgen_name("rapier_joint_configure_prismatic_motor") func rapier_joint_configure_prismatic_motor(_ world: UnsafeMutableRawPointer?, _ joint: UInt32, _ targetPos: Float, _ targetVel: Float, _ stiffness: Float, _ damping: Float) -> Void
+// --- Character Controller ---
+struct Vec3 {
+    var x: Float
+    var y: Float
+    var z: Float
+}
+
+struct Quat {
+    var x: Float
+    var y: Float
+    var z: Float
+    var w: Float
+}
+
+@_silgen_name("rapier_rigid_body_get_position") @discardableResult func rapier_rigid_body_get_position(_ world: UnsafeMutableRawPointer?, _ body: UInt32) -> Vec3
+@_silgen_name("rapier_rigid_body_get_rotation") @discardableResult func rapier_rigid_body_get_rotation(_ world: UnsafeMutableRawPointer?, _ body: UInt32) -> Quat
+@_silgen_name("rapier_collider_get_position") @discardableResult func rapier_collider_get_position(_ world: UnsafeMutableRawPointer?, _ handle: UInt32) -> Vec3
+@_silgen_name("rapier_collider_get_rotation") @discardableResult func rapier_collider_get_rotation(_ world: UnsafeMutableRawPointer?, _ handle: UInt32) -> Quat
+
+@_silgen_name("rapier_character_controller_create") @discardableResult func rapier_character_controller_create(_ offset: Float) -> UnsafeMutableRawPointer?
+@_silgen_name("rapier_character_controller_destroy") func rapier_character_controller_destroy(_ ctrl: UnsafeMutableRawPointer?) -> Void
+@_silgen_name("rapier_character_controller_set_up") func rapier_character_controller_set_up(_ ctrl: UnsafeMutableRawPointer?, _ x: Float, _ y: Float, _ z: Float) -> Void
+@_silgen_name("rapier_character_controller_set_max_slope") func rapier_character_controller_set_max_slope(_ ctrl: UnsafeMutableRawPointer?, _ angle_radians: Float) -> Void
+@_silgen_name("rapier_character_controller_set_min_slope") func rapier_character_controller_set_min_slope(_ ctrl: UnsafeMutableRawPointer?, _ angle_radians: Float) -> Void
+@_silgen_name("rapier_character_controller_set_snap_to_ground") func rapier_character_controller_set_snap_to_ground(_ ctrl: UnsafeMutableRawPointer?, _ distance: Float, _ enabled: Bool) -> Void
+@_silgen_name("rapier_character_controller_set_autostep") func rapier_character_controller_set_autostep(_ ctrl: UnsafeMutableRawPointer?, _ max_height: Float, _ min_width: Float, _ include_dynamic_bodies: Bool) -> Void
+@_silgen_name("rapier_character_controller_move") @discardableResult func rapier_character_controller_move(_ world: UnsafeMutableRawPointer?, _ ctrl: UnsafeMutableRawPointer?, _ collider_handle: UInt32, _ dx: Float, _ dy: Float, _ dz: Float, _ dt: Float) -> Vec3
+@_silgen_name("rapier_character_controller_is_grounded") @discardableResult func rapier_character_controller_is_grounded(_ ctrl: UnsafeMutableRawPointer?) -> Bool
+@_silgen_name("rapier_character_controller_is_on_wall") @discardableResult func rapier_character_controller_is_on_wall(_ ctrl: UnsafeMutableRawPointer?) -> Bool
+@_silgen_name("rapier_character_controller_is_on_ceiling") @discardableResult func rapier_character_controller_is_on_ceiling(_ ctrl: UnsafeMutableRawPointer?) -> Bool
+
+// --- Scene Queries ---
+struct RayIntersectionC {
+    var collider_handle: UInt32
+    var rigid_body_handle: UInt32
+    var toi: Float
+    var point_x: Float
+    var point_y: Float
+    var point_z: Float
+    var normal_x: Float
+    var normal_y: Float
+    var normal_z: Float
+    var hit: Bool
+}
+
+struct ShapeCastHitC {
+    var collider_handle: UInt32
+    var rigid_body_handle: UInt32
+    var toi: Float
+    var point_x: Float
+    var point_y: Float
+    var point_z: Float
+    var normal_x: Float
+    var normal_y: Float
+    var normal_z: Float
+    var hit: Bool
+}
+
+struct PointProjectionC {
+    var collider_handle: UInt32
+    var rigid_body_handle: UInt32
+    var point_x: Float
+    var point_y: Float
+    var point_z: Float
+    var is_inside: Bool
+    var hit: Bool
+}
+
+@_silgen_name("rapier_world_cast_ray") @discardableResult func rapier_world_cast_ray(_ world: UnsafeMutableRawPointer?, _ ox: Float, _ oy: Float, _ oz: Float, _ dx: Float, _ dy: Float, _ dz: Float, _ max_toi: Float, _ solid: Bool, _ exclude_collider: UInt32, _ exclude_rigid_body: UInt32) -> RayIntersectionC
+@_silgen_name("rapier_world_cast_ray_and_get_normal") @discardableResult func rapier_world_cast_ray_and_get_normal(_ world: UnsafeMutableRawPointer?, _ ox: Float, _ oy: Float, _ oz: Float, _ dx: Float, _ dy: Float, _ dz: Float, _ max_toi: Float, _ solid: Bool, _ exclude_collider: UInt32, _ exclude_rigid_body: UInt32) -> RayIntersectionC
+@_silgen_name("rapier_world_cast_shape") @discardableResult func rapier_world_cast_shape(_ world: UnsafeMutableRawPointer?, _ px: Float, _ py: Float, _ pz: Float, _ rx: Float, _ ry: Float, _ rz: Float, _ rw: Float, _ vx: Float, _ vy: Float, _ vz: Float, _ shape_desc: UnsafePointer<ColliderDesc>?, _ max_toi: Float, _ stop_at_penetration: Bool, _ exclude_collider: UInt32, _ exclude_rigid_body: UInt32) -> ShapeCastHitC
+@_silgen_name("rapier_world_project_point") @discardableResult func rapier_world_project_point(_ world: UnsafeMutableRawPointer?, _ px: Float, _ py: Float, _ pz: Float, _ solid: Bool, _ exclude_collider: UInt32, _ exclude_rigid_body: UInt32) -> PointProjectionC
+@_silgen_name("rapier_world_intersections_with_point") @discardableResult func rapier_world_intersections_with_point(_ world: UnsafeMutableRawPointer?, _ px: Float, _ py: Float, _ pz: Float, _ exclude_collider: UInt32, _ exclude_rigid_body: UInt32, _ out_colliders: UnsafeMutablePointer<UInt32>?, _ max_out_colliders: Int) -> Int
+@_silgen_name("rapier_world_intersection_with_shape") @discardableResult func rapier_world_intersection_with_shape(_ world: UnsafeMutableRawPointer?, _ px: Float, _ py: Float, _ pz: Float, _ rx: Float, _ ry: Float, _ rz: Float, _ rw: Float, _ shape_desc: UnsafePointer<ColliderDesc>?, _ exclude_collider: UInt32, _ exclude_rigid_body: UInt32) -> UInt32
 
 public class RapierPhysicsPlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
@@ -120,13 +179,8 @@ public class RapierPhysicsPlugin: NSObject, FlutterPlugin {
 
         // --- RigidBody ---
         rapier_rigid_body_create(dummyWorld, 0, 0, 0, 0)
-        rapier_rigid_body_get_position_x(dummyWorld, 0)
-        rapier_rigid_body_get_position_y(dummyWorld, 0)
-        rapier_rigid_body_get_position_z(dummyWorld, 0)
-        rapier_rigid_body_get_rotation_x(dummyWorld, 0)
-        rapier_rigid_body_get_rotation_y(dummyWorld, 0)
-        rapier_rigid_body_get_rotation_z(dummyWorld, 0)
-        rapier_rigid_body_get_rotation_w(dummyWorld, 0)
+        rapier_rigid_body_get_position(dummyWorld, 0)
+        rapier_rigid_body_get_rotation(dummyWorld, 0)
         rapier_rigid_body_set_position(dummyWorld, 0, 0, 0, 0)
         rapier_rigid_body_set_rotation(dummyWorld, 0, 0, 0, 0, 0)
         rapier_rigid_body_wake(dummyWorld, 0)
@@ -146,13 +200,8 @@ public class RapierPhysicsPlugin: NSObject, FlutterPlugin {
         // --- Collider ---
         rapier_collider_create(dummyWorld, 0, nil)
         rapier_collider_create_heightfield(dummyWorld, 0, nil, 0, 0, 0, 0, 0)
-        rapier_collider_get_position_x(dummyWorld, 0)
-        rapier_collider_get_position_y(dummyWorld, 0)
-        rapier_collider_get_position_z(dummyWorld, 0)
-        rapier_collider_get_rotation_x(dummyWorld, 0)
-        rapier_collider_get_rotation_y(dummyWorld, 0)
-        rapier_collider_get_rotation_z(dummyWorld, 0)
-        rapier_collider_get_rotation_w(dummyWorld, 0)
+        rapier_collider_get_position(dummyWorld, 0)
+        rapier_collider_get_rotation(dummyWorld, 0)
         rapier_collider_get_friction(dummyWorld, 0)
         rapier_collider_get_restitution(dummyWorld, 0)
         rapier_collider_get_density(dummyWorld, 0)
@@ -176,6 +225,26 @@ public class RapierPhysicsPlugin: NSObject, FlutterPlugin {
         rapier_joint_configure_revolute_motor(dummyWorld, 0, 0, 0, 0, 0)
         rapier_joint_configure_prismatic_motor(dummyWorld, 0, 0, 0, 0, 0)
         rapier_joint_remove(dummyWorld, 0)
+
+        // --- Character Controller ---
+        let dummyCtrl = rapier_character_controller_create(0)
+        rapier_character_controller_set_up(dummyCtrl, 0, 0, 0)
+        rapier_character_controller_set_max_slope(dummyCtrl, 0)
+        rapier_character_controller_set_min_slope(dummyCtrl, 0)
+        rapier_character_controller_set_snap_to_ground(dummyCtrl, 0, false)
+        rapier_character_controller_set_autostep(dummyCtrl, 0, 0, false)
+        rapier_character_controller_move(dummyWorld, dummyCtrl, 0, 0, 0, 0, 0)
+        rapier_character_controller_is_grounded(dummyCtrl)
+        rapier_character_controller_is_on_wall(dummyCtrl)
+        rapier_character_controller_is_on_ceiling(dummyCtrl)
+        rapier_character_controller_destroy(dummyCtrl)
+        // --- Scene Queries ---
+        rapier_world_cast_ray(dummyWorld, 0, 0, 0, 0, 0, 0, 0, false, 0, 0)
+        rapier_world_cast_ray_and_get_normal(dummyWorld, 0, 0, 0, 0, 0, 0, 0, false, 0, 0)
+        rapier_world_cast_shape(dummyWorld, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, nil, 0, false, 0, 0)
+        rapier_world_project_point(dummyWorld, 0, 0, 0, false, 0, 0)
+        rapier_world_intersections_with_point(dummyWorld, 0, 0, 0, 0, 0, nil, 0)
+        rapier_world_intersection_with_shape(dummyWorld, 0, 0, 0, 0, 0, 0, 0, nil, 0, 0)
     }
   }
 

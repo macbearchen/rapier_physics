@@ -25,13 +25,13 @@ class DoublePendulumScene extends BaseScene {
     // --- Sphere 1 ---
     final posSphere1 = position + Vector3(0, 0, -length);
     final entityS1 = addMesh(pendulumMesh, posSphere1)..color = Colors.red;
-    final rbS1 = physicsSystem.addSphere(radius, M3RigidBodyDesc.dynamic()..position = posSphere1);
+    final rbS1 = physicsSystem.addSphere(radius, desc: M3RigidBodyDesc.dynamic()..position = posSphere1);
     physicsSystem.attachEntity(entityS1, rbS1);
 
     // --- Sphere 2 ---
     final posSphere2 = posSphere1 + Vector3(0, 0, -length);
     final entityS2 = addMesh(pendulumMesh, posSphere2)..color = Colors.yellow;
-    final rbS2 = physicsSystem.addSphere(radius, M3RigidBodyDesc.dynamic()..position = posSphere2);
+    final rbS2 = physicsSystem.addSphere(radius, desc: M3RigidBodyDesc.dynamic()..position = posSphere2);
     physicsSystem.attachEntity(entityS2, rbS2);
 
     if (rbS1 is M3RapierRigidBody && rbS2 is M3RapierRigidBody) {
