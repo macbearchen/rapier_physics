@@ -1,5 +1,14 @@
 # Changelog
 
+🌐 **Language / 語言**：**English** | [繁體中文](CHANGELOG_zh.md)
+
+## 0.5.1
+#### 2026-08-21
+- **Character Controller Jump**: Added a **Jump** button to the `CharacterControllerScene` demo, enabling vertical impulse-based jumping with on-screen UI controls.
+- **Joystick Input Improvements**: Refined joystick interaction in `CharacterControllerScene` with a configurable input area and improved touch responsiveness.
+- **Windows DLL Updated**: Rebuilt and updated `prebuilt/rapier_ffi.dll`.
+- **CompoundScene Table**: Added `addTable` — a compound rigid body consisting of a flat tabletop box and four box legs with individual `ColliderDesc.cuboid` offsets and darker-wood sub-mesh colouring.
+
 ## 0.5.0
 #### 2026-08-19
 - **Kinematic Character Controller**: Introduced `KinematicCharacterController` for 3D character physics navigation, supporting auto-stepping, slope sliding, ground snapping, and dynamic body impulse pushing (`applyImpulsesToDynamicBodies`).

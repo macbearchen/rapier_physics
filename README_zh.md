@@ -8,6 +8,8 @@
 
 [**網頁版線上展示**](https://macbearchen.github.io/rapier_physics/)
 
+![Physics Demos](https://raw.githubusercontent.com/macbearchen/rapier_physics/main/img/physics_demos.gif)
+
 ## 特色
 
 - **跨平台**: 支持 Android、iOS、macOS、Windows 和 Web。
@@ -33,7 +35,7 @@
 
 ```yaml
 dependencies:
-  rapier_physics: ^0.5.0
+  rapier_physics: ^0.5.1
 ```
 
 ### 設置

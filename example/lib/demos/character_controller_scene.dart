@@ -154,30 +154,65 @@ class CharacterControllerScene extends BaseScene {
     _characterEntity.position = _characterBody.position;
   }
 
+  void jump() {
+    if (_grounded) {
+      _grounded = false;
+      _verticalVelocity = CharacterControllerScene._jumpSpeed;
+    }
+  }
+
   @override
   fm.Widget buildUI(fm.BuildContext context) {
     final joystickCenter = _inputCtrl._joystickCenter;
     final joystickDelta = _inputCtrl._joystickDelta;
     final isTouched = _inputCtrl._joystickTouchId != null;
 
-    if (!isTouched || joystickCenter == null) {
-      return const fm.SizedBox.shrink();
-    }
+    final children = <fm.Widget>[];
 
-    final knobOffset = joystickDelta * CharControllerKeyboardInput._joystickRadius;
-    final radius = CharControllerKeyboardInput._joystickRadius;
-
-    return fm.IgnorePointer(
-      child: fm.Stack(
-        children: [
-          fm.Positioned(
-            left: joystickCenter.dx - radius,
-            top: joystickCenter.dy - radius,
+    // Virtual Joystick indicator
+    if (isTouched && joystickCenter != null) {
+      final knobOffset = joystickDelta * CharControllerKeyboardInput._joystickRadius;
+      final radius = CharControllerKeyboardInput._joystickRadius;
+      children.add(
+        fm.Positioned(
+          left: joystickCenter.dx - radius,
+          top: joystickCenter.dy - radius,
+          child: fm.IgnorePointer(
             child: _buildJoystickCircle(isTouched: true, knobOffset: knobOffset, radius: radius),
           ),
-        ],
+        ),
+      );
+    }
+
+    // Jump button on the right center position
+    children.add(
+      fm.Align(
+        alignment: fm.Alignment.centerRight,
+        child: fm.Padding(
+          padding: const fm.EdgeInsets.only(right: 24.0),
+          child: fm.Material(
+            color: fm.Colors.transparent,
+            child: fm.InkWell(
+              borderRadius: fm.BorderRadius.circular(32),
+              onTap: jump,
+              child: fm.Container(
+                width: 64,
+                height: 64,
+                decoration: fm.BoxDecoration(
+                  shape: fm.BoxShape.circle,
+                  color: fm.Colors.blueAccent.withValues(alpha: 0.7),
+                  border: fm.Border.all(color: fm.Colors.white, width: 2),
+                  boxShadow: const [fm.BoxShadow(color: fm.Colors.black38, blurRadius: 6, spreadRadius: 1)],
+                ),
+                child: const fm.Icon(fm.Icons.arrow_upward, color: fm.Colors.white, size: 32),
+              ),
+            ),
+          ),
+        ),
       ),
     );
+
+    return fm.Stack(children: children);
   }
 
   fm.Widget _buildJoystickCircle({required bool isTouched, required fm.Offset knobOffset, required double radius}) {
@@ -218,15 +253,17 @@ class CharacterControllerScene extends BaseScene {
 
 class CharControllerKeyboardInput extends M3InputController {
   final CharacterControllerScene scene;
+  late final M3CameraOrbitController _cameraOrbitCtrl;
 
-  CharControllerKeyboardInput(this.scene);
+  CharControllerKeyboardInput(this.scene) {
+    _cameraOrbitCtrl = M3CameraOrbitController(scene.camera);
+  }
 
   @override
   void onKeyDown(KeyDownEvent e) {
     M3Log.d('Character', 'KeyDown: ${e.logicalKey}');
-    if (scene._grounded && e.logicalKey == LogicalKeyboardKey.keyX) {
-      scene._grounded = false;
-      scene._verticalVelocity = CharacterControllerScene._jumpSpeed;
+    if (e.logicalKey == LogicalKeyboardKey.keyX) {
+      scene.jump();
     }
   }
 
@@ -237,12 +274,12 @@ class CharControllerKeyboardInput extends M3InputController {
 
   @override
   void onKeyRepeat(PhysicalKeyboardKey key) {
-    // TODO: implement onKeyRepeat
+    _cameraOrbitCtrl.onKeyRepeat(key);
   }
 
   @override
   void onScroll(double scrollDelta) {
-    // TODO: implement onScroll
+    _cameraOrbitCtrl.onScroll(scrollDelta);
   }
 
   // Virtual joystick touch state
@@ -253,12 +290,17 @@ class CharControllerKeyboardInput extends M3InputController {
 
   @override
   void onTouchDown(M3Touch touch) {
-    // If joystick isn't active and touch is on the bottom-left half of screen
-    if (_joystickTouchId == null && touch.x < 300) {
+    final screenW = scene.camera.viewportW.toDouble();
+    final isLeftSide = touch.x < (screenW > 0 ? screenW * 0.25 : 120);
+
+    // If joystick isn't active and touch is on the left half of the screen
+    if (_joystickTouchId == null && isLeftSide) {
       _joystickTouchId = touch.id;
       _joystickCenter = Offset(touch.x, touch.y);
       _joystickDelta = Offset.zero;
       M3AppEngine.instance.refresh();
+    } else {
+      _cameraOrbitCtrl.onTouchDown(touch);
     }
   }
 
@@ -273,6 +315,8 @@ class CharControllerKeyboardInput extends M3InputController {
         _joystickDelta = diff / _joystickRadius;
       }
       M3AppEngine.instance.refresh();
+    } else {
+      _cameraOrbitCtrl.onTouchMove(touch);
     }
   }
 
@@ -283,6 +327,8 @@ class CharControllerKeyboardInput extends M3InputController {
       _joystickCenter = null;
       _joystickDelta = Offset.zero;
       M3AppEngine.instance.refresh();
+    } else {
+      _cameraOrbitCtrl.onTouchUp(touch);
     }
   }
 

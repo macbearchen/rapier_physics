@@ -42,7 +42,7 @@ class BaseScene extends M3Scene {
 
     M3AppEngine.backgroundColor = Vector3(0.04, 0.04, 0.8);
 
-    camera.setEuler(pi / 9, -pi / 5, 0, distance: 30);
+    camera.setEuler(pi / 9, -pi / 5, 0, distance: 20);
     dirLight.lightViewer.setEuler(pi / 5, -pi / 3, 0, distance: 30);
 
     addGround();

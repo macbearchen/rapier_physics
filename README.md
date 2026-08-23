@@ -10,6 +10,8 @@ A high-performance physics engine for Flutter, powered by [Rapier](https://rapie
 
 [**Live Web Demo**](https://macbearchen.github.io/rapier_physics/)
 
+![Physics Demos](https://raw.githubusercontent.com/macbearchen/rapier_physics/main/img/physics_demos.gif)
+
 ## Features
 
 - **Cross-Platform**: Support for Android, iOS, macOS, Windows, and Web.
@@ -35,7 +37,7 @@ Add `rapier_physics` to your `pubspec.yaml` dependencies:
 
 ```yaml
 dependencies:
-  rapier_physics: ^0.5.0
+  rapier_physics: ^0.5.1
 ```
 
 ### Setup

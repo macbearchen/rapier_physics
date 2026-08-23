@@ -30,7 +30,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   macbear_3d: ^0.9.4
   vector_math: ^2.4.2
-  material_ui: ^1.0.0
+  material_ui: ^1.0.1
   
 dev_dependencies:
   integration_test:
