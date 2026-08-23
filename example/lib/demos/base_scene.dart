@@ -77,11 +77,44 @@ class BaseScene extends M3Scene {
     physicsSystem.attachEntity(floor, rb);
   }
 
+  void addRope(int numSegments, Vector3 startPos) {
+    final List<RigidBody> rbRopes = [];
+    final ropeMesh = M3Mesh(M3BoxGeom(1, 0.4, 0.4));
+    // Rope Joint
+    final hookPos = Vector3(-0.5, 0, 0);
+    for (int i = 0; i < numSegments; i++) {
+      final ropePos = Vector3(i.toDouble(), 0, 0) + startPos;
+      // Use thin segments along X axis
+      final rope = addMesh(ropeMesh, ropePos)..color = Colors.lightCoral;
+      final rbRope = physicsSystem.addBox(0.5, 0.1, 0.1, desc: M3RigidBodyDesc.dynamic()..position = ropePos);
+      physicsSystem.attachEntity(rope, rbRope);
+
+      if (rbRope is M3RapierRigidBody) {
+        rbRopes.add(rbRope);
+        RopeJoint ropeJoint;
+        if (i == 0) {
+          // Anchor start of first segment to the wall
+          ropeJoint = world.addRopeJoint(rbRopes[i], world.groundBody, hookPos, ropePos + hookPos, 0.05);
+        } else {
+          // Connect start of current segment to end of previous segment
+          ropeJoint = world.addRopeJoint(rbRopes[i], rbRopes[i - 1], hookPos, -hookPos, 0.05);
+        }
+        world.setJointLimits(ropeJoint, JointAxis.angX, -0.3, 0.3);
+      }
+    }
+  }
+
   @override
   void update(double delta) {
     super.update(delta);
 
     double sec = totalTime;
     dirLight.lightViewer.setEuler(sec * pi / 18, -pi / 3, 0); // rotate light
+  }
+
+  @override
+  void dispose() {
+    physicsSystem.dispose();
+    super.dispose();
   }
 }

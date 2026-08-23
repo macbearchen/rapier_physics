@@ -1,4 +1,11 @@
 let rapier_exports;
+let vec3_buffer_ptr = 0;
+let quat_buffer_ptr = 0;
+let query_ray_buffer_ptr = 0;
+let query_shape_buffer_ptr = 0;
+let query_proj_buffer_ptr = 0;
+let query_desc_buffer_ptr = 0;
+let query_list_buffer_ptr = 0;
 
 // ==========================================
 // Initialization & Version
@@ -198,9 +205,6 @@ window.rapier_joint_remove = (world, handle) => rapier_exports.rapier_joint_remo
 // Kinematic Character Controller
 // ==========================================
 
-let vec3_buffer_ptr = 0;
-let quat_buffer_ptr = 0;
-
 window.rapier_character_controller_create = (offset) =>
     rapier_exports.rapier_character_controller_create(offset);
 
@@ -273,6 +277,119 @@ window.rapier_quat_get_w = (ptr) => {
     const view = new DataView(rapier_exports.memory.buffer);
     return view.getFloat32(ptr + 12, true);
 };
+
+window.rapier_world_cast_ray = (world, ox, oy, oz, dx, dy, dz, max_toi, solid, exclude_collider, exclude_rigid_body) => {
+    if (query_ray_buffer_ptr === 0) {
+        query_ray_buffer_ptr = rapier_exports.rapier_malloc(40);
+    }
+    rapier_exports.rapier_world_cast_ray(query_ray_buffer_ptr, world, ox, oy, oz, dx, dy, dz, max_toi, solid ? 1 : 0, exclude_collider, exclude_rigid_body);
+    return query_ray_buffer_ptr;
+};
+
+window.rapier_world_cast_ray_and_get_normal = (world, ox, oy, oz, dx, dy, dz, max_toi, solid, exclude_collider, exclude_rigid_body) => {
+    if (query_ray_buffer_ptr === 0) {
+        query_ray_buffer_ptr = rapier_exports.rapier_malloc(40);
+    }
+    rapier_exports.rapier_world_cast_ray_and_get_normal(query_ray_buffer_ptr, world, ox, oy, oz, dx, dy, dz, max_toi, solid ? 1 : 0, exclude_collider, exclude_rigid_body);
+    return query_ray_buffer_ptr;
+};
+
+window.rapier_world_cast_shape = (world, px, py, pz, rx, ry, rz, rw, vx, vy, vz, shapeType, hx, hy, hz, radius, halfHeight, friction, restitution, density, locX, locY, locZ, rotX, rotY, rotZ, rotW, isSensor, maxToi, stopAtPenetration, excludeCollider, excludeRigidBody) => {
+    if (query_shape_buffer_ptr === 0) {
+        query_shape_buffer_ptr = rapier_exports.rapier_malloc(40);
+    }
+    if (query_desc_buffer_ptr === 0) {
+        query_desc_buffer_ptr = rapier_exports.rapier_malloc(72);
+    }
+    const view = new DataView(rapier_exports.memory.buffer);
+    view.setUint32(query_desc_buffer_ptr, shapeType, true);
+    view.setFloat32(query_desc_buffer_ptr + 4, hx, true);
+    view.setFloat32(query_desc_buffer_ptr + 8, hy, true);
+    view.setFloat32(query_desc_buffer_ptr + 12, hz, true);
+    view.setFloat32(query_desc_buffer_ptr + 16, radius, true);
+    view.setFloat32(query_desc_buffer_ptr + 20, halfHeight, true);
+    view.setFloat32(query_desc_buffer_ptr + 24, friction, true);
+    view.setFloat32(query_desc_buffer_ptr + 28, restitution, true);
+    view.setFloat32(query_desc_buffer_ptr + 32, density, true);
+    view.setFloat32(query_desc_buffer_ptr + 36, locX, true);
+    view.setFloat32(query_desc_buffer_ptr + 40, locY, true);
+    view.setFloat32(query_desc_buffer_ptr + 44, locZ, true);
+    view.setFloat32(query_desc_buffer_ptr + 48, rotX, true);
+    view.setFloat32(query_desc_buffer_ptr + 52, rotY, true);
+    view.setFloat32(query_desc_buffer_ptr + 56, rotZ, true);
+    view.setFloat32(query_desc_buffer_ptr + 60, rotW, true);
+    view.setUint8(query_desc_buffer_ptr + 64, isSensor ? 1 : 0);
+
+    rapier_exports.rapier_world_cast_shape(query_shape_buffer_ptr, world, px, py, pz, rx, ry, rz, rw, vx, vy, vz, query_desc_buffer_ptr, maxToi, stopAtPenetration ? 1 : 0, excludeCollider, excludeRigidBody);
+    return query_shape_buffer_ptr;
+};
+
+window.rapier_world_project_point = (world, px, py, pz, solid, excludeCollider, excludeRigidBody) => {
+    if (query_proj_buffer_ptr === 0) {
+        query_proj_buffer_ptr = rapier_exports.rapier_malloc(24);
+    }
+    rapier_exports.rapier_world_project_point(query_proj_buffer_ptr, world, px, py, pz, solid ? 1 : 0, excludeCollider, excludeRigidBody);
+    return query_proj_buffer_ptr;
+};
+
+window.rapier_world_intersections_with_point = (world, px, py, pz, excludeCollider, excludeRigidBody) => {
+    if (query_list_buffer_ptr === 0) {
+        query_list_buffer_ptr = rapier_exports.rapier_malloc(512);
+    }
+    const count = rapier_exports.rapier_world_intersections_with_point(world, px, py, pz, excludeCollider, excludeRigidBody, query_list_buffer_ptr, 128);
+    const view = new DataView(rapier_exports.memory.buffer);
+    const result = [];
+    for (let i = 0; i < count && i < 128; i++) {
+        result.push(view.getUint32(query_list_buffer_ptr + i * 4, true));
+    }
+    return result;
+};
+
+window.rapier_world_intersection_with_shape = (world, px, py, pz, rx, ry, rz, rw, shapeType, hx, hy, hz, radius, halfHeight, friction, restitution, density, locX, locY, locZ, rotX, rotY, rotZ, rotW, isSensor, excludeCollider, excludeRigidBody) => {
+    if (query_desc_buffer_ptr === 0) {
+        query_desc_buffer_ptr = rapier_exports.rapier_malloc(72);
+    }
+    const view = new DataView(rapier_exports.memory.buffer);
+    view.setUint32(query_desc_buffer_ptr, shapeType, true);
+    view.setFloat32(query_desc_buffer_ptr + 4, hx, true);
+    view.setFloat32(query_desc_buffer_ptr + 8, hy, true);
+    view.setFloat32(query_desc_buffer_ptr + 12, hz, true);
+    view.setFloat32(query_desc_buffer_ptr + 16, radius, true);
+    view.setFloat32(query_desc_buffer_ptr + 20, halfHeight, true);
+    view.setFloat32(query_desc_buffer_ptr + 24, friction, true);
+    view.setFloat32(query_desc_buffer_ptr + 28, restitution, true);
+    view.setFloat32(query_desc_buffer_ptr + 32, density, true);
+    view.setFloat32(query_desc_buffer_ptr + 36, locX, true);
+    view.setFloat32(query_desc_buffer_ptr + 40, locY, true);
+    view.setFloat32(query_desc_buffer_ptr + 44, locZ, true);
+    view.setFloat32(query_desc_buffer_ptr + 48, rotX, true);
+    view.setFloat32(query_desc_buffer_ptr + 52, rotY, true);
+    view.setFloat32(query_desc_buffer_ptr + 56, rotZ, true);
+    view.setFloat32(query_desc_buffer_ptr + 60, rotW, true);
+    view.setUint8(query_desc_buffer_ptr + 64, isSensor ? 1 : 0);
+
+    return rapier_exports.rapier_world_intersection_with_shape(world, px, py, pz, rx, ry, rz, rw, query_desc_buffer_ptr, excludeCollider, excludeRigidBody);
+};
+
+window.rapier_ray_get_collider = (ptr) => new DataView(rapier_exports.memory.buffer).getUint32(ptr, true);
+window.rapier_ray_get_rigid_body = (ptr) => new DataView(rapier_exports.memory.buffer).getUint32(ptr + 4, true);
+window.rapier_ray_get_toi = (ptr) => new DataView(rapier_exports.memory.buffer).getFloat32(ptr + 8, true);
+window.rapier_ray_get_point_x = (ptr) => new DataView(rapier_exports.memory.buffer).getFloat32(ptr + 12, true);
+window.rapier_ray_get_point_y = (ptr) => new DataView(rapier_exports.memory.buffer).getFloat32(ptr + 16, true);
+window.rapier_ray_get_point_z = (ptr) => new DataView(rapier_exports.memory.buffer).getFloat32(ptr + 20, true);
+window.rapier_ray_get_normal_x = (ptr) => new DataView(rapier_exports.memory.buffer).getFloat32(ptr + 24, true);
+window.rapier_ray_get_normal_y = (ptr) => new DataView(rapier_exports.memory.buffer).getFloat32(ptr + 28, true);
+window.rapier_ray_get_normal_z = (ptr) => new DataView(rapier_exports.memory.buffer).getFloat32(ptr + 32, true);
+window.rapier_ray_get_hit = (ptr) => new DataView(rapier_exports.memory.buffer).getUint8(ptr + 36) !== 0;
+
+window.rapier_proj_get_collider = (ptr) => new DataView(rapier_exports.memory.buffer).getUint32(ptr, true);
+window.rapier_proj_get_rigid_body = (ptr) => new DataView(rapier_exports.memory.buffer).getUint32(ptr + 4, true);
+window.rapier_proj_get_point_x = (ptr) => new DataView(rapier_exports.memory.buffer).getFloat32(ptr + 8, true);
+window.rapier_proj_get_point_y = (ptr) => new DataView(rapier_exports.memory.buffer).getFloat32(ptr + 12, true);
+window.rapier_proj_get_point_z = (ptr) => new DataView(rapier_exports.memory.buffer).getFloat32(ptr + 16, true);
+window.rapier_proj_get_is_inside = (ptr) => new DataView(rapier_exports.memory.buffer).getUint8(ptr + 20) !== 0;
+window.rapier_proj_get_hit = (ptr) => new DataView(rapier_exports.memory.buffer).getUint8(ptr + 21) !== 0;
+
 
 // ==========================================
 // Memory Management

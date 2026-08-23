@@ -21,11 +21,17 @@ export 'scene_query.dart';
 class RapierWorld {
   static final RapierBindings bindings = rapier_bindings.RapierBindingsImpl();
   int _worldHandle = 0;
-  int _groundBodyHandle = 0;
+  RigidBody? _groundBody;
 
   int get worldHandle => _worldHandle;
 
-  RigidBody get groundBody => RigidBody(_groundBodyHandle, this);
+  RigidBody get groundBody {
+    final body = _groundBody;
+    if (body == null) {
+      throw StateError('RapierWorld is not initialized or has been destroyed.');
+    }
+    return body;
+  }
 
   final Map<RigidBody, List<Collider>> _bodyColliders = {};
   final Map<RigidBody, List<Joint>> _bodyJoints = {};
@@ -38,7 +44,8 @@ class RapierWorld {
   Future<void> init({Vector3? gravity}) async {
     await RapierWorld.bindings.init();
     _worldHandle = RapierWorld.bindings.createWorld();
-    _groundBodyHandle = RapierWorld.bindings.createRigidBody(_worldHandle, RigidBodyDesc.fixed());
+    final groundHandle = RapierWorld.bindings.createRigidBody(_worldHandle, RigidBodyDesc.fixed());
+    _groundBody = RigidBody(groundHandle, this);
     if (gravity != null) {
       setGravity(gravity.x, gravity.y, gravity.z);
     }
@@ -50,11 +57,18 @@ class RapierWorld {
     }
   }
 
+  void dispose() => destroy();
+
   void destroy() {
     if (_worldHandle != 0) {
       bindings.destroyWorld(_worldHandle);
       _worldHandle = 0;
-      _groundBodyHandle = 0;
+      _groundBody = null;
+      _bodies.clear();
+      _colliders.clear();
+      _joints.clear();
+      _bodyColliders.clear();
+      _bodyJoints.clear();
     }
   }
 
@@ -549,7 +563,7 @@ class RapierWorld {
 
   /// Look up a [RigidBody] registered in this world by its handle.
   RigidBody? getRigidBodyByHandle(int handle) {
-    if (_groundBodyHandle == handle) return groundBody;
+    if (_groundBody?.handle == handle) return _groundBody;
     for (final b in _bodies) {
       if (b.handle == handle) return b;
     }

@@ -23,7 +23,8 @@ class M3RapierPhysicsEngine implements M3PhysicsEngine {
 
   @override
   void dispose() {
-    world.destroy();
+    _initialized = false;
+    world.dispose();
   }
 
   @override
