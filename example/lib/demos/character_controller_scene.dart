@@ -1,6 +1,7 @@
 // ignore_for_file: unused_local_variable, unused_field
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart' as fm;
 import 'package:flutter/services.dart';
 
@@ -158,6 +159,9 @@ class CharacterControllerScene extends BaseScene {
     if (_grounded) {
       _grounded = false;
       _verticalVelocity = CharacterControllerScene._jumpSpeed;
+
+      final handle = world.groundBody.handle;
+      debugPrint('RapierWorld: groundHandle: $handle');
     }
   }
 

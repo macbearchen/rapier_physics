@@ -2,6 +2,11 @@
 
 🌐 **Language / 語言**：[English](CHANGELOG.md) | **繁體中文**
 
+## 0.5.2
+#### 2026-08-25
+- **物理世界與控制器生命週期清理**：為 `RapierWorld` 新增 `dispose()` 別名方法，優化 `destroy()` 流程以完整清除內部剛體、碰撞體與關節映射，並重設 `_groundBody`。
+- **角色控制器釋放安全性**：優化 `KinematicCharacterController.dispose()`，安全重設原生控制器控制代碼以防止重複釋放。
+
 ## 0.5.1
 #### 2026-08-21
 - **角色控制器跳躍**：在 `CharacterControllerScene` 示範中新增 **跳躍** 按鈕，支援基於脈衝的垂直跳躍，並配有螢幕 UI 控制項。

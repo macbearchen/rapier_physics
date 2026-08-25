@@ -2,6 +2,11 @@
 
 🌐 **Language / 語言**：**English** | [繁體中文](CHANGELOG_zh.md)
 
+## 0.5.2
+#### 2026-08-25
+- **World & Controller Lifecycle Cleanup**: Added `dispose()` alias to `RapierWorld`, improved `destroy()` to clear internal body, collider, and joint maps and nullify `_groundBody`.
+- **Character Controller Safety**: Enhanced `KinematicCharacterController.dispose()` to reset controller handles safely and prevent double-free.
+
 ## 0.5.1
 #### 2026-08-21
 - **Character Controller Jump**: Added a **Jump** button to the `CharacterControllerScene` demo, enabling vertical impulse-based jumping with on-screen UI controls.

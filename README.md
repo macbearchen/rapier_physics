@@ -37,7 +37,7 @@ Add `rapier_physics` to your `pubspec.yaml` dependencies:
 
 ```yaml
 dependencies:
-  rapier_physics: ^0.5.1
+  rapier_physics: ^0.5.2
 ```
 
 ### Setup

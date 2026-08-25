@@ -49,7 +49,7 @@ class CharacterMovementResult {
 ///
 /// Call [dispose] when the character is destroyed.
 class KinematicCharacterController {
-  final int _ctrlHandle;
+  int _ctrlHandle;
   final RapierWorld _world;
   final RigidBody _body;
   final Collider _collider;
@@ -157,8 +157,10 @@ class KinematicCharacterController {
   /// Releases the native controller memory. Must be called when the character
   /// is destroyed. After calling [dispose] this object must not be used.
   void dispose() {
-    if (_ctrlHandle != 0) {
-      RapierWorld.bindings.destroyCharacterController(_ctrlHandle);
+    final handle = _ctrlHandle;
+    if (handle != 0) {
+      _ctrlHandle = 0;
+      RapierWorld.bindings.destroyCharacterController(handle);
     }
   }
 }

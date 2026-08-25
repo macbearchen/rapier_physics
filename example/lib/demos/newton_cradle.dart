@@ -1,3 +1,4 @@
+import 'package:material_ui/material_ui.dart' as fm;
 import 'base_scene.dart';
 
 /// Newton's Cradle demo.
@@ -7,6 +8,8 @@ import 'base_scene.dart';
 ///   • Swinging happens in the XZ plane.
 ///   • Hinge axis = Y  →  rotation around Y allows XZ-plane swing.
 class NewtonCradleScene extends BaseScene {
+  double _cradleYOffset = 0.0;
+
   // constructor
   NewtonCradleScene({required super.physics});
 
@@ -15,7 +18,12 @@ class NewtonCradleScene extends BaseScene {
     if (isLoaded) return;
     await super.load();
 
-    _addNewtonCradle(count: 5, length: 4.0);
+    addCradle();
+  }
+
+  void addCradle({int count = 5, double length = 4.0}) {
+    _addNewtonCradle(count: count, length: length, yCenter: _cradleYOffset);
+    _cradleYOffset += 4.0;
   }
 
   M3Mesh _createFrameMesh(double frameW, double yOff, double cradleZ) {
@@ -59,7 +67,7 @@ class NewtonCradleScene extends BaseScene {
   }
 
   // ── Newton's Cradle ─────────────────────────────────────────────────────────
-  void _addNewtonCradle({required int count, required double length}) {
+  void _addNewtonCradle({required int count, required double length, double yCenter = 0.0}) {
     const spacing = 1.07; // tiny gap between balls
     final cradleZ = length + 1.0; // Z height of the top pivot rail
     final frameW = (count - 1) * spacing + 2.0; // rail length
@@ -67,7 +75,7 @@ class NewtonCradleScene extends BaseScene {
 
     // ── Visual-only frame (no physics body needed for a static frame) ─────────
     final frameMesh = _createFrameMesh(frameW, yOff, cradleZ);
-    addMesh(frameMesh, Vector3.zero());
+    addMesh(frameMesh, Vector3(0, yCenter, 0));
 
     // ── Balls + hinge (revolute) joints ──────────────────────────────────────
     //
@@ -76,7 +84,7 @@ class NewtonCradleScene extends BaseScene {
     //   worldAxis   = (0, 1, 0)         → rotate around Y → ball swings in XZ plane
     //   localAnchor = (0, 0, length)    → from ball centre UP to the pivot,
     //                                      in the ball's own local frame
-    //   worldAnchor = (x, 0, cradleZ)  → the fixed pivot position in world space
+    //   worldAnchor = (x, yCenter, cradleZ)  → the fixed pivot position in world space
 
     final ballMesh = createPendulum(0.5, length);
     final restZ = cradleZ - length; // ball centre height when hanging at rest
@@ -85,7 +93,7 @@ class NewtonCradleScene extends BaseScene {
 
     for (int i = 0; i < count; i++) {
       final x = (i - (count - 1) / 2.0) * spacing;
-      final pos = Vector3(x, 0.0, restZ);
+      final pos = Vector3(x, yCenter, restZ);
 
       final entity = addMesh(ballMesh, pos)..color = Colors.skyBlue;
       final rb = physicsSystem.addSphere(0.5, desc: M3RigidBodyDesc.dynamic()..position = pos);
@@ -101,13 +109,22 @@ class NewtonCradleScene extends BaseScene {
         rb.wakeUp();
 
         // Every ball (including ball 0) must have a joint
-        world.addRevoluteJointToWorld(
-          rb,
-          Vector3(0, 1, 0), // hinge axis = Y
-          Vector3(0, 0, length), // local anchor: pivot is `length` above ball centre
-          Vector3(x, 0, cradleZ), // world anchor: pivot position on the rail
-        );
+        // world.addRevoluteJointToWorld(
+        //   rb,
+        //   Vector3(0, 1, 0), // hinge axis = Y
+        //   Vector3(0, 0, length), // local anchor: pivot is `length` above ball centre
+        //   Vector3(x, yCenter, cradleZ), // world anchor: pivot position on the rail
+        // );
 
+        if (rbGround is M3RapierRigidBody) {
+          world.addRevoluteJoint(
+            rb,
+            rbGround as RigidBody,
+            Vector3(0, 1, 0), // hinge axis = Y
+            Vector3(0, 0, length), // local anchor: pivot is `length` above ball centre
+            Vector3(x, yCenter, cradleZ), // world anchor: pivot position on the rail
+          );
+        }
         if (i == 0) {
           rb0 = rb;
         }
@@ -118,6 +135,34 @@ class NewtonCradleScene extends BaseScene {
     // Arc formula: newPos = pivot + length * (−sin θ along X,  −cos θ along Z)
     final pivotX = -(count - 1) / 2.0 * spacing;
     const pullAngle = pi / 3; // 60°
-    rb0!.setPosition(Vector3(pivotX - length * sin(pullAngle), 0, cradleZ - length * cos(pullAngle)));
+    rb0?.setPosition(Vector3(pivotX - length * sin(pullAngle), yCenter, cradleZ - length * cos(pullAngle)));
+  }
+
+  @override
+  fm.Widget buildUI(fm.BuildContext context) {
+    return fm.Stack(
+      children: [
+        fm.Align(
+          alignment: fm.Alignment.topLeft,
+          child: fm.Padding(
+            padding: const fm.EdgeInsets.only(right: 24.0, bottom: 32.0),
+            child: fm.ElevatedButton.icon(
+              style: fm.ElevatedButton.styleFrom(
+                backgroundColor: fm.Colors.blueAccent,
+                foregroundColor: fm.Colors.white,
+                padding: const fm.EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                shape: fm.RoundedRectangleBorder(borderRadius: fm.BorderRadius.circular(12)),
+              ),
+              onPressed: () => addCradle(),
+              icon: const fm.Icon(fm.Icons.add, size: 22),
+              label: const fm.Text(
+                'Add Newton Cradle',
+                style: fm.TextStyle(fontSize: 15, fontWeight: fm.FontWeight.bold),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

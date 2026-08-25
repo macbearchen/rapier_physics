@@ -1,4 +1,4 @@
-import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:rapier_physics/src/collider_desc.dart';
 
 import 'bindings/rapier_bindings.dart';
@@ -42,13 +42,17 @@ class RapierWorld {
   RapierWorld();
 
   Future<void> init({Vector3? gravity}) async {
+    debugPrint('RapierWorld.init');
+
     await RapierWorld.bindings.init();
     _worldHandle = RapierWorld.bindings.createWorld();
-    final groundHandle = RapierWorld.bindings.createRigidBody(_worldHandle, RigidBodyDesc.fixed());
-    _groundBody = RigidBody(groundHandle, this);
     if (gravity != null) {
       setGravity(gravity.x, gravity.y, gravity.z);
     }
+    final groundHandle = RapierWorld.bindings.createRigidBody(_worldHandle, RigidBodyDesc.fixed());
+    _groundBody = RigidBody(groundHandle, this);
+
+    debugPrint('RapierWorld: $_worldHandle, groundHandle: $groundHandle');
   }
 
   void setGravity(double x, double y, double z) {
@@ -60,8 +64,10 @@ class RapierWorld {
   void dispose() => destroy();
 
   void destroy() {
-    if (_worldHandle != 0) {
-      bindings.destroyWorld(_worldHandle);
+    debugPrint('RapierWorld.destroy');
+
+    final handle = _worldHandle;
+    if (handle != 0) {
       _worldHandle = 0;
       _groundBody = null;
       _bodies.clear();
@@ -69,6 +75,7 @@ class RapierWorld {
       _joints.clear();
       _bodyColliders.clear();
       _bodyJoints.clear();
+      bindings.destroyWorld(handle);
     }
   }
 

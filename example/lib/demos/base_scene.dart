@@ -18,6 +18,7 @@ export 'rapier_physics_engine.dart';
 // Define a base scene
 class BaseScene extends M3Scene {
   late final RapierWorld world;
+  late final M3RigidBody rbGround;
 
   // 通用的靜態工廠方法
   static T createPhysicsScene<T extends BaseScene>(T Function(M3PhysicsSystem) sceneFactory) {
@@ -45,7 +46,7 @@ class BaseScene extends M3Scene {
     camera.setEuler(pi / 9, -pi / 5, 0, distance: 20);
     dirLight.lightViewer.setEuler(pi / 5, -pi / 3, 0, distance: 30);
 
-    addGround();
+    rbGround = addGround();
 
     // sample cubemap
     skybox = M3Skybox(M3Texture.createDefaultIBLCube());
@@ -63,7 +64,7 @@ class BaseScene extends M3Scene {
   }
 
   // ── Ground ──────────────────────────────────────────────────────────────────
-  void addGround() {
+  M3RigidBody addGround() {
     M3Texture texGrid = M3Texture.createCheckerboard(size: 10);
     M3Material mtr = M3Material();
     mtr.diffuseTexture = texGrid;
@@ -75,6 +76,7 @@ class BaseScene extends M3Scene {
     floor.mesh.subMeshes[0].localMatrix.setTranslation(Vector3(0, 0, 0.5));
     floor.color = Colors.limeGreen;
     physicsSystem.attachEntity(floor, rb);
+    return rb;
   }
 
   void addRope(int numSegments, Vector3 startPos) {
@@ -110,11 +112,5 @@ class BaseScene extends M3Scene {
 
     double sec = totalTime;
     dirLight.lightViewer.setEuler(sec * pi / 18, -pi / 3, 0); // rotate light
-  }
-
-  @override
-  void dispose() {
-    physicsSystem.dispose();
-    super.dispose();
   }
 }
