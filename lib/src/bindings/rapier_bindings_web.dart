@@ -11,9 +11,13 @@ class RapierBindingsImpl extends RapierBindings {
   // Initialization & Version
   // ==========================================
 
+  static bool _initialized = false;
+
   @override
   Future<void> init() async {
+    if (_initialized) return;
     await web_ffi.rapier_init().toDart;
+    _initialized = true;
   }
 
   @override

@@ -12,6 +12,11 @@ let query_list_buffer_ptr = 0;
 // ==========================================
 
 window.rapier_init = async function () {
+    if (rapier_exports) {
+        // Already initialized — skip re-loading WASM to avoid replacing the live
+        // module instance (which would cause "unreachable" errors from stale handles).
+        return;
+    }
     const response = await fetch('rapier_ffi.wasm');
     const buffer = await response.arrayBuffer();
     const { instance } = await WebAssembly.instantiate(buffer, {});

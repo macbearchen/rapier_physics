@@ -44,10 +44,11 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     final renderOptions = M3AppEngine.instance.renderEngine.options;
+    final rapierVersion = RapierPhysics.version;
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: Text(RapierPhysics.version),
+          title: Text(rapierVersion),
           actions: [
             IconButton(
               icon: renderOptions.debug.showHelpers == M3HelperType.none

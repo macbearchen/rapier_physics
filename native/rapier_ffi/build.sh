@@ -5,6 +5,8 @@ DIST=../../prebuilt
 DIST_ios=../../ios/rapier_physics
 DIST_macos=../../macos/rapier_physics
 DIST_android=../../android/src/main/jniLibs
+DIST_web=../../web
+DIST_example_web=../../example/web
 #rm -rf $DIST
 mkdir -p $DIST
 
@@ -111,10 +113,10 @@ fi
 echo "=== Web (WASM) ==="
 rustup target add wasm32-unknown-unknown
 cargo build --release --target wasm32-unknown-unknown
-mkdir -p $DIST/web
-cp target/wasm32-unknown-unknown/release/rapier_ffi.wasm $DIST/web/
-mkdir -p ../../example/web
-cp target/wasm32-unknown-unknown/release/rapier_ffi.wasm ../../example/web/
+mkdir -p $DIST_web
+cp target/wasm32-unknown-unknown/release/rapier_ffi.wasm $DIST_web/
+mkdir -p $DIST_example_web
+cp target/wasm32-unknown-unknown/release/rapier_ffi.wasm $DIST_example_web/
 
 # ===== Finish =====
 echo "=== Build finished ==="

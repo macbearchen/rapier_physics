@@ -35,7 +35,7 @@
 
 ```yaml
 dependencies:
-  rapier_physics: ^0.5.2
+  rapier_physics: ^0.5.3
 ```
 
 ### 設置

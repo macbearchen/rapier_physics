@@ -42,8 +42,6 @@ class RapierWorld {
   RapierWorld();
 
   Future<void> init({Vector3? gravity}) async {
-    debugPrint('RapierWorld.init');
-
     await RapierWorld.bindings.init();
     _worldHandle = RapierWorld.bindings.createWorld();
     if (gravity != null) {
@@ -51,8 +49,6 @@ class RapierWorld {
     }
     final groundHandle = RapierWorld.bindings.createRigidBody(_worldHandle, RigidBodyDesc.fixed());
     _groundBody = RigidBody(groundHandle, this);
-
-    debugPrint('RapierWorld: $_worldHandle, groundHandle: $groundHandle');
   }
 
   void setGravity(double x, double y, double z) {
@@ -64,8 +60,6 @@ class RapierWorld {
   void dispose() => destroy();
 
   void destroy() {
-    debugPrint('RapierWorld.destroy');
-
     final handle = _worldHandle;
     if (handle != 0) {
       _worldHandle = 0;

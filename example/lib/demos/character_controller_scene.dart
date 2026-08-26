@@ -1,7 +1,6 @@
 // ignore_for_file: unused_local_variable, unused_field
 import 'dart:math' as math;
 
-import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart' as fm;
 import 'package:flutter/services.dart';
 
@@ -52,7 +51,7 @@ class CharacterControllerScene extends BaseScene {
     inputController = _inputCtrl;
 
     M3AppEngine.backgroundColor = Vector3(0.06, 0.08, 0.18);
-    camera.setEuler(math.pi / 8, -math.pi / 5, 0, distance: 20);
+    // camera.setEuler(math.pi / 8, -math.pi / 5, 0, distance: 20);
 
     _buildObstacles();
     _buildCharacter();
@@ -161,7 +160,6 @@ class CharacterControllerScene extends BaseScene {
       _verticalVelocity = CharacterControllerScene._jumpSpeed;
 
       final handle = world.groundBody.handle;
-      debugPrint('RapierWorld: groundHandle: $handle');
     }
   }
 

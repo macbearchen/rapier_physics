@@ -2,6 +2,13 @@
 
 🌐 **Language / 語言**：**English** | [繁體中文](CHANGELOG_zh.md)
 
+## 0.5.3
+#### 2026-08-26
+- **Engine Upgrade**: Upgraded underlying native engine dependency to `rapier3d v0.35.2` (and `parry3d v0.30.2`).
+- **Web/WASM Re-initialization Guard**: Fixed issue where switching scenes re-initialized WASM and caused runtime unreachable exceptions with stale handles.
+- **Build Scripts & Web Assets**: Updated build script output paths directly to `web/` and `example/web/`, removing redundant `prebuilt/web`.
+- **Cleanup**: Cleaned up extraneous debug prints in `RapierWorld`.
+
 ## 0.5.2
 #### 2026-08-25
 - **World & Controller Lifecycle Cleanup**: Added `dispose()` alias to `RapierWorld`, improved `destroy()` to clear internal body, collider, and joint maps and nullify `_groundBody`.

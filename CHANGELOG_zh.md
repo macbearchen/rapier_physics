@@ -2,6 +2,13 @@
 
 🌐 **Language / 語言**：[English](CHANGELOG.md) | **繁體中文**
 
+## 0.5.3
+#### 2026-08-26
+- **引擎升級**：將底層原生引擎依賴升級至 `rapier3d v0.35.2`（與 `parry3d v0.30.2`）。
+- **Web/WASM 重複初始化防護**：修正切換場景時重複載入 WASM 導致舊控制代碼引發 `unreachable` 運行時錯誤之問題。
+- **建置腳本與 Web 產物路徑**：更新建置腳本直接輸出至 `web/` 與 `example/web/`，移除多餘的 `prebuilt/web`。
+- **清理**：移除 `RapierWorld` 中多餘的 debug 調試輸出。
+
 ## 0.5.2
 #### 2026-08-25
 - **物理世界與控制器生命週期清理**：為 `RapierWorld` 新增 `dispose()` 別名方法，優化 `destroy()` 流程以完整清除內部剛體、碰撞體與關節映射，並重設 `_groundBody`。

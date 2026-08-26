@@ -10,7 +10,7 @@ export 'src/rigid_body_desc.dart';
 export 'src/scene_query.dart';
 
 class RapierPhysics {
-  static const String version = "rapier_physics 0.5.2";
+  static const String version = "rapier_physics 0.5.3";
 
   Future<String?> getPlatformVersion() {
     return RapierPhysicsPlatform.instance.getPlatformVersion();

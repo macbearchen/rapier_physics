@@ -92,8 +92,10 @@ target/wasm32-unknown-unknown/release/rapier_ffi.wasm
 
 Copy WASM to web assets:
 ```powershell
-New-Item -ItemType Directory -Force -Path ..\..\prebuilt\web
-Copy-Item target\wasm32-unknown-unknown\release\rapier_ffi.wasm ..\..\prebuilt\web\
+New-Item -ItemType Directory -Force -Path ..\..\web
+Copy-Item target\wasm32-unknown-unknown\release\rapier_ffi.wasm ..\..\web\
+New-Item -ItemType Directory -Force -Path ..\..\example\web
+Copy-Item target\wasm32-unknown-unknown\release\rapier_ffi.wasm ..\..\example\web\
 ```
 
 ---

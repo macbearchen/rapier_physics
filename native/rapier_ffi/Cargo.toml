@@ -8,7 +8,7 @@ name = "rapier_ffi"
 crate-type = ["staticlib", "cdylib"]   # staticlib for iOS, cdylib for macOS/Linux
 
 [dependencies]
-rapier3d = "0.34.0"
+rapier3d = "0.35.2"
 
 [profile.dev.package.rapier3d]
 opt-level = 3
