@@ -1,10 +1,22 @@
 let rapier_exports;
+let vec3_buffer_ptr = 0;
+let quat_buffer_ptr = 0;
+let query_ray_buffer_ptr = 0;
+let query_shape_buffer_ptr = 0;
+let query_proj_buffer_ptr = 0;
+let query_desc_buffer_ptr = 0;
+let query_list_buffer_ptr = 0;
 
 // ==========================================
 // Initialization & Version
 // ==========================================
 
 window.rapier_init = async function () {
+    if (rapier_exports) {
+        // Already initialized — skip re-loading WASM to avoid replacing the live
+        // module instance (which would cause "unreachable" errors from stale handles).
+        return;
+    }
     const response = await fetch('rapier_ffi.wasm');
     const buffer = await response.arrayBuffer();
     const { instance } = await WebAssembly.instantiate(buffer, {});
@@ -198,9 +210,6 @@ window.rapier_joint_remove = (world, handle) => rapier_exports.rapier_joint_remo
 // Kinematic Character Controller
 // ==========================================
 
-let vec3_buffer_ptr = 0;
-let quat_buffer_ptr = 0;
-
 window.rapier_character_controller_create = (offset) =>
     rapier_exports.rapier_character_controller_create(offset);
 
@@ -273,12 +282,6 @@ window.rapier_quat_get_w = (ptr) => {
     const view = new DataView(rapier_exports.memory.buffer);
     return view.getFloat32(ptr + 12, true);
 };
-
-let query_ray_buffer_ptr = 0;
-let query_shape_buffer_ptr = 0;
-let query_proj_buffer_ptr = 0;
-let query_desc_buffer_ptr = 0;
-let query_list_buffer_ptr = 0;
 
 window.rapier_world_cast_ray = (world, ox, oy, oz, dx, dy, dz, max_toi, solid, exclude_collider, exclude_rigid_body) => {
     if (query_ray_buffer_ptr === 0) {
