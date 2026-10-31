@@ -8,9 +8,10 @@ export 'src/rapier_world.dart';
 export 'src/rigid_body.dart';
 export 'src/rigid_body_desc.dart';
 export 'src/scene_query.dart';
+export 'src/vehicle_controller.dart';
 
 class RapierPhysics {
-  static const String version = "rapier_physics 0.5.3";
+  static const String version = "rapier_physics 0.6.0";
 
   Future<String?> getPlatformVersion() {
     return RapierPhysicsPlatform.instance.getPlatformVersion();

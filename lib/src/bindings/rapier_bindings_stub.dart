@@ -327,6 +327,81 @@ class RapierBindingsImpl extends RapierBindings {
   bool isCharacterOnCeiling(int ctrl) => throw UnsupportedError('Stub');
 
   // ==========================================
+  // Dynamic Ray-Cast Vehicle Controller
+  // ==========================================
+
+  @override
+  int createVehicle(int chassisHandle, int upAxis, int forwardAxis) => throw UnsupportedError('Stub');
+
+  @override
+  void destroyVehicle(int vehicle) => throw UnsupportedError('Stub');
+
+  @override
+  int addVehicleWheel(
+    int vehicle, {
+    required double connectionX,
+    required double connectionY,
+    required double connectionZ,
+    required double directionX,
+    required double directionY,
+    required double directionZ,
+    required double axleX,
+    required double axleY,
+    required double axleZ,
+    required double suspensionRestLength,
+    required double radius,
+    double suspensionStiffness = 0,
+    double suspensionCompression = 0,
+    double suspensionDamping = 0,
+    double maxSuspensionTravel = 0,
+    double frictionSlip = 0,
+    double maxSuspensionForce = 0,
+  }) =>
+      throw UnsupportedError('Stub');
+
+  @override
+  int vehicleWheelCount(int vehicle) => throw UnsupportedError('Stub');
+
+  @override
+  void setVehicleSteering(int vehicle, int wheelIndex, double steering) => throw UnsupportedError('Stub');
+
+  @override
+  void setVehicleEngineForce(int vehicle, int wheelIndex, double force) => throw UnsupportedError('Stub');
+
+  @override
+  void setVehicleBrake(int vehicle, int wheelIndex, double brake) => throw UnsupportedError('Stub');
+
+  @override
+  void updateVehicle(int world, int vehicle, double dt) => throw UnsupportedError('Stub');
+
+  @override
+  double vehicleWheelRotation(int vehicle, int wheelIndex) => throw UnsupportedError('Stub');
+
+  @override
+  double vehicleWheelSteering(int vehicle, int wheelIndex) => throw UnsupportedError('Stub');
+
+  @override
+  double vehicleWheelSuspensionLength(int vehicle, int wheelIndex) => throw UnsupportedError('Stub');
+
+  @override
+  bool vehicleWheelIsInContact(int vehicle, int wheelIndex) => throw UnsupportedError('Stub');
+
+  @override
+  Vector3 vehicleWheelCenter(int vehicle, int wheelIndex) => throw UnsupportedError('Stub');
+
+  @override
+  Vector3 vehicleWheelContactPoint(int vehicle, int wheelIndex) => throw UnsupportedError('Stub');
+
+  @override
+  Vector3 vehicleWheelContactNormal(int vehicle, int wheelIndex) => throw UnsupportedError('Stub');
+
+  @override
+  double vehicleCurrentSpeed(int vehicle) => throw UnsupportedError('Stub');
+
+  @override
+  int vehicleWheelGroundObject(int vehicle, int wheelIndex) => throw UnsupportedError('Stub');
+
+  // ==========================================
   // Scene Queries (QueryPipeline)
   // ==========================================
 

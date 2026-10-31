@@ -239,6 +239,96 @@ abstract class RapierBindings {
   bool isCharacterOnCeiling(int ctrl);
 
   // ==========================================
+  // Dynamic Ray-Cast Vehicle Controller
+  // ==========================================
+
+  /// Creates a new vehicle controller for the given chassis rigid body.
+  ///
+  /// [chassisHandle] is the raw rigid-body handle index (generation-0).
+  /// [upAxis] and [forwardAxis] select the chassis-local *up* / *forward*
+  /// axes: 0 = X, 1 = Y, 2 = Z.
+  int createVehicle(int chassisHandle, int upAxis, int forwardAxis);
+
+  /// Frees a vehicle controller previously created with [createVehicle].
+  void destroyVehicle(int vehicle);
+
+  /// Adds a wheel to the vehicle and returns its 0-based index.
+  ///
+  /// [connectionX/Y/Z] — chassis-local attachment point.
+  /// [directionX/Y/Z]  — suspension ray-cast direction (chassis space;
+  ///                      typically pointing *down*, e.g. `(0, -1, 0)`).
+  /// [axleX/Y/Z]       — wheel spin axis (chassis space, e.g. `(1, 0, 0)`).
+  /// [suspensionRestLength] — unloaded spring length (m).
+  /// [radius]           — wheel radius (m).
+  ///
+  /// Tuning parameters default to rapier's built-in defaults when set to 0.
+  int addVehicleWheel(
+    int vehicle, {
+    required double connectionX,
+    required double connectionY,
+    required double connectionZ,
+    required double directionX,
+    required double directionY,
+    required double directionZ,
+    required double axleX,
+    required double axleY,
+    required double axleZ,
+    required double suspensionRestLength,
+    required double radius,
+    double suspensionStiffness,
+    double suspensionCompression,
+    double suspensionDamping,
+    double maxSuspensionTravel,
+    double frictionSlip,
+    double maxSuspensionForce,
+  });
+
+  /// Returns the number of wheels attached to the vehicle.
+  int vehicleWheelCount(int vehicle);
+
+  /// Sets the steering angle (radians) for the wheel at [wheelIndex].
+  void setVehicleSteering(int vehicle, int wheelIndex, double steering);
+
+  /// Sets the engine force for the wheel at [wheelIndex].
+  void setVehicleEngineForce(int vehicle, int wheelIndex, double force);
+
+  /// Sets the braking force for the wheel at [wheelIndex].
+  void setVehicleBrake(int vehicle, int wheelIndex, double brake);
+
+  /// Advances the vehicle simulation by [dt] seconds.
+  /// Must be called **before** [stepWorld] each frame.
+  void updateVehicle(int world, int vehicle, double dt);
+
+  /// Returns the spin rotation (radians) of a wheel around its axle.
+  double vehicleWheelRotation(int vehicle, int wheelIndex);
+
+  /// Returns the current steering angle (radians) of a wheel.
+  double vehicleWheelSteering(int vehicle, int wheelIndex);
+
+  /// Returns the current suspension length of a wheel (metres).
+  double vehicleWheelSuspensionLength(int vehicle, int wheelIndex);
+
+  /// Returns true if the wheel is currently touching the ground.
+  bool vehicleWheelIsInContact(int vehicle, int wheelIndex);
+
+  /// Returns the world-space center position of a wheel.
+  Vector3 vehicleWheelCenter(int vehicle, int wheelIndex);
+
+  /// Returns the world-space ground contact point of a wheel.
+  /// Only meaningful when [vehicleWheelIsInContact] is true.
+  Vector3 vehicleWheelContactPoint(int vehicle, int wheelIndex);
+
+  /// Returns the world-space contact normal of a wheel.
+  Vector3 vehicleWheelContactNormal(int vehicle, int wheelIndex);
+
+  /// Returns the current forward speed of the vehicle (m/s).
+  double vehicleCurrentSpeed(int vehicle);
+
+  /// Returns the collider handle of the ground object under a wheel,
+  /// or -1 if the wheel is not in contact with anything.
+  int vehicleWheelGroundObject(int vehicle, int wheelIndex);
+
+  // ==========================================
   // Scene Queries (QueryPipeline)
   // ==========================================
 

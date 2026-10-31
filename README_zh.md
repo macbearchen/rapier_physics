@@ -16,6 +16,7 @@
 - **高性能**: 核心物理模擬使用 Rust 編寫。
 - **靈活的物理**: 支持多種剛體類型（動態 Dynamic、固定 Fixed、運動學 Kinematic）。
 - **角色控制器 (Character Controller)**: 支持台階自動跨越、斜坡滑行、貼地吸附與動態物體衝量推擠。
+- **車輛控制器 (Vehicle Controller)**: 基於 `DynamicRayCastVehicleController` 的射線車輛控制器，支援多輪獨立懸吊設定、轉向、引擎驅動、煞車以及接地與接觸點狀態查詢。
 - **場景查詢 (Scene Queries)**: 射線檢測 (`castRay`, `castRayAndGetNormal`, `intersectionWithRay`, `intersectionsWithRay`) 與形狀檢測 (`castShape`, `intersectionsWithShape`)，支持過濾標記。
 - **力與衝量**: 完整支持 `addForce`、`applyImpulse` 及其 `AtPoint` 變體。
 - **速度控制**: 直接設定線速度與角速度，實現精確的物理狀態控制。
@@ -35,7 +36,7 @@
 
 ```yaml
 dependencies:
-  rapier_physics: ^0.5.3
+  rapier_physics: ^0.6.0
 ```
 
 ### 設置
@@ -114,6 +115,7 @@ flutter run -t lib/main_3d.dart
 4. **複合形狀 (Compound Shapes)**：由多個碰撞體組成的單個剛體（例如具有四隻腳的桌子）。
 5. **角色控制器 (Character Controller)**：3D 玩家角色移動、台階跨越、斜坡滑行與動態障礙物推擠。
 6. **場景查詢 (Scene Queries)**：動態射線與形狀檢測、射線交點可視化與碰撞過濾。
+7. **射線車輛與高度場地形 (Raycast Vehicle & Terrain)**：具備懸吊模擬、轉向、四輪驅動與煞車的射線車輛模擬，支援後方鎖定追隨鏡頭與螢幕觸控控制盤，馳騁於波浪、漣漪與拱形環道等起伏的高度場地形之上。
 
 ## 支持的剛體類型 (Rigid Body Types)
 

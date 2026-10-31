@@ -18,6 +18,7 @@ A high-performance physics engine for Flutter, powered by [Rapier](https://rapie
 - **High Performance**: Core physics simulation written in Rust.
 - **Flexible Physics**: Support for various rigid body types (Dynamic, Fixed, Kinematic).
 - **Character Controller**: Kinematic character controller supporting auto-stepping, slope sliding, ground snapping, and dynamic body pushing.
+- **Vehicle Controller**: Raycast vehicle controller (`DynamicRayCastVehicleController`) supporting configurable multi-wheel suspension, steering, engine drive, and braking with per-wheel contact query.
 - **Scene Queries**: Raycasting (`castRay`, `castRayAndGetNormal`, `intersectionWithRay`, `intersectionsWithRay`) and shape casting (`castShape`, `intersectionsWithShape`) with filter flags.
 - **Force & Impulse**: Full support for `addForce`, `applyImpulse`, and their `AtPoint` variants.
 - **Velocity Control**: Set linear and angular velocities directly for precise state control.
@@ -37,7 +38,7 @@ Add `rapier_physics` to your `pubspec.yaml` dependencies:
 
 ```yaml
 dependencies:
-  rapier_physics: ^0.5.3
+  rapier_physics: ^0.6.0
 ```
 
 ### Setup
@@ -116,6 +117,7 @@ These demos include:
 4. **Compound Shapes**: Rigid bodies consisting of multiple colliders (e.g., table with four legs).
 5. **Character Controller**: 3D player movement with auto-stepping, slope sliding, and pushing dynamic obstacles.
 6. **Scene Queries**: Raycasting and shape casting with dynamic visualization and hit filtering.
+7. **Raycast Vehicle & Terrain**: 4WD raycast vehicle simulation with suspension physics, steering, throttle, and braking over heightfield terrain (wave, ripple, and loop tracks) with chase camera and on-screen touch controls.
 
 ## Supported Rigid Body Types
 

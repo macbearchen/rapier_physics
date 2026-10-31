@@ -2,6 +2,17 @@
 
 🌐 **Language / 語言**：[English](CHANGELOG.md) | **繁體中文**
 
+## 0.6.0
+#### 2026-10-31
+- **動態射線車輛控制器**：引入 `VehicleController`，封裝 Rapier 的 `DynamicRayCastVehicleController` 以支援擬真的射線車輛物理模擬。
+- **車輪懸吊調校 (`WheelTuning`)**：新增 `WheelTuning` 類別，支援懸吊剛度、壓縮／回彈阻尼、最大懸吊行程、輪胎摩擦力與最大懸吊力等細緻參數，並提供 `WheelTuning.car()` 預設配置。
+- **車輛操控與狀態查詢**：支援各輪獨立轉向 (`setSteering`)、引擎推力 (`setEngineForce`)、煞車 (`setBrake`)，並提供前進速度 (`currentSpeed`) 與各輪詳細物理狀態查詢 (`WheelState`，包含接地狀態、接觸點與法線、車輪中心位置、轉向角與旋轉量）。
+- **高度場地形車輛示範**：在範例專案的 `HeightfieldScene`（示範 7）中新增四輪驅動射線車輛模擬：
+  - 相機鎖定跟隨車輛底盤後方視角。
+  - 整合螢幕觸控控制盤：含可定速鎖定的油門/推力滑桿、左右轉向滑桿與按壓煞車按鈕（煞車時油門自動歸零）。
+  - 支援 WASD / 方向鍵鍵盤駕駛、空白鍵煞車、'R' 鍵重設車輛位置。
+  - 波浪 (wave)、漣漪 (ripple) 與半圓拱形環道 (semi-circle loop) 複合高度場地形。
+
 ## 0.5.3
 #### 2026-08-26
 - **引擎升級**：將底層原生引擎依賴升級至 `rapier3d v0.35.2`（與 `parry3d v0.30.2`）。

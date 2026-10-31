@@ -599,6 +599,136 @@ class RapierBindingsImpl extends RapierBindings {
   bool isCharacterOnCeiling(int ctrl) => web_ffi.rapier_character_controller_is_on_ceiling(ctrl.toJS).toDart;
 
   // ==========================================
+  // Dynamic Ray-Cast Vehicle Controller
+  // ==========================================
+
+  @override
+  int createVehicle(int chassisHandle, int upAxis, int forwardAxis) =>
+      web_ffi.rapier_vehicle_create(chassisHandle.toJS, upAxis.toJS, forwardAxis.toJS).toDartInt;
+
+  @override
+  void destroyVehicle(int vehicle) => web_ffi.rapier_vehicle_destroy(vehicle.toJS);
+
+  @override
+  int addVehicleWheel(
+    int vehicle, {
+    required double connectionX,
+    required double connectionY,
+    required double connectionZ,
+    required double directionX,
+    required double directionY,
+    required double directionZ,
+    required double axleX,
+    required double axleY,
+    required double axleZ,
+    required double suspensionRestLength,
+    required double radius,
+    double suspensionStiffness = 0,
+    double suspensionCompression = 0,
+    double suspensionDamping = 0,
+    double maxSuspensionTravel = 0,
+    double frictionSlip = 0,
+    double maxSuspensionForce = 0,
+  }) =>
+      web_ffi
+          .rapier_vehicle_add_wheel(
+            vehicle.toJS,
+            connectionX.toJS,
+            connectionY.toJS,
+            connectionZ.toJS,
+            directionX.toJS,
+            directionY.toJS,
+            directionZ.toJS,
+            axleX.toJS,
+            axleY.toJS,
+            axleZ.toJS,
+            suspensionRestLength.toJS,
+            radius.toJS,
+            suspensionStiffness.toJS,
+            suspensionCompression.toJS,
+            suspensionDamping.toJS,
+            maxSuspensionTravel.toJS,
+            frictionSlip.toJS,
+            maxSuspensionForce.toJS,
+          )
+          .toDartInt;
+
+  @override
+  int vehicleWheelCount(int vehicle) => web_ffi.rapier_vehicle_wheel_count(vehicle.toJS).toDartInt;
+
+  @override
+  void setVehicleSteering(int vehicle, int wheelIndex, double steering) =>
+      web_ffi.rapier_vehicle_set_steering(vehicle.toJS, wheelIndex.toJS, steering.toJS);
+
+  @override
+  void setVehicleEngineForce(int vehicle, int wheelIndex, double force) =>
+      web_ffi.rapier_vehicle_set_engine_force(vehicle.toJS, wheelIndex.toJS, force.toJS);
+
+  @override
+  void setVehicleBrake(int vehicle, int wheelIndex, double brake) =>
+      web_ffi.rapier_vehicle_set_brake(vehicle.toJS, wheelIndex.toJS, brake.toJS);
+
+  @override
+  void updateVehicle(int world, int vehicle, double dt) =>
+      web_ffi.rapier_vehicle_update(world.toJS, vehicle.toJS, dt.toJS);
+
+  @override
+  double vehicleWheelRotation(int vehicle, int wheelIndex) =>
+      web_ffi.rapier_vehicle_wheel_rotation(vehicle.toJS, wheelIndex.toJS).toDartDouble;
+
+  @override
+  double vehicleWheelSteering(int vehicle, int wheelIndex) =>
+      web_ffi.rapier_vehicle_wheel_steering(vehicle.toJS, wheelIndex.toJS).toDartDouble;
+
+  @override
+  double vehicleWheelSuspensionLength(int vehicle, int wheelIndex) =>
+      web_ffi.rapier_vehicle_wheel_suspension_length(vehicle.toJS, wheelIndex.toJS).toDartDouble;
+
+  @override
+  bool vehicleWheelIsInContact(int vehicle, int wheelIndex) =>
+      web_ffi.rapier_vehicle_wheel_is_in_contact(vehicle.toJS, wheelIndex.toJS).toDart;
+
+  @override
+  Vector3 vehicleWheelCenter(int vehicle, int wheelIndex) {
+    final ptr = web_ffi.rapier_vehicle_wheel_center(vehicle.toJS, wheelIndex.toJS);
+    return Vector3(
+      web_ffi.rapier_vec3_get_x(ptr).toDartDouble,
+      web_ffi.rapier_vec3_get_y(ptr).toDartDouble,
+      web_ffi.rapier_vec3_get_z(ptr).toDartDouble,
+    );
+  }
+
+  @override
+  Vector3 vehicleWheelContactPoint(int vehicle, int wheelIndex) {
+    final ptr = web_ffi.rapier_vehicle_wheel_contact_point(vehicle.toJS, wheelIndex.toJS);
+    return Vector3(
+      web_ffi.rapier_vec3_get_x(ptr).toDartDouble,
+      web_ffi.rapier_vec3_get_y(ptr).toDartDouble,
+      web_ffi.rapier_vec3_get_z(ptr).toDartDouble,
+    );
+  }
+
+  @override
+  Vector3 vehicleWheelContactNormal(int vehicle, int wheelIndex) {
+    final ptr = web_ffi.rapier_vehicle_wheel_contact_normal(vehicle.toJS, wheelIndex.toJS);
+    return Vector3(
+      web_ffi.rapier_vec3_get_x(ptr).toDartDouble,
+      web_ffi.rapier_vec3_get_y(ptr).toDartDouble,
+      web_ffi.rapier_vec3_get_z(ptr).toDartDouble,
+    );
+  }
+
+  @override
+  double vehicleCurrentSpeed(int vehicle) =>
+      web_ffi.rapier_vehicle_current_speed(vehicle.toJS).toDartDouble;
+
+  @override
+  int vehicleWheelGroundObject(int vehicle, int wheelIndex) {
+    final raw = web_ffi.rapier_vehicle_wheel_ground_object(vehicle.toJS, wheelIndex.toJS).toDartInt;
+    return raw == 0xFFFFFFFF ? -1 : raw;
+  }
+
+  // ==========================================
   // Scene Queries (QueryPipeline)
   // ==========================================
 

@@ -15,6 +15,7 @@ part 'collider_bindings.dart';
 part 'joint_bindings.dart';
 part 'character_controller_bindings.dart';
 part 'scene_query_bindings.dart';
+part 'vehicle_controller_bindings.dart';
 
 // Version query is small enough to live directly on the implementation
 // class rather than in its own part file.
@@ -37,7 +38,8 @@ class RapierBindingsImpl extends RapierBindings
         ColliderBindings,
         JointBindings,
         CharacterControllerBindings,
-        SceneQueryBindings {
+        SceneQueryBindings,
+        VehicleControllerBindings {
   late _VersionDart _versionNative;
 
   @override
@@ -52,6 +54,7 @@ class RapierBindingsImpl extends RapierBindings
     initJointBindings();
     initCharacterControllerBindings();
     initSceneQueryBindings();
+    initVehicleControllerBindings();
   }
 
   DynamicLibrary _loadLibrary() {

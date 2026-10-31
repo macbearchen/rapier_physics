@@ -27,10 +27,10 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.8
-  macbear_3d: ^0.9.4
-  vector_math: ^2.4.2
-  material_ui: ^1.1.0
+  cupertino_icons: ^2.0.0
+  macbear_3d: ^0.12.0
+  vector_math: ^2.4.3
+  material_ui: ^1.8.0
   
 dev_dependencies:
   integration_test:

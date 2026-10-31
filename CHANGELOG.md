@@ -2,6 +2,17 @@
 
 🌐 **Language / 語言**：**English** | [繁體中文](CHANGELOG_zh.md)
 
+## 0.6.0
+#### 2026-10-31
+- **Dynamic Raycast Vehicle Controller**: Introduced `VehicleController` wrapping Rapier's `DynamicRayCastVehicleController` for realistic raycast vehicle physics simulation.
+- **Wheel Suspension & Tuning (`WheelTuning`)**: Added `WheelTuning` configuration supporting suspension stiffness, compression/rebound damping, suspension travel, friction slip, and max suspension force, including a `WheelTuning.car()` preset.
+- **Vehicle Controls & State Queries**: Added per-wheel steering (`setSteering`), motor drive force (`setEngineForce`), braking (`setBrake`), forward speed query (`currentSpeed`), and per-wheel physics state queries via `WheelState` (ground contact status, contact point/normal, wheel center position, steering angle, and spin rotation).
+- **3D Vehicle Demo on Heightfield**: Added 4WD raycast vehicle simulation on heightfield terrain in `HeightfieldScene` (Demo 7) with:
+  - Third-person camera tracking that locks behind the vehicle chassis.
+  - On-screen touch control pad with power (throttle lockable) slider, steering slider, and brake button (pressing brake zeroes throttle).
+  - Keyboard driving controls (WASD / Arrow keys, Space for brake, 'R' to reset vehicle).
+  - Wave, ripple, and semi-circular loop terrain heightfield profiles.
+
 ## 0.5.3
 #### 2026-08-26
 - **Engine Upgrade**: Upgraded underlying native engine dependency to `rapier3d v0.35.2` (and `parry3d v0.30.2`).

@@ -9,6 +9,7 @@ import 'demos/double_pendulum.dart';
 import 'demos/newton_cradle.dart';
 import 'demos/character_controller_scene.dart';
 import 'demos/scene_query_scene.dart';
+import 'demos/heightfield_scene.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,11 +21,11 @@ void main() async {
 Future<void> onDidInit() async {
   M3Log.i('main.dart', 'onDidInit');
   final appEngine = M3AppEngine.instance;
-  appEngine.renderEngine.createShadowMap(width: 2048, height: 4096);
+  appEngine.renderEngine.initShadowMap();
 
-  final testScene = BaseScene.createPhysicsScene((physicsSystem) => PhysicsScene(physics: physicsSystem));
+  // final testScene = BaseScene.createPhysicsScene((physicsSystem) => PhysicsScene(physics: physicsSystem));
   // final testScene = BaseScene.createPhysicsScene((physicsSystem) => NewtonCradleScene(physics: physicsSystem));
-  // final testScene = BaseScene();
+  final testScene = BaseScene.createPhysicsScene((physicsSystem) => HeightfieldScene(physics: physicsSystem));
   await appEngine.setScene(testScene);
 }
 
@@ -79,9 +80,9 @@ class _MyAppState extends State<MyApp> {
                 final scene = M3AppEngine.instance.activeScene!;
                 shadowMode = (shadowMode + 1) % 3;
                 if (shadowMode == 0) {
-                  renderOptions.shadows = false;
+                  renderOptions.useShadow = false;
                 } else if (shadowMode == 1) {
-                  renderOptions.shadows = true;
+                  renderOptions.useShadow = true;
                   scene.camera.csmCount = 0;
                   final halfView = 8;
                   final lightViewer = scene.dirLight.lightViewer;
@@ -90,7 +91,7 @@ class _MyAppState extends State<MyApp> {
                   lightViewer.setEuler(pi / 5, -pi / 3, 0, distance: 30); // rotate light
                   lightViewer.refreshProjectionMatrix();
                 } else {
-                  renderOptions.shadows = true;
+                  renderOptions.useShadow = true;
                   scene.camera.csmCount = 4;
                 }
               },
@@ -143,8 +144,10 @@ class _PanelWidgetState extends State<PanelWidget> {
       scene = BaseScene.createPhysicsScene((physicsSystem) => CompoundScene(physics: physicsSystem));
     } else if (index == 4) {
       scene = BaseScene.createPhysicsScene((physicsSystem) => CharacterControllerScene(physics: physicsSystem));
-    } else {
+    } else if (index == 5) {
       scene = BaseScene.createPhysicsScene((physicsSystem) => SceneQueryScene(physics: physicsSystem));
+    } else {
+      scene = BaseScene.createPhysicsScene((physicsSystem) => HeightfieldScene(physics: physicsSystem));
     }
     await M3AppEngine.instance.setScene(scene);
   }
@@ -195,6 +198,13 @@ class _PanelWidgetState extends State<PanelWidget> {
           backgroundColor: _selectedIndex == 5 ? Colors.lightGreen : Colors.grey,
           onPressed: () => _loadScene(5),
           child: const Icon(Icons.filter_6),
+        ),
+        const SizedBox(width: 10),
+        FloatingActionButton(
+          heroTag: 'scene_07',
+          backgroundColor: _selectedIndex == 6 ? Colors.lightGreen : Colors.grey,
+          onPressed: () => _loadScene(6),
+          child: const Icon(Icons.filter_7),
         ),
       ],
     );

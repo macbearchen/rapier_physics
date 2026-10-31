@@ -563,3 +563,121 @@ external JSBoolean rapier_proj_get_is_inside(JSNumber ptr);
 @JS()
 external JSBoolean rapier_proj_get_hit(JSNumber ptr);
 
+// ==========================================
+// Dynamic Ray-Cast Vehicle Controller
+// ==========================================
+
+@JS()
+external JSNumber rapier_vehicle_create(
+  JSNumber chassis,
+  JSNumber upAxis,
+  JSNumber forwardAxis,
+);
+
+@JS()
+external void rapier_vehicle_destroy(JSNumber vehicle);
+
+@JS()
+external JSNumber rapier_vehicle_add_wheel(
+  JSNumber vehicle,
+  JSNumber connX,
+  JSNumber connY,
+  JSNumber connZ,
+  JSNumber dirX,
+  JSNumber dirY,
+  JSNumber dirZ,
+  JSNumber axleX,
+  JSNumber axleY,
+  JSNumber axleZ,
+  JSNumber restLen,
+  JSNumber radius,
+  JSNumber stiff,
+  JSNumber comp,
+  JSNumber damp,
+  JSNumber maxTravel,
+  JSNumber friction,
+  JSNumber maxForce,
+);
+
+@JS()
+external JSNumber rapier_vehicle_wheel_count(JSNumber vehicle);
+
+@JS()
+external void rapier_vehicle_set_steering(
+  JSNumber vehicle,
+  JSNumber wheelIndex,
+  JSNumber steering,
+);
+
+@JS()
+external void rapier_vehicle_set_engine_force(
+  JSNumber vehicle,
+  JSNumber wheelIndex,
+  JSNumber force,
+);
+
+@JS()
+external void rapier_vehicle_set_brake(
+  JSNumber vehicle,
+  JSNumber wheelIndex,
+  JSNumber brake,
+);
+
+@JS()
+external void rapier_vehicle_update(
+  JSNumber world,
+  JSNumber vehicle,
+  JSNumber dt,
+);
+
+@JS()
+external JSNumber rapier_vehicle_wheel_rotation(
+  JSNumber vehicle,
+  JSNumber wheelIndex,
+);
+
+@JS()
+external JSNumber rapier_vehicle_wheel_steering(
+  JSNumber vehicle,
+  JSNumber wheelIndex,
+);
+
+@JS()
+external JSNumber rapier_vehicle_wheel_suspension_length(
+  JSNumber vehicle,
+  JSNumber wheelIndex,
+);
+
+@JS()
+external JSBoolean rapier_vehicle_wheel_is_in_contact(
+  JSNumber vehicle,
+  JSNumber wheelIndex,
+);
+
+@JS()
+external JSNumber rapier_vehicle_wheel_center(
+  JSNumber vehicle,
+  JSNumber wheelIndex,
+);
+
+@JS()
+external JSNumber rapier_vehicle_wheel_contact_point(
+  JSNumber vehicle,
+  JSNumber wheelIndex,
+);
+
+@JS()
+external JSNumber rapier_vehicle_wheel_contact_normal(
+  JSNumber vehicle,
+  JSNumber wheelIndex,
+);
+
+@JS()
+external JSNumber rapier_vehicle_current_speed(JSNumber vehicle);
+
+@JS()
+external JSNumber rapier_vehicle_wheel_ground_object(
+  JSNumber vehicle,
+  JSNumber wheelIndex,
+);
+

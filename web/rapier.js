@@ -397,6 +397,90 @@ window.rapier_proj_get_hit = (ptr) => new DataView(rapier_exports.memory.buffer)
 
 
 // ==========================================
+// Dynamic Ray-Cast Vehicle Controller
+// ==========================================
+
+window.rapier_vehicle_create = (chassis, upAxis, forwardAxis) =>
+    rapier_exports.rapier_vehicle_create(chassis, upAxis, forwardAxis);
+
+window.rapier_vehicle_destroy = (vehicle) =>
+    rapier_exports.rapier_vehicle_destroy(vehicle);
+
+window.rapier_vehicle_add_wheel = (
+    vehicle,
+    connX, connY, connZ,
+    dirX, dirY, dirZ,
+    axleX, axleY, axleZ,
+    restLen, radius,
+    stiff, comp, damp, maxTravel, friction, maxForce
+) =>
+    rapier_exports.rapier_vehicle_add_wheel(
+        vehicle,
+        connX, connY, connZ,
+        dirX, dirY, dirZ,
+        axleX, axleY, axleZ,
+        restLen, radius,
+        stiff, comp, damp, maxTravel, friction, maxForce
+    );
+
+window.rapier_vehicle_wheel_count = (vehicle) =>
+    rapier_exports.rapier_vehicle_wheel_count(vehicle);
+
+window.rapier_vehicle_set_steering = (vehicle, wheelIndex, steering) =>
+    rapier_exports.rapier_vehicle_set_steering(vehicle, wheelIndex, steering);
+
+window.rapier_vehicle_set_engine_force = (vehicle, wheelIndex, force) =>
+    rapier_exports.rapier_vehicle_set_engine_force(vehicle, wheelIndex, force);
+
+window.rapier_vehicle_set_brake = (vehicle, wheelIndex, brake) =>
+    rapier_exports.rapier_vehicle_set_brake(vehicle, wheelIndex, brake);
+
+window.rapier_vehicle_update = (world, vehicle, dt) =>
+    rapier_exports.rapier_vehicle_update(world, vehicle, dt);
+
+window.rapier_vehicle_wheel_rotation = (vehicle, wheelIndex) =>
+    rapier_exports.rapier_vehicle_wheel_rotation(vehicle, wheelIndex);
+
+window.rapier_vehicle_wheel_steering = (vehicle, wheelIndex) =>
+    rapier_exports.rapier_vehicle_wheel_steering(vehicle, wheelIndex);
+
+window.rapier_vehicle_wheel_suspension_length = (vehicle, wheelIndex) =>
+    rapier_exports.rapier_vehicle_wheel_suspension_length(vehicle, wheelIndex);
+
+window.rapier_vehicle_wheel_is_in_contact = (vehicle, wheelIndex) =>
+    rapier_exports.rapier_vehicle_wheel_is_in_contact(vehicle, wheelIndex) !== 0;
+
+window.rapier_vehicle_wheel_center = (vehicle, wheelIndex) => {
+    if (vec3_buffer_ptr === 0) {
+        vec3_buffer_ptr = rapier_exports.rapier_malloc(12);
+    }
+    rapier_exports.rapier_vehicle_wheel_center(vehicle, wheelIndex, vec3_buffer_ptr, vec3_buffer_ptr + 4, vec3_buffer_ptr + 8);
+    return vec3_buffer_ptr;
+};
+
+window.rapier_vehicle_wheel_contact_point = (vehicle, wheelIndex) => {
+    if (vec3_buffer_ptr === 0) {
+        vec3_buffer_ptr = rapier_exports.rapier_malloc(12);
+    }
+    rapier_exports.rapier_vehicle_wheel_contact_point(vehicle, wheelIndex, vec3_buffer_ptr, vec3_buffer_ptr + 4, vec3_buffer_ptr + 8);
+    return vec3_buffer_ptr;
+};
+
+window.rapier_vehicle_wheel_contact_normal = (vehicle, wheelIndex) => {
+    if (vec3_buffer_ptr === 0) {
+        vec3_buffer_ptr = rapier_exports.rapier_malloc(12);
+    }
+    rapier_exports.rapier_vehicle_wheel_contact_normal(vehicle, wheelIndex, vec3_buffer_ptr, vec3_buffer_ptr + 4, vec3_buffer_ptr + 8);
+    return vec3_buffer_ptr;
+};
+
+window.rapier_vehicle_current_speed = (vehicle) =>
+    rapier_exports.rapier_vehicle_current_speed(vehicle);
+
+window.rapier_vehicle_wheel_ground_object = (vehicle, wheelIndex) =>
+    rapier_exports.rapier_vehicle_wheel_ground_object(vehicle, wheelIndex);
+
+// ==========================================
 // Memory Management
 // ==========================================
 

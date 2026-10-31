@@ -57,6 +57,11 @@ class CharacterControllerScene extends BaseScene {
     _buildCharacter();
 
     addBoxes(8);
+    addGround();
+    addWalls(10);
+    addRope(5, Vector3(0, -5, 6));
+    addRope(4, Vector3(0, 0, 5));
+    addRope(3, Vector3(0, 5, 4));
 
     // axis gizmo
     addMesh(M3Resources.axisGizmoMesh, Vector3(0, 0, 0));
