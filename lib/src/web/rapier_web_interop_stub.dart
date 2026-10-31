@@ -43,6 +43,44 @@ void rapier_collider_create_heightfield(
   dynamic sz,
 ) => throw UnsupportedError('Web only');
 
+void rapier_collider_create_convex_hull(
+  dynamic world,
+  dynamic body,
+  dynamic points,
+  dynamic numPoints,
+  dynamic friction,
+  dynamic restitution,
+  dynamic density,
+  dynamic localPositionX,
+  dynamic localPositionY,
+  dynamic localPositionZ,
+  dynamic localRotationX,
+  dynamic localRotationY,
+  dynamic localRotationZ,
+  dynamic localRotationW,
+  dynamic isSensor,
+) => throw UnsupportedError('Web only');
+
+void rapier_collider_create_convex_mesh(
+  dynamic world,
+  dynamic body,
+  dynamic points,
+  dynamic numPoints,
+  dynamic indices,
+  dynamic numIndices,
+  dynamic friction,
+  dynamic restitution,
+  dynamic density,
+  dynamic localPositionX,
+  dynamic localPositionY,
+  dynamic localPositionZ,
+  dynamic localRotationX,
+  dynamic localRotationY,
+  dynamic localRotationZ,
+  dynamic localRotationW,
+  dynamic isSensor,
+) => throw UnsupportedError('Web only');
+
 dynamic rapier_malloc(dynamic size) => throw UnsupportedError('Web only');
 void rapier_free(dynamic ptr, dynamic size) => throw UnsupportedError('Web only');
 

@@ -238,6 +238,61 @@ class RapierBindingsImpl extends RapierBindings {
       .toDartInt;
 
   @override
+  int createConvexHullCollider(
+    int world,
+    int body,
+    Float32List points, {
+    ColliderDesc? desc,
+  }) => web_ffi
+      .rapier_collider_create_convex_hull(
+        world.toJS,
+        body.toJS,
+        points.toJS,
+        (points.length ~/ 3).toJS,
+        (desc?.friction ?? 0.5).toJS,
+        (desc?.restitution ?? 0.0).toJS,
+        (desc?.density ?? 1.0).toJS,
+        (desc?.localPosition.x ?? 0.0).toJS,
+        (desc?.localPosition.y ?? 0.0).toJS,
+        (desc?.localPosition.z ?? 0.0).toJS,
+        (desc?.localRotation.x ?? 0.0).toJS,
+        (desc?.localRotation.y ?? 0.0).toJS,
+        (desc?.localRotation.z ?? 0.0).toJS,
+        (desc?.localRotation.w ?? 1.0).toJS,
+        (desc?.isSensor ?? false).toJS,
+      )
+      .toDartInt;
+
+  @override
+  int createConvexMeshCollider(
+    int world,
+    int body,
+    Float32List points,
+    Uint32List indices, {
+    ColliderDesc? desc,
+  }) => web_ffi
+      .rapier_collider_create_convex_mesh(
+        world.toJS,
+        body.toJS,
+        points.toJS,
+        (points.length ~/ 3).toJS,
+        indices.toJS,
+        indices.length.toJS,
+        (desc?.friction ?? 0.5).toJS,
+        (desc?.restitution ?? 0.0).toJS,
+        (desc?.density ?? 1.0).toJS,
+        (desc?.localPosition.x ?? 0.0).toJS,
+        (desc?.localPosition.y ?? 0.0).toJS,
+        (desc?.localPosition.z ?? 0.0).toJS,
+        (desc?.localRotation.x ?? 0.0).toJS,
+        (desc?.localRotation.y ?? 0.0).toJS,
+        (desc?.localRotation.z ?? 0.0).toJS,
+        (desc?.localRotation.w ?? 1.0).toJS,
+        (desc?.isSensor ?? false).toJS,
+      )
+      .toDartInt;
+
+  @override
   void removeCollider(int world, int handle) => web_ffi.rapier_collider_remove(world.toJS, handle.toJS);
 
   @override

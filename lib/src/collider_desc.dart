@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'rapier_world.dart';
 
 // dart format off
@@ -10,6 +11,8 @@ enum ColliderShapeType {
   capsuleY,
   capsuleZ,
   heightfield,
+  convexHull,
+  convexMesh,
 }
 // dart format on
 
@@ -20,6 +23,8 @@ class ColliderDesc {
   double hx = 0, hy = 0, hz = 0; // cuboid (half-extents)
   double radius = 0; // ball, cylinder, cone, capsule
   double halfHeight = 0; // cylinder, cone, capsule
+  Float32List? points; // convexHull / convexMesh: flat [x, y, z, ...] points
+  Uint32List? indices; // convexMesh: flat triangle indices [i0, i1, i2, ...]
 
   // Common properties
   Vector3 localPosition = Vector3.zero();
@@ -37,4 +42,6 @@ class ColliderDesc {
   ColliderDesc.capsuleX({required this.radius, required this.halfHeight}) : shapeType = ColliderShapeType.capsuleX;
   ColliderDesc.capsuleY({required this.radius, required this.halfHeight}) : shapeType = ColliderShapeType.capsuleY;
   ColliderDesc.capsuleZ({required this.radius, required this.halfHeight}) : shapeType = ColliderShapeType.capsuleZ;
+  ColliderDesc.convexHull(this.points) : shapeType = ColliderShapeType.convexHull;
+  ColliderDesc.convexMesh({required this.points, required this.indices}) : shapeType = ColliderShapeType.convexMesh;
 }

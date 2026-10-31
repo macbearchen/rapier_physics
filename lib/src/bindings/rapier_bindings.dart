@@ -65,6 +65,19 @@ abstract class RapierBindings {
     double sy,
     double sz,
   );
+  int createConvexHullCollider(
+    int world,
+    int body,
+    Float32List points, {
+    ColliderDesc? desc,
+  });
+  int createConvexMeshCollider(
+    int world,
+    int body,
+    Float32List points,
+    Uint32List indices, {
+    ColliderDesc? desc,
+  });
   void removeCollider(int world, int handle);
 
   Vector3 getColliderPosition(int world, int handle);

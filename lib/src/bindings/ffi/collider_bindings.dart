@@ -8,6 +8,10 @@ typedef _GetFloatC = Float Function(Pointer<Void>, Uint32);
 typedef _CreateColliderC = Uint32 Function(Pointer<Void>, Uint32, Pointer<_ColliderDesc>);
 typedef _CreateHeightfieldColliderC =
     Uint32 Function(Pointer<Void>, Uint32, Pointer<Float>, Size, Size, Float, Float, Float);
+typedef _CreateConvexHullColliderC =
+    Uint32 Function(Pointer<Void>, Uint32, Pointer<Float>, Size, Pointer<_ColliderDesc>);
+typedef _CreateConvexMeshColliderC =
+    Uint32 Function(Pointer<Void>, Uint32, Pointer<Float>, Size, Pointer<Uint32>, Size, Pointer<_ColliderDesc>);
 typedef _SetColliderFrictionC = Void Function(Pointer<Void>, Uint32, Float);
 typedef _SetColliderRestitutionC = Void Function(Pointer<Void>, Uint32, Float);
 typedef _SetColliderDensityC = Void Function(Pointer<Void>, Uint32, Float);
@@ -21,6 +25,10 @@ typedef _GetFloatDart = double Function(Pointer<Void>, int);
 typedef _CreateColliderDart = int Function(Pointer<Void>, int, Pointer<_ColliderDesc>);
 typedef _CreateHeightfieldColliderDart =
     int Function(Pointer<Void>, int, Pointer<Float>, int, int, double, double, double);
+typedef _CreateConvexHullColliderDart =
+    int Function(Pointer<Void>, int, Pointer<Float>, int, Pointer<_ColliderDesc>);
+typedef _CreateConvexMeshColliderDart =
+    int Function(Pointer<Void>, int, Pointer<Float>, int, Pointer<Uint32>, int, Pointer<_ColliderDesc>);
 typedef _SetColliderFrictionDart = void Function(Pointer<Void>, int, double);
 typedef _SetColliderRestitutionDart = void Function(Pointer<Void>, int, double);
 typedef _SetColliderDensityDart = void Function(Pointer<Void>, int, double);
@@ -32,6 +40,8 @@ typedef _SetColliderRotationDart = void Function(Pointer<Void>, int, double, dou
 mixin ColliderBindings on FfiBindingsBase {
   late _CreateColliderDart _createColliderNative;
   late _CreateHeightfieldColliderDart _createHeightfieldColliderNative;
+  late _CreateConvexHullColliderDart _createConvexHullColliderNative;
+  late _CreateConvexMeshColliderDart _createConvexMeshColliderNative;
   late _WakeBodyDart _removeColliderNative;
   late _GetVec3Dart _getColliderPositionNative;
   late _GetQuatDart _getColliderRotationNative;
@@ -49,6 +59,14 @@ mixin ColliderBindings on FfiBindingsBase {
     _createHeightfieldColliderNative = dylib
         .lookupFunction<_CreateHeightfieldColliderC, _CreateHeightfieldColliderDart>(
           'rapier_collider_create_heightfield',
+        );
+    _createConvexHullColliderNative = dylib
+        .lookupFunction<_CreateConvexHullColliderC, _CreateConvexHullColliderDart>(
+          'rapier_collider_create_convex_hull',
+        );
+    _createConvexMeshColliderNative = dylib
+        .lookupFunction<_CreateConvexMeshColliderC, _CreateConvexMeshColliderDart>(
+          'rapier_collider_create_convex_mesh',
         );
     _removeColliderNative = dylib.lookupFunction<_WakeBodyC, _WakeBodyDart>('rapier_collider_remove');
     _getColliderPositionNative = dylib.lookupFunction<_GetVec3C, _GetVec3Dart>('rapier_collider_get_position');
@@ -117,6 +135,108 @@ mixin ColliderBindings on FfiBindingsBase {
       sz,
     );
     calloc.free(pointer);
+    return handle;
+  }
+
+  int createConvexHullCollider(
+    int world,
+    int body,
+    Float32List points, {
+    ColliderDesc? desc,
+  }) {
+    final pointer = calloc<Float>(points.length);
+    pointer.asTypedList(points.length).setAll(0, points);
+
+    Pointer<_ColliderDesc> nativeDesc = nullptr;
+    if (desc != null) {
+      nativeDesc = calloc<_ColliderDesc>();
+      nativeDesc.ref.shapeType = desc.shapeType.index;
+      nativeDesc.ref.hx = desc.hx;
+      nativeDesc.ref.hy = desc.hy;
+      nativeDesc.ref.hz = desc.hz;
+      nativeDesc.ref.radius = desc.radius;
+      nativeDesc.ref.halfHeight = desc.halfHeight;
+      nativeDesc.ref.friction = desc.friction;
+      nativeDesc.ref.restitution = desc.restitution;
+      nativeDesc.ref.density = desc.density;
+      nativeDesc.ref.localPositionX = desc.localPosition.x;
+      nativeDesc.ref.localPositionY = desc.localPosition.y;
+      nativeDesc.ref.localPositionZ = desc.localPosition.z;
+      nativeDesc.ref.localRotationX = desc.localRotation.x;
+      nativeDesc.ref.localRotationY = desc.localRotation.y;
+      nativeDesc.ref.localRotationZ = desc.localRotation.z;
+      nativeDesc.ref.localRotationW = desc.localRotation.w;
+      nativeDesc.ref.isSensor = desc.isSensor;
+    }
+
+    final numPoints = points.length ~/ 3;
+    final handle = _createConvexHullColliderNative(
+      Pointer<Void>.fromAddress(world),
+      body,
+      pointer,
+      numPoints,
+      nativeDesc,
+    );
+
+    calloc.free(pointer);
+    if (nativeDesc != nullptr) {
+      calloc.free(nativeDesc);
+    }
+    return handle;
+  }
+
+  int createConvexMeshCollider(
+    int world,
+    int body,
+    Float32List points,
+    Uint32List indices, {
+    ColliderDesc? desc,
+  }) {
+    final ptsPointer = calloc<Float>(points.length);
+    ptsPointer.asTypedList(points.length).setAll(0, points);
+
+    final idxPointer = calloc<Uint32>(indices.length);
+    idxPointer.asTypedList(indices.length).setAll(0, indices);
+
+    Pointer<_ColliderDesc> nativeDesc = nullptr;
+    if (desc != null) {
+      nativeDesc = calloc<_ColliderDesc>();
+      nativeDesc.ref.shapeType = desc.shapeType.index;
+      nativeDesc.ref.hx = desc.hx;
+      nativeDesc.ref.hy = desc.hy;
+      nativeDesc.ref.hz = desc.hz;
+      nativeDesc.ref.radius = desc.radius;
+      nativeDesc.ref.halfHeight = desc.halfHeight;
+      nativeDesc.ref.friction = desc.friction;
+      nativeDesc.ref.restitution = desc.restitution;
+      nativeDesc.ref.density = desc.density;
+      nativeDesc.ref.localPositionX = desc.localPosition.x;
+      nativeDesc.ref.localPositionY = desc.localPosition.y;
+      nativeDesc.ref.localPositionZ = desc.localPosition.z;
+      nativeDesc.ref.localRotationX = desc.localRotation.x;
+      nativeDesc.ref.localRotationY = desc.localRotation.y;
+      nativeDesc.ref.localRotationZ = desc.localRotation.z;
+      nativeDesc.ref.localRotationW = desc.localRotation.w;
+      nativeDesc.ref.isSensor = desc.isSensor;
+    }
+
+    final numPoints = points.length ~/ 3;
+    final numIndices = indices.length;
+    final handle = _createConvexMeshColliderNative(
+      Pointer<Void>.fromAddress(world),
+      body,
+      ptsPointer,
+      numPoints,
+      idxPointer,
+      numIndices,
+      nativeDesc,
+    );
+
+    calloc.free(ptsPointer);
+    calloc.free(idxPointer);
+    if (nativeDesc != nullptr) {
+      calloc.free(nativeDesc);
+    }
     return handle;
   }
 

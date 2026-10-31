@@ -77,6 +77,123 @@ pub extern "C" fn rapier_collider_create_heightfield(
 }
 
 #[no_mangle]
+pub extern "C" fn rapier_collider_create_convex_hull(
+    world: *mut RapierWorld,
+    body_handle: u32,
+    points: *const f32,
+    num_points: usize,
+    desc: *const ColliderDesc,
+) -> u32 {
+    let world = unsafe { &mut *world };
+    let body_handle = RigidBodyHandle::from_raw_parts(body_handle, 0);
+
+    let pts_slice = unsafe { std::slice::from_raw_parts(points, num_points * 3) };
+    let mut pts = Vec::with_capacity(num_points);
+    for i in 0..num_points {
+        let x = pts_slice[i * 3];
+        let y = pts_slice[i * 3 + 1];
+        let z = pts_slice[i * 3 + 2];
+        pts.push(Vector::new(x, y, z));
+    }
+
+    if let Some(mut builder) = ColliderBuilder::convex_hull(&pts) {
+        if !desc.is_null() {
+            let d = unsafe { &*desc };
+            builder = builder
+                .friction(d.friction)
+                .restitution(d.restitution)
+                .density(d.density)
+                .sensor(d.is_sensor)
+                .position(
+                    Isometry::from_parts(
+                        Translation::new(d.local_position_x, d.local_position_y, d.local_position_z),
+                        rapier3d::prelude::Rotation::from_xyzw(
+                            d.local_rotation_x,
+                            d.local_rotation_y,
+                            d.local_rotation_z,
+                            d.local_rotation_w,
+                        )
+                        .into(),
+                    )
+                    .into(),
+                );
+        }
+        let collider = builder.build();
+        let handle = world
+            .colliders
+            .insert_with_parent(collider, body_handle, &mut world.bodies);
+        handle.into_raw_parts().0
+    } else {
+        u32::MAX
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn rapier_collider_create_convex_mesh(
+    world: *mut RapierWorld,
+    body_handle: u32,
+    points: *const f32,
+    num_points: usize,
+    indices: *const u32,
+    num_indices: usize,
+    desc: *const ColliderDesc,
+) -> u32 {
+    let world = unsafe { &mut *world };
+    let body_handle = RigidBodyHandle::from_raw_parts(body_handle, 0);
+
+    let pts_slice = unsafe { std::slice::from_raw_parts(points, num_points * 3) };
+    let mut pts = Vec::with_capacity(num_points);
+    for i in 0..num_points {
+        let x = pts_slice[i * 3];
+        let y = pts_slice[i * 3 + 1];
+        let z = pts_slice[i * 3 + 2];
+        pts.push(Vector::new(x, y, z));
+    }
+
+    let num_triangles = num_indices / 3;
+    let idx_slice = unsafe { std::slice::from_raw_parts(indices, num_indices) };
+    let mut idx_triangles = Vec::with_capacity(num_triangles);
+    for i in 0..num_triangles {
+        idx_triangles.push([
+            idx_slice[i * 3],
+            idx_slice[i * 3 + 1],
+            idx_slice[i * 3 + 2],
+        ]);
+    }
+
+    if let Some(mut builder) = ColliderBuilder::convex_mesh(pts, &idx_triangles) {
+        if !desc.is_null() {
+            let d = unsafe { &*desc };
+            builder = builder
+                .friction(d.friction)
+                .restitution(d.restitution)
+                .density(d.density)
+                .sensor(d.is_sensor)
+                .position(
+                    Isometry::from_parts(
+                        Translation::new(d.local_position_x, d.local_position_y, d.local_position_z),
+                        rapier3d::prelude::Rotation::from_xyzw(
+                            d.local_rotation_x,
+                            d.local_rotation_y,
+                            d.local_rotation_z,
+                            d.local_rotation_w,
+                        )
+                        .into(),
+                    )
+                    .into(),
+                );
+        }
+        let collider = builder.build();
+        let handle = world
+            .colliders
+            .insert_with_parent(collider, body_handle, &mut world.bodies);
+        handle.into_raw_parts().0
+    } else {
+        u32::MAX
+    }
+}
+
+#[no_mangle]
 pub extern "C" fn rapier_collider_remove(world: *mut RapierWorld, handle: u32) {
     let world = unsafe { &mut *world };
     let handle = ColliderHandle::from_raw_parts(handle, 0);

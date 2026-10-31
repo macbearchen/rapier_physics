@@ -117,6 +117,23 @@ class RapierBindingsImpl extends RapierBindings {
   ) => throw UnsupportedError('Stub');
 
   @override
+  int createConvexHullCollider(
+    int world,
+    int body,
+    Float32List points, {
+    ColliderDesc? desc,
+  }) => throw UnsupportedError('Stub');
+
+  @override
+  int createConvexMeshCollider(
+    int world,
+    int body,
+    Float32List points,
+    Uint32List indices, {
+    ColliderDesc? desc,
+  }) => throw UnsupportedError('Stub');
+
+  @override
   void removeCollider(int world, int handle) => throw UnsupportedError('Stub');
 
   @override

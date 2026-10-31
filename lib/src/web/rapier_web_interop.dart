@@ -65,6 +65,46 @@ external JSNumber rapier_collider_create_heightfield(
 );
 
 @JS()
+external JSNumber rapier_collider_create_convex_hull(
+  JSNumber world,
+  JSNumber body,
+  JSFloat32Array points,
+  JSNumber numPoints,
+  JSNumber friction,
+  JSNumber restitution,
+  JSNumber density,
+  JSNumber localPositionX,
+  JSNumber localPositionY,
+  JSNumber localPositionZ,
+  JSNumber localRotationX,
+  JSNumber localRotationY,
+  JSNumber localRotationZ,
+  JSNumber localRotationW,
+  JSBoolean isSensor,
+);
+
+@JS()
+external JSNumber rapier_collider_create_convex_mesh(
+  JSNumber world,
+  JSNumber body,
+  JSFloat32Array points,
+  JSNumber numPoints,
+  JSUint32Array indices,
+  JSNumber numIndices,
+  JSNumber friction,
+  JSNumber restitution,
+  JSNumber density,
+  JSNumber localPositionX,
+  JSNumber localPositionY,
+  JSNumber localPositionZ,
+  JSNumber localRotationX,
+  JSNumber localRotationY,
+  JSNumber localRotationZ,
+  JSNumber localRotationW,
+  JSBoolean isSensor,
+);
+
+@JS()
 external JSNumber rapier_malloc(JSNumber size);
 
 @JS()

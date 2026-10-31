@@ -55,6 +55,8 @@ struct ColliderDesc {
 
 @_silgen_name("rapier_collider_create") @discardableResult func rapier_collider_create(_ world: UnsafeMutableRawPointer?, _ body: UInt32, _ desc: UnsafePointer<ColliderDesc>?) -> UInt32
 @_silgen_name("rapier_collider_create_heightfield") @discardableResult func rapier_collider_create_heightfield(_ world: UnsafeMutableRawPointer?, _ body: UInt32, _ heights: UnsafePointer<Float>?, _ nrows: Int, _ ncols: Int, _ sx: Float, _ sy: Float, _ sz: Float) -> UInt32
+@_silgen_name("rapier_collider_create_convex_hull") @discardableResult func rapier_collider_create_convex_hull(_ world: UnsafeMutableRawPointer?, _ body: UInt32, _ points: UnsafePointer<Float>?, _ numPoints: Int, _ desc: UnsafePointer<ColliderDesc>?) -> UInt32
+@_silgen_name("rapier_collider_create_convex_mesh") @discardableResult func rapier_collider_create_convex_mesh(_ world: UnsafeMutableRawPointer?, _ body: UInt32, _ points: UnsafePointer<Float>?, _ numPoints: Int, _ indices: UnsafePointer<UInt32>?, _ numIndices: Int, _ desc: UnsafePointer<ColliderDesc>?) -> UInt32
 @_silgen_name("rapier_collider_remove") func rapier_collider_remove(_ world: UnsafeMutableRawPointer?, _ handle: UInt32) -> Void
 
 @_silgen_name("rapier_collider_get_friction") @discardableResult func rapier_collider_get_friction(_ world: UnsafeMutableRawPointer?, _ handle: UInt32) -> Float
@@ -198,6 +200,8 @@ public class RapierPhysicsPlugin: NSObject, FlutterPlugin {
         // --- Collider ---
         rapier_collider_create(dummyWorld, 0, nil)
         rapier_collider_create_heightfield(dummyWorld, 0, nil, 0, 0, 0, 0, 0)
+        rapier_collider_create_convex_hull(dummyWorld, 0, nil, 0, nil)
+        rapier_collider_create_convex_mesh(dummyWorld, 0, nil, 0, nil, 0, nil)
         rapier_collider_get_position(dummyWorld, 0)
         rapier_collider_get_rotation(dummyWorld, 0)
         rapier_collider_get_friction(dummyWorld, 0)

@@ -134,6 +134,90 @@ window.rapier_collider_create_heightfield = (world, body, heights, nrows, ncols,
     return handle;
 };
 
+window.rapier_collider_create_convex_hull = (world, body, points, numPoints, friction, restitution, density, px, py, pz, rx, ry, rz, rw, isSensor) => {
+    const pointsLen = numPoints * 3;
+    const pointsSize = pointsLen * 4;
+    const pointsPtr = rapier_exports.rapier_malloc(pointsSize);
+    const heap = new Float32Array(rapier_exports.memory.buffer, pointsPtr, pointsLen);
+    heap.set(points);
+
+    let descPtr = 0;
+    const descSize = 68;
+    if (friction !== undefined && friction !== null) {
+        descPtr = rapier_exports.rapier_malloc(descSize);
+        const view = new DataView(rapier_exports.memory.buffer);
+        view.setUint32(descPtr + 0, 7, true); // shape_type convex_hull
+        view.setFloat32(descPtr + 4, 0, true);
+        view.setFloat32(descPtr + 8, 0, true);
+        view.setFloat32(descPtr + 12, 0, true);
+        view.setFloat32(descPtr + 16, 0, true);
+        view.setFloat32(descPtr + 20, 0, true);
+        view.setFloat32(descPtr + 24, friction ?? 0.5, true);
+        view.setFloat32(descPtr + 28, restitution ?? 0.0, true);
+        view.setFloat32(descPtr + 32, density ?? 1.0, true);
+        view.setFloat32(descPtr + 36, px ?? 0.0, true);
+        view.setFloat32(descPtr + 40, py ?? 0.0, true);
+        view.setFloat32(descPtr + 44, pz ?? 0.0, true);
+        view.setFloat32(descPtr + 48, rx ?? 0.0, true);
+        view.setFloat32(descPtr + 52, ry ?? 0.0, true);
+        view.setFloat32(descPtr + 56, rz ?? 0.0, true);
+        view.setFloat32(descPtr + 60, rw ?? 1.0, true);
+        view.setUint8(descPtr + 64, isSensor ? 1 : 0);
+    }
+
+    const handle = rapier_exports.rapier_collider_create_convex_hull(world, body, pointsPtr, numPoints, descPtr);
+    rapier_exports.rapier_free(pointsPtr, pointsSize);
+    if (descPtr !== 0) {
+        rapier_exports.rapier_free(descPtr, descSize);
+    }
+    return handle;
+};
+
+window.rapier_collider_create_convex_mesh = (world, body, points, numPoints, indices, numIndices, friction, restitution, density, px, py, pz, rx, ry, rz, rw, isSensor) => {
+    const pointsLen = numPoints * 3;
+    const pointsSize = pointsLen * 4;
+    const pointsPtr = rapier_exports.rapier_malloc(pointsSize);
+    const ptsHeap = new Float32Array(rapier_exports.memory.buffer, pointsPtr, pointsLen);
+    ptsHeap.set(points);
+
+    const indicesSize = numIndices * 4;
+    const indicesPtr = rapier_exports.rapier_malloc(indicesSize);
+    const idxHeap = new Uint32Array(rapier_exports.memory.buffer, indicesPtr, numIndices);
+    idxHeap.set(indices);
+
+    let descPtr = 0;
+    const descSize = 68;
+    if (friction !== undefined && friction !== null) {
+        descPtr = rapier_exports.rapier_malloc(descSize);
+        const view = new DataView(rapier_exports.memory.buffer);
+        view.setUint32(descPtr + 0, 8, true); // shape_type convex_mesh
+        view.setFloat32(descPtr + 4, 0, true);
+        view.setFloat32(descPtr + 8, 0, true);
+        view.setFloat32(descPtr + 12, 0, true);
+        view.setFloat32(descPtr + 16, 0, true);
+        view.setFloat32(descPtr + 20, 0, true);
+        view.setFloat32(descPtr + 24, friction ?? 0.5, true);
+        view.setFloat32(descPtr + 28, restitution ?? 0.0, true);
+        view.setFloat32(descPtr + 32, density ?? 1.0, true);
+        view.setFloat32(descPtr + 36, px ?? 0.0, true);
+        view.setFloat32(descPtr + 40, py ?? 0.0, true);
+        view.setFloat32(descPtr + 44, pz ?? 0.0, true);
+        view.setFloat32(descPtr + 48, rx ?? 0.0, true);
+        view.setFloat32(descPtr + 52, ry ?? 0.0, true);
+        view.setFloat32(descPtr + 56, rz ?? 0.0, true);
+        view.setFloat32(descPtr + 60, rw ?? 1.0, true);
+        view.setUint8(descPtr + 64, isSensor ? 1 : 0);
+    }
+
+    const handle = rapier_exports.rapier_collider_create_convex_mesh(world, body, pointsPtr, numPoints, indicesPtr, numIndices, descPtr);
+    rapier_exports.rapier_free(pointsPtr, pointsSize);
+    rapier_exports.rapier_free(indicesPtr, indicesSize);
+    if (descPtr !== 0) {
+        rapier_exports.rapier_free(descPtr, descSize);
+    }
+    return handle;
+};
+
 window.rapier_collider_get_position = (world, handle) => {
     if (vec3_buffer_ptr === 0) {
         vec3_buffer_ptr = rapier_exports.rapier_malloc(12);

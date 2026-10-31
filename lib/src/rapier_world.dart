@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'dart:typed_data';
 import 'package:rapier_physics/src/collider_desc.dart';
 
 import 'bindings/rapier_bindings.dart';
@@ -157,11 +157,36 @@ class RapierWorld {
     return body;
   }
 
+  /// Adds a rigid body with a convex hull collider formed by [points].
+  RigidBody addConvexHull({required Float32List points, RigidBodyDesc? desc, ColliderDesc? colliderDesc}) {
+    final body = createRigidBody(desc ?? RigidBodyDesc.dynamic());
+    createConvexHullCollider(body, points, desc: colliderDesc);
+    return body;
+  }
+
+  /// Adds a rigid body with a convex mesh collider formed by [points] and [indices].
+  RigidBody addConvexMesh({
+    required Float32List points,
+    required Uint32List indices,
+    RigidBodyDesc? desc,
+    ColliderDesc? colliderDesc,
+  }) {
+    final body = createRigidBody(desc ?? RigidBodyDesc.dynamic());
+    createConvexMeshCollider(body, points, indices, desc: colliderDesc);
+    return body;
+  }
+
   //--------------------------
   // create collider by shape type
   //--------------------------
 
   Collider createCollider(RigidBody body, ColliderDesc desc) {
+    if (desc.shapeType == ColliderShapeType.convexHull && desc.points != null) {
+      return createConvexHullCollider(body, desc.points!, desc: desc);
+    }
+    if (desc.shapeType == ColliderShapeType.convexMesh && desc.points != null && desc.indices != null) {
+      return createConvexMeshCollider(body, desc.points!, desc.indices!, desc: desc);
+    }
     final handle = bindings.createCollider(_worldHandle, body.handle, desc);
     final collider = Collider(handle, body);
     _registerCollider(collider);
@@ -182,6 +207,63 @@ class RapierWorld {
     final collider = HeightfieldCollider(handle, body);
     _registerCollider(collider);
     return collider;
+  }
+
+  /// Creates a convex hull collider attached to [body] from flat [points] (`[x0, y0, z0, x1, y1, z1, ...]`).
+  Collider createConvexHullCollider(RigidBody body, Float32List points, {ColliderDesc? desc}) {
+    final handle = bindings.createConvexHullCollider(_worldHandle, body.handle, points, desc: desc);
+    if (handle == 0xFFFFFFFF) {
+      throw StateError('Failed to compute convex hull from points.');
+    }
+    final collider = Collider(handle, body);
+    _registerCollider(collider);
+    return collider;
+  }
+
+  /// Convenience method to create a convex hull collider from a list of [Vector3] points.
+  Collider createConvexHull(RigidBody body, List<Vector3> points, {ColliderDesc? desc}) {
+    final flat = Float32List(points.length * 3);
+    for (int i = 0; i < points.length; i++) {
+      final p = points[i];
+      flat[i * 3] = p.x;
+      flat[i * 3 + 1] = p.y;
+      flat[i * 3 + 2] = p.z;
+    }
+    return createConvexHullCollider(body, flat, desc: desc);
+  }
+
+  /// Creates a convex mesh collider attached to [body] from flat [points] and triangle [indices].
+  Collider createConvexMeshCollider(
+    RigidBody body,
+    Float32List points,
+    Uint32List indices, {
+    ColliderDesc? desc,
+  }) {
+    final handle = bindings.createConvexMeshCollider(_worldHandle, body.handle, points, indices, desc: desc);
+    if (handle == 0xFFFFFFFF) {
+      throw StateError('Failed to create convex mesh collider from points and indices.');
+    }
+    final collider = Collider(handle, body);
+    _registerCollider(collider);
+    return collider;
+  }
+
+  /// Convenience method to create a convex mesh collider from a list of [Vector3] points and triangle indices.
+  Collider createConvexMesh(
+    RigidBody body,
+    List<Vector3> points,
+    List<int> indices, {
+    ColliderDesc? desc,
+  }) {
+    final flatPts = Float32List(points.length * 3);
+    for (int i = 0; i < points.length; i++) {
+      final p = points[i];
+      flatPts[i * 3] = p.x;
+      flatPts[i * 3 + 1] = p.y;
+      flatPts[i * 3 + 2] = p.z;
+    }
+    final flatIdx = Uint32List.fromList(indices);
+    return createConvexMeshCollider(body, flatPts, flatIdx, desc: desc);
   }
 
   //--------------------------
