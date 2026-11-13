@@ -114,6 +114,25 @@ struct Quat {
 @_silgen_name("rapier_character_controller_is_on_wall") @discardableResult func rapier_character_controller_is_on_wall(_ ctrl: UnsafeMutableRawPointer?) -> Bool
 @_silgen_name("rapier_character_controller_is_on_ceiling") @discardableResult func rapier_character_controller_is_on_ceiling(_ ctrl: UnsafeMutableRawPointer?) -> Bool
 
+// --- Vehicle Controller ---
+@_silgen_name("rapier_vehicle_create") @discardableResult func rapier_vehicle_create(_ chassis: UInt32, _ upAxis: UInt32, _ fwdAxis: UInt32) -> UnsafeMutableRawPointer?
+@_silgen_name("rapier_vehicle_destroy") func rapier_vehicle_destroy(_ vehicle: UnsafeMutableRawPointer?) -> Void
+@_silgen_name("rapier_vehicle_add_wheel") @discardableResult func rapier_vehicle_add_wheel(_ vehicle: UnsafeMutableRawPointer?, _ cx: Float, _ cy: Float, _ cz: Float, _ dx: Float, _ dy: Float, _ dz: Float, _ ax: Float, _ ay: Float, _ az: Float, _ restLen: Float, _ radius: Float, _ stiff: Float, _ comp: Float, _ damp: Float, _ maxTravel: Float, _ friction: Float, _ maxForce: Float) -> UInt32
+@_silgen_name("rapier_vehicle_wheel_count") @discardableResult func rapier_vehicle_wheel_count(_ vehicle: UnsafeMutableRawPointer?) -> UInt32
+@_silgen_name("rapier_vehicle_set_steering") func rapier_vehicle_set_steering(_ vehicle: UnsafeMutableRawPointer?, _ wheel: UInt32, _ v: Float) -> Void
+@_silgen_name("rapier_vehicle_set_engine_force") func rapier_vehicle_set_engine_force(_ vehicle: UnsafeMutableRawPointer?, _ wheel: UInt32, _ v: Float) -> Void
+@_silgen_name("rapier_vehicle_set_brake") func rapier_vehicle_set_brake(_ vehicle: UnsafeMutableRawPointer?, _ wheel: UInt32, _ v: Float) -> Void
+@_silgen_name("rapier_vehicle_update") func rapier_vehicle_update(_ world: UnsafeMutableRawPointer?, _ vehicle: UnsafeMutableRawPointer?, _ dt: Float) -> Void
+@_silgen_name("rapier_vehicle_wheel_rotation") @discardableResult func rapier_vehicle_wheel_rotation(_ vehicle: UnsafeMutableRawPointer?, _ wheel: UInt32) -> Float
+@_silgen_name("rapier_vehicle_wheel_steering") @discardableResult func rapier_vehicle_wheel_steering(_ vehicle: UnsafeMutableRawPointer?, _ wheel: UInt32) -> Float
+@_silgen_name("rapier_vehicle_wheel_suspension_length") @discardableResult func rapier_vehicle_wheel_suspension_length(_ vehicle: UnsafeMutableRawPointer?, _ wheel: UInt32) -> Float
+@_silgen_name("rapier_vehicle_wheel_is_in_contact") @discardableResult func rapier_vehicle_wheel_is_in_contact(_ vehicle: UnsafeMutableRawPointer?, _ wheel: UInt32) -> Bool
+@_silgen_name("rapier_vehicle_wheel_center") func rapier_vehicle_wheel_center(_ vehicle: UnsafeMutableRawPointer?, _ wheel: UInt32, _ ox: UnsafeMutablePointer<Float>?, _ oy: UnsafeMutablePointer<Float>?, _ oz: UnsafeMutablePointer<Float>?) -> Void
+@_silgen_name("rapier_vehicle_wheel_contact_point") func rapier_vehicle_wheel_contact_point(_ vehicle: UnsafeMutableRawPointer?, _ wheel: UInt32, _ ox: UnsafeMutablePointer<Float>?, _ oy: UnsafeMutablePointer<Float>?, _ oz: UnsafeMutablePointer<Float>?) -> Void
+@_silgen_name("rapier_vehicle_wheel_contact_normal") func rapier_vehicle_wheel_contact_normal(_ vehicle: UnsafeMutableRawPointer?, _ wheel: UInt32, _ ox: UnsafeMutablePointer<Float>?, _ oy: UnsafeMutablePointer<Float>?, _ oz: UnsafeMutablePointer<Float>?) -> Void
+@_silgen_name("rapier_vehicle_current_speed") @discardableResult func rapier_vehicle_current_speed(_ vehicle: UnsafeMutableRawPointer?) -> Float
+@_silgen_name("rapier_vehicle_wheel_ground_object") @discardableResult func rapier_vehicle_wheel_ground_object(_ vehicle: UnsafeMutableRawPointer?, _ wheel: UInt32) -> UInt32
+
 // --- Scene Queries ---
 struct RayIntersectionC {
     var collider_handle: UInt32
@@ -247,6 +266,25 @@ public class RapierPhysicsPlugin: NSObject, FlutterPlugin {
         rapier_world_project_point(dummyWorld, 0, 0, 0, false, 0, 0)
         rapier_world_intersections_with_point(dummyWorld, 0, 0, 0, 0, 0, nil, 0)
         rapier_world_intersection_with_shape(dummyWorld, 0, 0, 0, 0, 0, 0, 0, nil, 0, 0)
+
+        // --- Vehicle Controller ---
+        let dummyVehicle = rapier_vehicle_create(0, 1, 2)
+        rapier_vehicle_add_wheel(dummyVehicle, 0, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+        rapier_vehicle_wheel_count(dummyVehicle)
+        rapier_vehicle_set_steering(dummyVehicle, 0, 0)
+        rapier_vehicle_set_engine_force(dummyVehicle, 0, 0)
+        rapier_vehicle_set_brake(dummyVehicle, 0, 0)
+        rapier_vehicle_update(dummyWorld, dummyVehicle, 0)
+        rapier_vehicle_wheel_rotation(dummyVehicle, 0)
+        rapier_vehicle_wheel_steering(dummyVehicle, 0)
+        rapier_vehicle_wheel_suspension_length(dummyVehicle, 0)
+        rapier_vehicle_wheel_is_in_contact(dummyVehicle, 0)
+        rapier_vehicle_wheel_center(dummyVehicle, 0, nil, nil, nil)
+        rapier_vehicle_wheel_contact_point(dummyVehicle, 0, nil, nil, nil)
+        rapier_vehicle_wheel_contact_normal(dummyVehicle, 0, nil, nil, nil)
+        rapier_vehicle_current_speed(dummyVehicle)
+        rapier_vehicle_wheel_ground_object(dummyVehicle, 0)
+        rapier_vehicle_destroy(dummyVehicle)
     }
   }
 

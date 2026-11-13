@@ -24,10 +24,11 @@ let package = Package(
             linkerSettings: [
                 // Rapier (Rust) links against the C++ standard library
                 .linkedLibrary("c++"),
-                // Force-load all symbols from the static lib so Dart FFI
-                // can resolve them at runtime even in release builds.
-                // Note: unsafeFlags makes this package unsafe for direct SPM
-                // dependency use, which is acceptable for Flutter plugins.
+                // -all_load on the SPM target ensures the static lib symbols
+                // survive SPM's own link step. The Runner project also adds
+                // -force_load librapier_ffi_macos.a via OTHER_LDFLAGS so that
+                // DEAD_CODE_STRIPPING=YES cannot strip Rust FFI symbols that
+                // are only resolved at runtime by Dart's DynamicLibrary.process().
                 .unsafeFlags(["-all_load"]),
             ]
         ),

@@ -11,7 +11,7 @@ export 'src/scene_query.dart';
 export 'src/vehicle_controller.dart';
 
 class RapierPhysics {
-  static const String version = "rapier_physics 0.6.0";
+  static const String version = "rapier_physics 0.6.1";
 
   Future<String?> getPlatformVersion() {
     return RapierPhysicsPlatform.instance.getPlatformVersion();

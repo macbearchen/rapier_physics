@@ -23,9 +23,9 @@ Future<void> onDidInit() async {
   final appEngine = M3AppEngine.instance;
   appEngine.renderEngine.initShadowMap();
 
-  // final testScene = BaseScene.createPhysicsScene((physicsSystem) => PhysicsScene(physics: physicsSystem));
+  final testScene = BaseScene.createPhysicsScene((physicsSystem) => PhysicsScene(physics: physicsSystem));
   // final testScene = BaseScene.createPhysicsScene((physicsSystem) => NewtonCradleScene(physics: physicsSystem));
-  final testScene = BaseScene.createPhysicsScene((physicsSystem) => HeightfieldScene(physics: physicsSystem));
+  // final testScene = BaseScene.createPhysicsScene((physicsSystem) => HeightfieldScene(physics: physicsSystem));
   await appEngine.setScene(testScene);
 }
 

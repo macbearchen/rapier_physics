@@ -2,6 +2,11 @@
 
 🌐 **Language / 語言**：**English** | [繁體中文](CHANGELOG_zh.md)
 
+## 0.6.1
+#### 2026-11-13
+- **Fix: Vehicle symbols stripped on iOS/macOS profile & release builds**: Added missing `@_silgen_name` stubs in `RapierPhysicsPlugin.swift` for iOS and macOS to prevent the linker from dead-stripping `rapier_vehicle_*` FFI symbols.
+- **Documentation**: Added `doc/rapier_physics 0.6.0.pdf` architecture and API reference guide.
+
 ## 0.6.0
 #### 2026-10-31
 - **Dynamic Raycast Vehicle Controller**: Introduced `VehicleController` wrapping Rapier's `DynamicRayCastVehicleController` for realistic raycast vehicle physics simulation.

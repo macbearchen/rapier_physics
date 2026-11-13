@@ -2,6 +2,11 @@
 
 🌐 **Language / 語言**：[English](CHANGELOG.md) | **繁體中文**
 
+## 0.6.1
+#### 2026-11-13
+- **修復：iOS/macOS profile 與 release 建構中車輛符號遭到剔除的問題**：在 `RapierPhysicsPlugin.swift`（iOS 與 macOS）補齊車輛控制器 `@_silgen_name` 存根，避免連結器剔除 `rapier_vehicle_*` FFI 符號。
+- **文件更新**：新增 `doc/rapier_physics 0.6.0.pdf` 架構與 API 參考手冊。
+
 ## 0.6.0
 #### 2026-10-31
 - **動態射線車輛控制器**：引入 `VehicleController`，封裝 Rapier 的 `DynamicRayCastVehicleController` 以支援擬真的射線車輛物理模擬。
