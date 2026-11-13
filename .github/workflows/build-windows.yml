@@ -1,0 +1,50 @@
+name: Build Windows DLL
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ develop, main ]
+    paths:
+      - 'native/rapier_ffi/**'
+      - '.github/workflows/build-windows.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-commit-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Build rapier_ffi.dll
+        run: |
+          cd native/rapier_ffi
+          cargo build --release --target x86_64-pc-windows-msvc
+
+      - name: Copy DLL to prebuilt
+        run: |
+          New-Item -ItemType Directory -Force -Path prebuilt
+          Copy-Item native/rapier_ffi/target/x86_64-pc-windows-msvc/release/rapier_ffi.dll prebuilt/ -Force
+
+      - name: Upload artifact (backup)
+        uses: actions/upload-artifact@v4
+        with:
+          name: rapier_ffi-windows-x64
+          path: prebuilt/rapier_ffi.dll
+
+      - name: Commit and push rapier_ffi.dll
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore(prebuilt): update Windows rapier_ffi.dll from GitHub Actions"
+          file_pattern: "prebuilt/rapier_ffi.dll"
+
