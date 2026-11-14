@@ -6,7 +6,7 @@ on:
     branches: [ develop, main ]
     paths:
       - 'native/rapier_ffi/**'
-      - '.github/workflows/build-windows.yml'
+      - 'lib/**'
 
 permissions:
   contents: write
