@@ -1,3 +1,25 @@
-/img/
-/doc/
-/build/
+
+# Rust target build outputs
+**/target/
+native/rapier_ffi/target/
+
+# Flutter & Dart build outputs
+**/build/
+.dart_tool/
+
+# Example app build outputs & pods
+example/build/
+example/.dart_tool/
+example/ios/Pods/
+example/macos/Pods/
+
+# Documentation & image assets (if you don't want them in pub package)
+img/
+doc/
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# CI / GitHub workflows
+.github/
